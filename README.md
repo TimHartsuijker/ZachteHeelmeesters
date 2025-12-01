@@ -1,10 +1,6 @@
 om dit project te kunnen gebruiken moeten de volgende stappen gedaan worden:
 
-
-
-Frontend:
-
-
+### Databse setup:
 
 * installeer de vs code extentie "SQL Server (mssql)",
 * start docker desktop op,
@@ -14,8 +10,3 @@ Frontend:
 * refresh de docker image door op het ronde pijltje te drukken die bij de image staat,
 * open de image en de "databases" map daarin,
 * de database zou nu in docker moeten staan!
-
-
-
-Backend:
-

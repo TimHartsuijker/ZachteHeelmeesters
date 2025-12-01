@@ -5,5 +5,6 @@ DROP DATABASE IF EXISTS ZachteHeelMeester;
 
 CREATE DATABASE ZachteHeelMeester;
 
-USE ZachteHeelMeester;
-GO
+-- uncommenten wanneer iedereen de eerste creatie heeft uitgevoerd.
+-- USE ZachteHeelMeester;
+-- GO

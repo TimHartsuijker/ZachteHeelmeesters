@@ -8,7 +8,6 @@ Frontend:
 
 * installeer de vs code extentie "SQL Server (mssql)",
 * start docker desktop op,
-* 
 * open het mapje "database" en open de file "database.sql",
 * run met het groene pijltje rechts bovenin de query,
 * ga links in vs code naar de nieuwe blok "SQL Server" (ctrl+alt+D),

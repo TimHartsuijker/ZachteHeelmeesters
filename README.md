@@ -2,25 +2,21 @@ om dit project te kunnen gebruiken moeten de volgende stappen gedaan worden:
 
 
 
+Frontend:
 
 
-* Installeer de vs code extentie "SQL Server (mssql)",
-* Start docker desktop op,
-* Ga links in vs code naar de nieuwe blok "SQL Server" (ctrl+alt+D),
-* Klik bovenin naast "connections" op "new deployment",
-* Klik op "create a Local Docker SQL Server",
-* Klik op "get started",
-* Wacht tot de "cancel" veranderd naar "Next" en druk dan op deze knop,
-* Vul een wachtwoord in wat je gaat onthouden,
-* Accepteer de terms and conditions checkbox,
-* Druk op "Create Connection",
-* Nu staat de container links in het tabblad "SQL Server" bij "Connections"
-* Open het mapje "database" en open de file "database.sql",
-* Run met het groene pijltje rechts bovenin de query
-* Hij zou automatisch aangemaakt moeten zijn, zo niet
-*   - Kies sql container die je zojuist hebt aangemaakt.
-* De database zou nu in docker moeten staan! 
+
+* installeer de vs code extentie "SQL Server (mssql)",
+* start docker desktop op,
 * 
-* Als dat niet het geval is bewerk 
-* 
-* (Als het nogsteeds niet werkt, contacteer Tim)
+* open het mapje "database" en open de file "database.sql",
+* run met het groene pijltje rechts bovenin de query,
+* ga links in vs code naar de nieuwe blok "SQL Server" (ctrl+alt+D),
+* refresh de docker image door op het ronde pijltje te drukken die bij de image staat,
+* open de image en de "databases" map daarin,
+* de database zou nu in docker moeten staan!
+
+
+
+Backend:
+

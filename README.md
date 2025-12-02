@@ -14,7 +14,7 @@ Om dit project te kunnen gebruiken moeten de volgende stappen ondernomen worden
 
 ### Database setup:
 
-* 1. Start ![image]("https://img.shields.io/badge/Visual_Studio_Code-0078D4?style=for-the-badge&logo=visual%20studio%20code&logoColor=white") op
+* 1. Start ![image](https://img.shields.io/badge/Visual_Studio_Code-0078D4?style=for-the-badge&logo=visual%20studio%20code&logoColor=white) op
 * 2. Installeer extentie "SQL Server (mssql)" _(bij "Extensions" Ctrl+Shift+X)_
 * 3. Start Docker Desktop op
 * 4. In VS code, open het mapje `database` en open de file `DatabaseCreationScript.sql`
@@ -29,7 +29,7 @@ Om dit project te kunnen gebruiken moeten de volgende stappen ondernomen worden
 
 ### Backend setup:
 
-* start ![image]("https://img.shields.io/badge/Visual_Studio-5C2D91?style=for-the-badge&logo=visual%20studio&logoColor=white") (2022) op
+* start ![image](https://img.shields.io/badge/Visual_Studio-5C2D91?style=for-the-badge&logo=visual%20studio&logoColor=white) (2022) op
 
 
 

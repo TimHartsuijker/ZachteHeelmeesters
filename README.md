@@ -5,13 +5,9 @@
 
 ## 📝 Inhoudsopgave
 
-* [1. Introductie](#1-introductie)
-* [2. Installatie](#2-installatie)
-* [3. Gebruik](#3-gebruik)
-    * [3.1. Selenium Tests Runnen](#31-selenium-tests-runnen)
-    * [3.2. Configuratie-Opties](#32-configuratie-opties)
-* [4. Contributie](#4-contributie)
-* [5. Licentie](#5-licentie)
+* [Database Setup](#database-setup)
+* [Backend Setup](#backend-setup)
+* [Frontend Setup](#3-frontend-setup)
 
 
 ### Database setup:

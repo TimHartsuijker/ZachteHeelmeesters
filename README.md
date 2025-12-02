@@ -1,7 +1,7 @@
 # De Zachte Heelmeesters - Ctrl+C
 
 > Dit project is een afsprakensysteem voor ziekenhuis "De Zachte Heelmeesters" met betrekking tot hun vraag en wensen
-> Om dit project te kunnen gebruiken moeten de volgende stappen ondernomen worden ->
+Om dit project te kunnen gebruiken moeten de volgende stappen ondernomen worden ->
 
 ## Inhoudsopgave
 

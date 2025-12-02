@@ -3,6 +3,7 @@ USE zachteheelmeester;
 -- Drop tables in reverse order that they are created in the script below to avoid foreign key constraint errors
 DROP TABLE IF EXISTS afspraken;
 DROP TABLE IF EXISTS afdelingen;
+DROP TABLE IF EXISTS medischdossierentry;
 DROP TABLE IF EXISTS huisarts_patient;
 DROP TABLE IF EXISTS gebruikers;
 DROP TABLE IF EXISTS rollen;
@@ -45,6 +46,15 @@ CREATE TABLE huisarts_patient (
     PRIMARY KEY (huisartsID, patientID)
 );
 
+CREATE TABLE medischdossierentry (
+    entryID INT IDENTITY(1,1) NOT NULL,
+    patientID INT NOT NULL,
+    datumtijd DATETIME NOT NULL,
+    -- nog geen idee wat hier verder moet komen
+    FOREIGN KEY (patientID) REFERENCES gebruikers(gebruikersID),
+    PRIMARY KEY (patientID, entryID)
+);
+
 CREATE TABLE afdelingen(
 afdelingID VARCHAR(50) NOT NULL,
 naam VARCHAR(100) NOT NULL,
@@ -60,3 +70,4 @@ FOREIGN KEY (arts) REFERENCES gebruikers(gebruikersID),
 FOREIGN KEY (behandeling) REFERENCES behandelingen(zorgcode),
 FOREIGN KEY (afdeling) REFERENCES afdelingen(afdelingID)
 );
+

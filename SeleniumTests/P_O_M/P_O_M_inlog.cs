@@ -1,6 +1,6 @@
 ﻿using OpenQA.Selenium;
 
-namespace SeleniumTests.Pages
+namespace SeleniumTests.P_O_M
 {
     public class LoginPage
     {
@@ -43,7 +43,14 @@ namespace SeleniumTests.Pages
             driver.FindElement(By.XPath("//button[contains(text(), 'Log in')]")).Click();
         }
 
-     
+        public void LoginAsPatient(string email, string password)
+        {
+            Navigate();
+            EnterEmail(email);
+            EnterPassword(password);
+            ClickLogin();
+        }
+
         public bool IsEmailFieldDisplayed()
         {
             return driver.FindElement(EmailInput).Displayed;

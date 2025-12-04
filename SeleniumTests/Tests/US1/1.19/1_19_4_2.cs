@@ -7,11 +7,11 @@ using System;
 namespace SeleniumTests
 {
     [TestClass]
-    public class _1_19_4_NoLogin
+    public class _1_19_4_2
     {
         private IWebDriver driver;
         private WebDriverWait wait;
-        private string baseUrl = "https://localhost:7058";
+        private string baseUrl = "https://localhost:5173";
 
         [TestInitialize]
         public void Setup()
@@ -34,13 +34,13 @@ namespace SeleniumTests
         [TestMethod]
         public void TC_1_19_4_NoLogin_AccessDashboard()
         {
-            // Probeer direct dashboard te openen
+           
             driver.Navigate().GoToUrl($"{baseUrl}/dashboard");
 
-            // Wacht tot loginpagina zichtbaar is
+            
             var loginField = wait.Until(d => d.FindElement(By.Id("email")));
 
-            // Controleer dat gebruiker terug naar loginpagina wordt gestuurd
+         
             Assert.IsTrue(loginField.Displayed, "Gebruiker kan dashboard openen zonder inloggen.");
         }
     }

@@ -12,7 +12,7 @@ namespace SeleniumTests
     {
         private IWebDriver driver;
         private WebDriverWait wait;
-        private string baseUrl = "https://localhost:5147"; 
+        private string baseUrl = "https://localhost:5173"; 
 
         private LoginPage loginPage;
 

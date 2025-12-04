@@ -12,7 +12,7 @@ namespace SeleniumTests
     {
         private IWebDriver driver;
         private WebDriverWait wait;
-        private string baseUrl = "https://localhost:7058";
+        private string baseUrl = "https://localhost:5173";
         private LoginPage loginPage;
 
         [TestInitialize]
@@ -41,12 +41,12 @@ namespace SeleniumTests
             // 1. Navigeer naar loginpagina
             driver.Navigate().GoToUrl($"{baseUrl}/");
 
-            // 2. Vul correcte login in
+            
             loginPage.EnterEmail("gebruiker@example.com");
             loginPage.EnterPassword("Wachtwoord123");
             loginPage.ClickLogin();
 
-            // 3. Wacht tot gebruiker doorgestuurd is
+            
             wait.Until(d => d.Url.Contains("/dashboard") || !d.Url.EndsWith("/login"));
 
             // 4. Controleer dat gebruiker niet op loginpagina blijft

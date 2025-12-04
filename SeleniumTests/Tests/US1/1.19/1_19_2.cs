@@ -12,7 +12,7 @@ namespace SeleniumTests
     {
         private IWebDriver driver;
         private WebDriverWait wait;
-        private string baseUrl = "https://localhost:7058";
+        private string baseUrl = "https://localhost:5173";
 
         private LoginPage loginPage;
 
@@ -39,20 +39,20 @@ namespace SeleniumTests
         [TestMethod]
         public void TC_1_19_2_PasswordInputIsPresentAndAcceptsInput()
         {
-            // 1. Navigeer naar homepage ? redirect naar login
+            
             driver.Navigate().GoToUrl($"{baseUrl}/");
 
-            // 2. Controleer of wachtwoord input zichtbaar is
+            
             Assert.IsTrue(loginPage.IsPasswordFieldDisplayed(),
                 "Het wachtwoordveld is niet zichtbaar.");
 
-            // 3. Check of inputveld focus kan krijgen
+            
             var passwordField = driver.FindElement(By.Id("password"));
             passwordField.Click();
             Assert.IsTrue(passwordField.Equals(driver.SwitchTo().ActiveElement()),
                 "Het wachtwoordveld kan geen focus krijgen.");
 
-            // 4. Test invoer
+           
             string testPassword = "Test123!";
             loginPage.EnterPassword(testPassword);
 

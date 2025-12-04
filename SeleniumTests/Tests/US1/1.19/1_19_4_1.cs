@@ -8,11 +8,11 @@ using System;
 namespace SeleniumTests
 {
     [TestClass]
-    public class _1_19_4
+    public class _1_19_4_1
     {
         private IWebDriver driver;
         private WebDriverWait wait;
-        private string baseUrl = "https://localhost:7058";
+        private string baseUrl = "https://localhost:5173";
         private LoginPage loginPage;
 
         [TestInitialize]
@@ -41,15 +41,15 @@ namespace SeleniumTests
             // Navigeer naar loginpagina
             driver.Navigate().GoToUrl($"{baseUrl}/");
 
-            // Vul correcte gegevens in
+            
             loginPage.EnterEmail("gebruiker@example.com");
             loginPage.EnterPassword("Wachtwoord123");
             loginPage.ClickLogin();
 
-            // Wacht tot dashboard geladen is
+            
             wait.Until(d => d.Url.Contains("/dashboard"));
 
-            // Controleer dat gebruiker op dashboard zit
+            
             Assert.IsTrue(driver.Url.Contains("/dashboard"), "Gebruiker is niet doorgestuurd naar het dashboard.");
         }
     }

@@ -5,17 +5,17 @@ using OpenQA.Selenium.Support.UI;
 namespace SeleniumTests;
 
 [TestClass]
-public class _3_7a_1
+public class _3_7a_2
 {
     [TestMethod]
-    public void RoleChange_UserRoleIsChanged()
+    public void AddSystemManagerPermission_UserPermissionIsAdded()
     {
         // Arrange
         IWebDriver driver = null;
         try
         {
             // Step 1: Start test
-            Console.WriteLine("LOG [Step 1] Start test: RoleChange_UserRoleIsChanged");
+            Console.WriteLine("LOG [Step 1] Start test: AddSystemManagerPermission_UserPermissionIsAdded");
             driver = new ChromeDriver();
             var loginPage = new SeleniumTests.Pages.LoginPage(driver);
 
@@ -30,28 +30,27 @@ public class _3_7a_1
             Console.WriteLine("LOG [Step 3] Logged in as system manager.");
 
             // Step 4: Go to Gebruikers (Users) page
-            // WHEN TEST: Change selector (if needed)
             driver.FindElement(By.LinkText("Gebruikers")).Click();
             Console.WriteLine("LOG [Step 4] Navigated to 'Gebruikers' page.");
 
-            // Step 5: Find the user's row in the overview and change the role directly
-            // Find the row for the user by email
-            // user rows are divs with IDs like "user-email@example.com", use that for selection
+            // Step 5: Find the user's div by ID and toggle the System Manager permission
             var userDiv = driver.FindElement(By.Id("user-email@example.com"));
             Console.WriteLine("LOG [Step 5] Found user div for 'email@example.com'.");
 
-            // Step 6: Change User role (select input in the user's row)
-            var roleSelect = userDiv.FindElement(By.Name("role"));
-            var selectElement = new SelectElement(roleSelect);
-            string[] roles = { "Patiënt", "Huisarts", "Specialist", "Admin" };
-            string currentRole = selectElement.SelectedOption.Text;
-            string newRole = roles.First(r => r != currentRole);
-            selectElement.SelectByText(newRole);
-            Console.WriteLine($"LOG [Step 6] Changed user role from '{currentRole}' to '{newRole}'.");
+            // Find the permission checkbox (input name="systemManager" or similar)
+            var permissionCheckbox = userDiv.FindElement(By.Name("systemManager"));
+            bool isChecked = permissionCheckbox.Selected;
+            if (!isChecked)
+            {
+                permissionCheckbox.Click();
+                Console.WriteLine("LOG [Step 6] System Manager permission enabled (checkbox checked).");
+            }
+            else
+            {
+                Console.WriteLine("LOG [Step 6] System Manager permission was already enabled.");
+            }
 
-            // Step 7: Click on "Save"
-            // WHEN TEST: Replace with selector for save button!!
-            // Only click the save button for this user, not other users
+            // Step 7: Click Save button for this user
             var saveButton = userDiv.FindElement(By.XPath(".//button[contains(text(),'Save')]"));
             saveButton.Click();
             Console.WriteLine("LOG [Step 7] Clicked 'Save' button for user.");
@@ -60,19 +59,18 @@ public class _3_7a_1
             driver.Navigate().Refresh();
             Console.WriteLine("LOG [Step 8] Page refreshed to reload data from database.");
 
-            // Step 9: Find the user's div again and check the role value
+            // Step 9: Find the user's div again and check the permission value
             var userDivAfter = driver.FindElement(By.Id("user-email@example.com"));
-            var roleSelectAfter = userDivAfter.FindElement(By.Name("role"));
-            var selectElementAfter = new SelectElement(roleSelectAfter);
-            string selectedRoleAfter = selectElementAfter.SelectedOption.Text;
-            if (selectedRoleAfter == newRole)
+            var permissionCheckboxAfter = userDivAfter.FindElement(By.Name("systemManager"));
+            bool isCheckedAfter = permissionCheckboxAfter.Selected;
+            if (isCheckedAfter)
             {
-                Console.WriteLine($"LOG [Step 9] PASS: Role in UI after refresh matches expected: '{newRole}'.");
+                Console.WriteLine("LOG [Step 9] PASS: System Manager permission is enabled after refresh.");
             }
             else
             {
-                Console.WriteLine($"LOG [Step 9] FAIL: Role in UI after refresh is '{selectedRoleAfter}', expected '{newRole}'.");
-                throw new Exception("Role not updated in database/UI after refresh.");
+                Console.WriteLine("LOG [Step 9] FAIL: System Manager permission is NOT enabled after refresh.");
+                throw new Exception("Permission not updated in database/UI after refresh.");
             }
 
             // Step 10: Test completed
@@ -93,7 +91,7 @@ public class _3_7a_1
             if (driver != null)
             {
                 driver.Quit();
-                Console.WriteLine("LOG [Step 9] WebDriver closed.");
+                Console.WriteLine("LOG [Step 11] WebDriver closed.");
             }
         }
     }

@@ -8,12 +8,11 @@ using System;
 namespace SeleniumTests
 {
     [TestClass]
-    public class _1_19_1
+    public class _1_19_4
     {
         private IWebDriver driver;
         private WebDriverWait wait;
-        private string baseUrl = "https://localhost:5147"; 
-
+        private string baseUrl = "https://localhost:7058";
         private LoginPage loginPage;
 
         [TestInitialize]
@@ -30,34 +29,28 @@ namespace SeleniumTests
         }
 
         [TestCleanup]
-        public void Cleanup()
+        public void TearDown()
         {
             driver.Quit();
             driver.Dispose();
         }
 
         [TestMethod]
-        public void TC_1_19_1_EmailInputIsPresentAndAcceptsInput()
+        public void TC_1_19_4_CorrecteLoginNaarPortaal()
         {
-            
+            // Navigeer naar loginpagina
             driver.Navigate().GoToUrl($"{baseUrl}/");
 
-            
-            Assert.IsTrue(loginPage.IsEmailFieldDisplayed(),
-                "Het e-mailadres veld is niet zichtbaar.");
+            // Vul correcte gegevens in
+            loginPage.EnterEmail("gebruiker@example.com");
+            loginPage.EnterPassword("Wachtwoord123");
+            loginPage.ClickLogin();
 
-           
-            var emailField = driver.FindElement(By.Id("email"));
-            emailField.Click();
-            Assert.IsTrue(emailField.Equals(driver.SwitchTo().ActiveElement()),
-                "Het e-mailadres veld kan geen focus krijgen.");
+            // Wacht tot dashboard geladen is
+            wait.Until(d => d.Url.Contains("/dashboard"));
 
-            
-            string testEmail = "test@example.com";
-            loginPage.EnterEmail(testEmail);
-
-            Assert.AreEqual(testEmail, emailField.GetAttribute("value"),
-                "Het e-mailadres veld accepteert geen tekst.");
+            // Controleer dat gebruiker op dashboard zit
+            Assert.IsTrue(driver.Url.Contains("/dashboard"), "Gebruiker is niet doorgestuurd naar het dashboard.");
         }
     }
 }

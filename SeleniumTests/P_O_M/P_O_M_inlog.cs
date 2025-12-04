@@ -40,10 +40,10 @@ namespace SeleniumTests.Pages
 
         public void ClickLogin()
         {
-            driver.FindElement(By.XPath("//button[contains(text(), 'Log in')]")).Click();
+            driver.FindElement(LoginButton).Click();
         }
 
-     
+
         public bool IsEmailFieldDisplayed()
         {
             return driver.FindElement(EmailInput).Displayed;

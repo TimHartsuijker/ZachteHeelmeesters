@@ -8,11 +8,11 @@ using System;
 namespace SeleniumTests
 {
     [TestClass]
-    public class _1_19_1
+    public class _1_19_2
     {
         private IWebDriver driver;
         private WebDriverWait wait;
-        private string baseUrl = "https://localhost:5147"; 
+        private string baseUrl = "https://localhost:7058";
 
         private LoginPage loginPage;
 
@@ -37,27 +37,27 @@ namespace SeleniumTests
         }
 
         [TestMethod]
-        public void TC_1_19_1_EmailInputIsPresentAndAcceptsInput()
+        public void TC_1_19_2_PasswordInputIsPresentAndAcceptsInput()
         {
-            
+            // 1. Navigeer naar homepage ? redirect naar login
             driver.Navigate().GoToUrl($"{baseUrl}/");
 
-            
-            Assert.IsTrue(loginPage.IsEmailFieldDisplayed(),
-                "Het e-mailadres veld is niet zichtbaar.");
+            // 2. Controleer of wachtwoord input zichtbaar is
+            Assert.IsTrue(loginPage.IsPasswordFieldDisplayed(),
+                "Het wachtwoordveld is niet zichtbaar.");
 
-           
-            var emailField = driver.FindElement(By.Id("email"));
-            emailField.Click();
-            Assert.IsTrue(emailField.Equals(driver.SwitchTo().ActiveElement()),
-                "Het e-mailadres veld kan geen focus krijgen.");
+            // 3. Check of inputveld focus kan krijgen
+            var passwordField = driver.FindElement(By.Id("password"));
+            passwordField.Click();
+            Assert.IsTrue(passwordField.Equals(driver.SwitchTo().ActiveElement()),
+                "Het wachtwoordveld kan geen focus krijgen.");
 
-            
-            string testEmail = "test@example.com";
-            loginPage.EnterEmail(testEmail);
+            // 4. Test invoer
+            string testPassword = "Test123!";
+            loginPage.EnterPassword(testPassword);
 
-            Assert.AreEqual(testEmail, emailField.GetAttribute("value"),
-                "Het e-mailadres veld accepteert geen tekst.");
+            Assert.AreEqual(testPassword, passwordField.GetAttribute("value"),
+                "Het wachtwoordveld accepteert geen tekst.");
         }
     }
 }

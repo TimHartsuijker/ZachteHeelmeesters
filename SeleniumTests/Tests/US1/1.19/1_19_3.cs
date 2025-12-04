@@ -8,12 +8,11 @@ using System;
 namespace SeleniumTests
 {
     [TestClass]
-    public class _1_19_1
+    public class _1_19_3
     {
         private IWebDriver driver;
         private WebDriverWait wait;
-        private string baseUrl = "https://localhost:5147"; 
-
+        private string baseUrl = "https://localhost:7058";
         private LoginPage loginPage;
 
         [TestInitialize]
@@ -30,34 +29,28 @@ namespace SeleniumTests
         }
 
         [TestCleanup]
-        public void Cleanup()
+        public void TearDown()
         {
             driver.Quit();
             driver.Dispose();
         }
 
         [TestMethod]
-        public void TC_1_19_1_EmailInputIsPresentAndAcceptsInput()
+        public void TC_1_19_3_ValidatieCorrecteInlog()
         {
-            
+            // 1. Navigeer naar loginpagina
             driver.Navigate().GoToUrl($"{baseUrl}/");
 
-            
-            Assert.IsTrue(loginPage.IsEmailFieldDisplayed(),
-                "Het e-mailadres veld is niet zichtbaar.");
+            // 2. Vul correcte login in
+            loginPage.EnterEmail("gebruiker@example.com");
+            loginPage.EnterPassword("Wachtwoord123");
+            loginPage.ClickLogin();
 
-           
-            var emailField = driver.FindElement(By.Id("email"));
-            emailField.Click();
-            Assert.IsTrue(emailField.Equals(driver.SwitchTo().ActiveElement()),
-                "Het e-mailadres veld kan geen focus krijgen.");
+            // 3. Wacht tot gebruiker doorgestuurd is
+            wait.Until(d => d.Url.Contains("/dashboard") || !d.Url.EndsWith("/login"));
 
-            
-            string testEmail = "test@example.com";
-            loginPage.EnterEmail(testEmail);
-
-            Assert.AreEqual(testEmail, emailField.GetAttribute("value"),
-                "Het e-mailadres veld accepteert geen tekst.");
+            // 4. Controleer dat gebruiker niet op loginpagina blijft
+            Assert.IsFalse(driver.Url.Contains("login"), "Gebruiker bleef op loginpagina na correcte inlog.");
         }
     }
 }

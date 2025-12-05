@@ -39,25 +39,39 @@ namespace SeleniumTests
         [TestMethod]
         public void TC_1_19_1_EmailInputIsPresentAndAcceptsInput()
         {
-            
+
+            Console.WriteLine("Test gestart: TC_1_19_1_EmailInputIsPresentAndAcceptsInput");
+
+            Console.WriteLine("Navigeren naar loginpagina...");
             driver.Navigate().GoToUrl($"{baseUrl}/");
+            Console.WriteLine("Navigatie voltooid!");
 
             
+            Console.WriteLine("Controleren of emailveld zichtbaar is...");
             Assert.IsTrue(loginPage.IsEmailFieldDisplayed(),
                 "Het e-mailadres veld is niet zichtbaar.");
+            Console.WriteLine("Emailveld is zichtbaar!");
 
-           
+          
+            Console.WriteLine("Emailveld selecteren...");
             var emailField = driver.FindElement(By.Id("email"));
             emailField.Click();
+            Console.WriteLine("Emailveld aangeklikt.");
+
             Assert.IsTrue(emailField.Equals(driver.SwitchTo().ActiveElement()),
                 "Het e-mailadres veld kan geen focus krijgen.");
+            Console.WriteLine("Emailveld heeft focus.");
 
-            
+            // Tekst invoeren
             string testEmail = "test@example.com";
+            Console.WriteLine($"Email invoeren: {testEmail}");
             loginPage.EnterEmail(testEmail);
 
             Assert.AreEqual(testEmail, emailField.GetAttribute("value"),
                 "Het e-mailadres veld accepteert geen tekst.");
+            Console.WriteLine("Email correct ingevoerd!");
+
+            Console.WriteLine("Test succesvol afgerond.");
         }
     }
 }

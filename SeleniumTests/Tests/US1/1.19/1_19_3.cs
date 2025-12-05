@@ -38,19 +38,35 @@ namespace SeleniumTests
         [TestMethod]
         public void TC_1_19_3_ValidatieCorrecteInlog()
         {
-            // 1. Navigeer naar loginpagina
-            driver.Navigate().GoToUrl($"{baseUrl}/");
+            Console.WriteLine("Test gestart: TC_1_19_3_ValidatieCorrecteInlog");
 
             
+            Console.WriteLine("Navigeren naar loginpagina...");
+            driver.Navigate().GoToUrl($"{baseUrl}/");
+            Console.WriteLine("Loginpagina geladen.");
+
+           
+            Console.WriteLine("E-mailadres invoeren: gebruiker@example.com");
             loginPage.EnterEmail("gebruiker@example.com");
+
+            Console.WriteLine("Wachtwoord invoeren: Wachtwoord123");
             loginPage.EnterPassword("Wachtwoord123");
+
+            Console.WriteLine("Op inlogknop klikken...");
             loginPage.ClickLogin();
 
             
+            Console.WriteLine("Wachten op redirect naar dashboard...");
             wait.Until(d => d.Url.Contains("/dashboard") || !d.Url.EndsWith("/login"));
+            Console.WriteLine("Redirect gedetecteerd!");
 
-            // 4. Controleer dat gebruiker niet op loginpagina blijft
-            Assert.IsFalse(driver.Url.Contains("login"), "Gebruiker bleef op loginpagina na correcte inlog.");
+            
+            Console.WriteLine("Controleren of gebruiker NIET op loginpagina is gebleven...");
+            Assert.IsFalse(driver.Url.Contains("login"),
+                "Gebruiker bleef op loginpagina na correcte inlog.");
+
+            Console.WriteLine("? Succesvolle loginvalidatie uitgevoerd. Gebruiker is doorgestuurd.");
+            Console.WriteLine("Test succesvol afgerond.");
         }
     }
 }

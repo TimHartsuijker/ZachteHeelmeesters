@@ -41,13 +41,25 @@ namespace SeleniumTests
         [TestMethod]
         public void TC_1_19_5_CorrectEmail_WrongPassword()
         {
+            Console.WriteLine("Test: CorrectEmail_WrongPassword");
+
             driver.Navigate().GoToUrl($"{baseUrl}/");
+            Console.WriteLine("Loginpagina geladen.");
+
             loginPage.EnterEmail("gebruiker@example.com");
+            Console.WriteLine("Correct e-mailadres ingevoerd.");
+
             loginPage.EnterPassword("FoutWw123");
+            Console.WriteLine("Fout wachtwoord ingevoerd.");
+
             loginPage.ClickLogin();
+            Console.WriteLine("Loginpoging uitgevoerd.");
 
             var error = wait.Until(d => d.FindElement(By.Id("login-error")));
+            Console.WriteLine("Foutmelding gevonden: " + error.Text);
+
             Assert.AreEqual("inloggegevens zijn incorrect", error.Text);
+            Console.WriteLine("? Test geslaagd.\n");
         }
 
         // ------------------------
@@ -56,13 +68,25 @@ namespace SeleniumTests
         [TestMethod]
         public void TC_1_19_5_WrongEmail_CorrectPassword()
         {
+            Console.WriteLine("Test: WrongEmail_CorrectPassword");
+
             driver.Navigate().GoToUrl($"{baseUrl}/");
+            Console.WriteLine("Loginpagina geladen.");
+
             loginPage.EnterEmail("gebruikerexample.com");
+            Console.WriteLine("Fout e-mailadres ingevoerd.");
+
             loginPage.EnterPassword("Wachtwoord123");
+            Console.WriteLine("Correct wachtwoord ingevoerd.");
+
             loginPage.ClickLogin();
+            Console.WriteLine("Loginpoging uitgevoerd.");
 
             var error = wait.Until(d => d.FindElement(By.Id("login-error")));
+            Console.WriteLine("Foutmelding gevonden: " + error.Text);
+
             Assert.AreEqual("inloggegevens zijn incorrect", error.Text);
+            Console.WriteLine("? Test geslaagd.\n");
         }
 
         // ------------------------
@@ -71,13 +95,25 @@ namespace SeleniumTests
         [TestMethod]
         public void TC_1_19_5_WrongEmail_WrongPassword()
         {
+            Console.WriteLine("Test: WrongEmail_WrongPassword");
+
             driver.Navigate().GoToUrl($"{baseUrl}/");
+            Console.WriteLine("Loginpagina geladen.");
+
             loginPage.EnterEmail("gebruikerexample.com");
+            Console.WriteLine("Fout e-mailadres ingevoerd.");
+
             loginPage.EnterPassword("Wachtwoord");
+            Console.WriteLine("Fout wachtwoord ingevoerd.");
+
             loginPage.ClickLogin();
+            Console.WriteLine("Loginpoging uitgevoerd.");
 
             var error = wait.Until(d => d.FindElement(By.Id("login-error")));
+            Console.WriteLine("Foutmelding gevonden: " + error.Text);
+
             Assert.AreEqual("inloggegevens zijn incorrect", error.Text);
+            Console.WriteLine("? Test geslaagd.\n");
         }
 
         // ------------------------
@@ -86,13 +122,25 @@ namespace SeleniumTests
         [TestMethod]
         public void TC_1_19_5_EmptyEmail_CorrectPassword()
         {
+            Console.WriteLine("Test: EmptyEmail_CorrectPassword");
+
             driver.Navigate().GoToUrl($"{baseUrl}/");
+            Console.WriteLine("Loginpagina geladen.");
+
             loginPage.EnterEmail("");
+            Console.WriteLine("Leeg e-mailadres ingevoerd.");
+
             loginPage.EnterPassword("Wachtwoord123");
+            Console.WriteLine("Correct wachtwoord ingevoerd.");
+
             loginPage.ClickLogin();
+            Console.WriteLine("Loginpoging uitgevoerd.");
 
             var error = wait.Until(d => d.FindElement(By.Id("empty-input-error")));
+            Console.WriteLine("Foutmelding gevonden: " + error.Text);
+
             Assert.AreEqual("gegevens moeten ingevuld zijn", error.Text);
+            Console.WriteLine("? Test geslaagd.\n");
         }
 
         // ------------------------
@@ -101,13 +149,25 @@ namespace SeleniumTests
         [TestMethod]
         public void TC_1_19_5_CorrectEmail_EmptyPassword()
         {
+            Console.WriteLine("Test: CorrectEmail_EmptyPassword");
+
             driver.Navigate().GoToUrl($"{baseUrl}/");
+            Console.WriteLine("Loginpagina geladen.");
+
             loginPage.EnterEmail("gebruiker@example.com");
+            Console.WriteLine("Correct e-mailadres ingevoerd.");
+
             loginPage.EnterPassword("");
+            Console.WriteLine("Leeg wachtwoord ingevoerd.");
+
             loginPage.ClickLogin();
+            Console.WriteLine("Loginpoging uitgevoerd.");
 
             var error = wait.Until(d => d.FindElement(By.Id("empty-input-error")));
+            Console.WriteLine("Foutmelding gevonden: " + error.Text);
+
             Assert.AreEqual("gegevens moeten ingevuld zijn", error.Text);
+            Console.WriteLine("? Test geslaagd.\n");
         }
 
         // ------------------------
@@ -116,13 +176,25 @@ namespace SeleniumTests
         [TestMethod]
         public void TC_1_19_5_BothFieldsEmpty()
         {
+            Console.WriteLine("Test: BothFieldsEmpty");
+
             driver.Navigate().GoToUrl($"{baseUrl}/");
+            Console.WriteLine("Loginpagina geladen.");
+
             loginPage.EnterEmail("");
+            Console.WriteLine("Leeg e-mailadres ingevoerd.");
+
             loginPage.EnterPassword("");
+            Console.WriteLine("Leeg wachtwoord ingevoerd.");
+
             loginPage.ClickLogin();
+            Console.WriteLine("Loginpoging uitgevoerd.");
 
             var error = wait.Until(d => d.FindElement(By.Id("empty-input-error")));
+            Console.WriteLine("Foutmelding gevonden: " + error.Text);
+
             Assert.AreEqual("gegevens moeten ingevuld zijn", error.Text);
+            Console.WriteLine("? Test geslaagd.\n");
         }
     }
 }

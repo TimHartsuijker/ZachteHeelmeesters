@@ -34,14 +34,25 @@ namespace SeleniumTests
         [TestMethod]
         public void TC_1_19_4_NoLogin_AccessDashboard()
         {
-           
+            Console.WriteLine("Test gestart: TC_1_19_4_NoLogin_AccessDashboard");
+
+            
+            Console.WriteLine("Navigeren naar /dashboard zonder in te loggen...");
             driver.Navigate().GoToUrl($"{baseUrl}/dashboard");
 
             
+            Console.WriteLine("Wachten op emailveld (loginpagina)...");
             var loginField = wait.Until(d => d.FindElement(By.Id("email")));
 
-         
-            Assert.IsTrue(loginField.Displayed, "Gebruiker kan dashboard openen zonder inloggen.");
+            Console.WriteLine("Emailveld gevonden ? gebruiker is teruggestuurd naar loginpagina.");
+
+            
+            Assert.IsTrue(loginField.Displayed,
+                "Gebruiker kan dashboard openen zonder inloggen!");
+
+            Console.WriteLine("? Toegang tot dashboard zonder login is geblokkeerd zoals verwacht.");
+            Console.WriteLine("Test succesvol afgerond.");
         }
+
     }
 }

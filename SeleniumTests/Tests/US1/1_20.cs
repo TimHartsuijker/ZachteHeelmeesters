@@ -1,7 +1,8 @@
 using OpenQA.Selenium;
 using OpenQA.Selenium.BiDi.BrowsingContext;
+using OpenQA.Selenium.Support.UI;
 using OpenQA.Selenium.Chrome;
-using SeleniumTests.Pages;
+using SeleniumTests.P_O_M;
 
 namespace SeleniumTests.Tests.US1
 {
@@ -10,6 +11,7 @@ namespace SeleniumTests.Tests.US1
     {
         private IWebDriver _driver;
         private LoginPage _loginPage;
+        private WebDriverWait wait;
 
         private const string VALID_EMAIL = "gebruiker@example.com";
         private const string VALID_PASSWORD = "Wachtwoord123";
@@ -21,6 +23,8 @@ namespace SeleniumTests.Tests.US1
             _driver.Manage().Window.Maximize();
             _loginPage = new LoginPage(_driver);
             _loginPage.Navigate();
+
+            wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(10));
         }
 
         [TestMethod]
@@ -29,10 +33,9 @@ namespace SeleniumTests.Tests.US1
             // Login
             DashboardPage dashboardPage = _loginPage.PerformLogin(VALID_EMAIL, VALID_PASSWORD);
 
-            // ASSERT 1: Successful login
-            Assert.IsTrue(dashboardPage.IsDashboardDisplayed(), "ERROR: Dashboard is not displayed");
+            wait.Until(d => dashboardPage.IsDashboardDisplayed());
 
-            // ASSERT 2: Logout button available
+            // ASSERT: Logout button available
             Assert.IsTrue(dashboardPage.IsLogoutButtonDisplayed(), "ERROR: The logout button is not available on the Dashboardpage");
         }
 
@@ -42,16 +45,17 @@ namespace SeleniumTests.Tests.US1
             // Login
             DashboardPage dashboardPage = _loginPage.PerformLogin(VALID_EMAIL, VALID_PASSWORD);
 
-            // ASSERT 1: Dashboard displayed
-            Assert.IsTrue(dashboardPage.IsDashboardDisplayed(), "ERROR: Dashboard is not displayed");
+            wait.Until(d => dashboardPage.IsDashboardDisplayed());
 
             // Logout
+            Console.WriteLine("LOG: Clicking the logout button");
             dashboardPage.ClickLogout();
 
+            Console.WriteLine("LOG: Trying to navigate to the dashboard via routing");
             var testDashboard = new DashboardPage(_driver);
             testDashboard.NavigateToDashboard();
 
-            // ASSERT 3: No access to Dashboard via routing
+            // ASSERT: No access to Dashboard via routing
             Assert.IsFalse(testDashboard.IsDashboardDisplayed(), "ERROR: Dashboard was accessible via routing");
         }
 
@@ -61,18 +65,19 @@ namespace SeleniumTests.Tests.US1
             // Login
             DashboardPage dashboardPage = _loginPage.PerformLogin(VALID_EMAIL, VALID_PASSWORD);
 
-            // ASSERT 1: Dashboard displayed
-            Assert.IsTrue(dashboardPage.IsDashboardDisplayed(), "ERROR: Dashboard is not displayed");
+            wait.Until(d => dashboardPage.IsDashboardDisplayed());
 
             // Logout
+            Console.WriteLine("LOG: Clicking the logout button");
             dashboardPage.ClickLogout();
 
             // Navigate back
+            Console.WriteLine("LOG: Trying to navigate back");
             _driver.Navigate().Back();
 
             var currentDashboardState = new DashboardPage(_driver);
 
-            // ASSERT 2: Dashboard is not displayed after navigating back
+            // ASSERT: Dashboard is not displayed after navigating back
             Assert.IsFalse(currentDashboardState.IsDashboardDisplayed(),
                 "ERROR: Dashboard was accessible via navigating back");
         }
@@ -83,13 +88,13 @@ namespace SeleniumTests.Tests.US1
             // Login
             DashboardPage dashboardPage = _loginPage.PerformLogin(VALID_EMAIL, VALID_PASSWORD);
 
-            // ASSERT 1: Dashboard displayed
-            Assert.IsTrue(dashboardPage.IsDashboardDisplayed(), "ERROR: Dashboard is not displayed");
+            wait.Until(d => dashboardPage.IsDashboardDisplayed());
 
             // Logout
+            Console.WriteLine("LOG: Clicking the logout button");
             dashboardPage.ClickLogout();
 
-            // ASSERT 2: User redirected to Loginpage
+            // ASSERT: User redirected to Loginpage
             Assert.AreEqual(_loginPage.Url, _driver.Url, "ERROR: After login out the user is not redirected to the Loginpage");
         }
 

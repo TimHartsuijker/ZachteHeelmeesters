@@ -1,17 +1,17 @@
 ﻿using OpenQA.Selenium;
 
-namespace SeleniumTests.Pages
+namespace SeleniumTests.P_O_M
 {
     public class DashboardPage (IWebDriver driver)
     {
         private readonly IWebDriver driver = driver;
 
         // URL
-        public string Url => "http://localhost:5000/dashboard";
+        public static string Url => "http://localhost:5000/dashboard";
 
         // Locators
-        private By DashboardHeader => By.Id("header");
-        private By LogoutButton => By.Id("logout-btn");
+        private static By DashboardHeader => By.Id("header");
+        private static By LogoutButton => By.Id("logout-btn");
 
         // Actions
         public void ClickLogout()

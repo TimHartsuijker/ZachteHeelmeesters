@@ -1,7 +1,6 @@
 ﻿using OpenQA.Selenium;
-using SeleniumTests.Pages; // Veronderstel dat de volgende pagina in Pages staat
 
-namespace SeleniumTests.Pages
+namespace SeleniumTests.P_O_M
 {
     public class LoginPage(IWebDriver driver)
     {
@@ -40,6 +39,7 @@ namespace SeleniumTests.Pages
 
         public DashboardPage PerformLogin(string email, string password)
         {
+            Console.WriteLine($"Performing login with these credentials \nEmail: {email} \nPassword: {password}");
             EnterEmail(email);
             EnterPassword(password);
             ClickLogin();

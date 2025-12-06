@@ -7,7 +7,7 @@ using SeleniumTests.P_O_M;
 namespace SeleniumTests.Tests.US1
 {
     [TestClass]
-    public class LogoutTests : IDisposable
+    public class LogoutTests
     {
         private IWebDriver _driver;
         private LoginPage _loginPage;
@@ -95,18 +95,25 @@ namespace SeleniumTests.Tests.US1
             dashboardPage.ClickLogout();
 
             // ASSERT: User redirected to Loginpage
-            Assert.AreEqual(_loginPage.Url, _driver.Url, "ERROR: After login out the user is not redirected to the Loginpage");
+            Assert.AreEqual(LoginPage.Url, _driver.Url, "ERROR: After logging out the user is not redirected to the Login page");
         }
 
         [TestCleanup]
         public void Teardown()
         {
-            _driver.Quit();
-        }
-
-        public void Dispose()
-        {
-            Teardown();
+            try
+            {
+                _driver?.Quit();
+                _driver?.Dispose();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error during teardown: {ex}");
+            }
+            finally
+            {
+                _driver = null!;
+            }
         }
     }
 }

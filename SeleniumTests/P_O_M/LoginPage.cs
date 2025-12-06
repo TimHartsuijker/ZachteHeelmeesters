@@ -7,13 +7,13 @@ namespace SeleniumTests.P_O_M
         private readonly IWebDriver driver = driver;
 
         // URL
-        public string Url => "http://localhost:5000/inloggen";
+        public static string Url => "http://localhost:5000/inloggen";
 
         // Locators
-        private By EmailInput => By.Id("email") ;
-        private By PasswordInput => By.Id("password");
-        private By LoginButton => By.Id("login-btn");
-        private By LoginHeader => By.XPath("//h1[contains(text(), 'Log in')]"); // Voor verificatie dat we op de pagina zijn
+        private static By EmailInput => By.Id("email") ;
+        private static By PasswordInput => By.Id("password");
+        private static By LoginButton => By.Id("login-btn");
+        private static By LoginHeader => By.XPath("//h1[contains(text(), 'Log in')]"); // Voor verificatie dat we op de pagina zijn
 
         // Actions
 
@@ -50,12 +50,49 @@ namespace SeleniumTests.P_O_M
         // Verification
         public bool IsLoginPageDisplayed()
         {
-            // Controleer op een uniek element op de pagina (bijv. de header)
-            return driver.FindElement(LoginHeader).Displayed;
+            try
+            {
+                return driver.FindElement(LoginHeader).Displayed;
+            }
+            catch (NoSuchElementException)
+            {
+                return false;
+            }
+        }
+        public bool IsEmailFieldDisplayed()
+        {
+            try
+            {
+                return driver.FindElement(EmailInput).Displayed;
+            }
+            catch (NoSuchElementException)
+            {
+                return false;
+            }
         }
 
-        public bool IsEmailFieldDisplayed() => driver.FindElement(EmailInput).Displayed;
-        public bool IsPasswordFieldDisplayed() => driver.FindElement(PasswordInput).Displayed;
-        public bool IsLoginButtonDisplayed() => driver.FindElement(LoginButton).Displayed;
+        public bool IsPasswordFieldDisplayed()
+        {
+            try
+            {
+                return driver.FindElement(PasswordInput).Displayed;
+            }
+            catch (NoSuchElementException)
+            {
+                return false;
+            }
+        }
+
+        public bool IsLoginButtonDisplayed()
+        {
+            try
+            {
+                return driver.FindElement(LoginButton).Displayed;
+            }
+            catch (NoSuchElementException)
+            {
+                return false;
+            }
+        }
     }
 }

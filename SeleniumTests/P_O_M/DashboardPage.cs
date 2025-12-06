@@ -25,7 +25,6 @@ namespace SeleniumTests.P_O_M
         }
 
         // Verifications
-
         public bool IsLogoutButtonDisplayed()
         {
             try

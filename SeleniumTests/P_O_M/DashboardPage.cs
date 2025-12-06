@@ -7,7 +7,7 @@ namespace SeleniumTests.P_O_M
         private readonly IWebDriver driver = driver;
 
         // URL
-        public static string Url => "http://localhost:5000/dashboard";
+        public static string Url => "http://localhost:5173/dashboard";
 
         // Locators
         private static By DashboardHeader => By.Id("header");

@@ -7,7 +7,7 @@ namespace SeleniumTests.P_O_M
         private readonly IWebDriver driver = driver;
 
         // URL
-        public static string Url => "http://localhost:5000/inloggen";
+        public static string Url => "http://localhost:5173/inloggen";
 
         // Locators
         private static By EmailInput => By.Id("email") ;

@@ -57,14 +57,7 @@ frontend/cypress/screenshots/
 frontend/__screenshots__/
 
 # Node module cache (specifiek path)
-frontend/node_modules/.vite/deps/
-
-# ---------------------------------------------------
-# Algemene Project Regels (Optioneel, maar aanbevolen)
-# ---------------------------------------------------
-
-# Algemene Node Modules (negeert ze overal)
-# node_modules/ 
+frontend/node_modules/.vite/deps
 
 # Algemene OS bestanden
 .DS_Store

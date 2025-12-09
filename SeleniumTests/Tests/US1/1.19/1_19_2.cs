@@ -12,7 +12,7 @@ namespace SeleniumTests
     {
         private IWebDriver driver;
         private WebDriverWait wait;
-        private string baseUrl = "https://localhost:5173";
+        private string baseUrl = "http://localhost:5173";
 
         private LoginPage loginPage;
 
@@ -53,7 +53,7 @@ namespace SeleniumTests
 
             
             Console.WriteLine("Wachtwoordveld selecteren...");
-            var passwordField = driver.FindElement(By.Id("password"));
+            var passwordField = driver.FindElement(By.Id("wachtwoord"));
             passwordField.Click();
             Console.WriteLine("Wachtwoordveld aangeklikt.");
 

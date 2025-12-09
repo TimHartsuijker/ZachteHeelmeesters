@@ -15,7 +15,7 @@ namespace SeleniumTests.Pages
         public string Url => "http://localhost:5000/inloggen"; // Later vervangen
 
         private By EmailInput => By.Id("email");
-        private By PasswordInput => By.Id("password");
+        private By PasswordInput => By.Id("wachtwoord");
         private By LoginButton => By.Id("login-btn"); 
 
      

@@ -12,7 +12,7 @@ namespace SeleniumTests
     {
         private IWebDriver driver;
         private WebDriverWait wait;
-        private string baseUrl = "https://localhost:5173";
+        private string baseUrl = "http://localhost:5173";
         private LoginPage loginPage;
 
         [TestInitialize]
@@ -139,7 +139,7 @@ namespace SeleniumTests
             var error = wait.Until(d => d.FindElement(By.Id("empty-input-error")));
             Console.WriteLine("Foutmelding gevonden: " + error.Text);
 
-            Assert.AreEqual("gegevens moeten ingevuld zijn", error.Text);
+            Assert.AreEqual("Gegevens moeten ingevuld zijn", error.Text);
             Console.WriteLine("? Test geslaagd.\n");
         }
 
@@ -166,7 +166,7 @@ namespace SeleniumTests
             var error = wait.Until(d => d.FindElement(By.Id("empty-input-error")));
             Console.WriteLine("Foutmelding gevonden: " + error.Text);
 
-            Assert.AreEqual("gegevens moeten ingevuld zijn", error.Text);
+            Assert.AreEqual("Gegevens moeten ingevuld zijn", error.Text);
             Console.WriteLine("? Test geslaagd.\n");
         }
 
@@ -193,7 +193,7 @@ namespace SeleniumTests
             var error = wait.Until(d => d.FindElement(By.Id("empty-input-error")));
             Console.WriteLine("Foutmelding gevonden: " + error.Text);
 
-            Assert.AreEqual("gegevens moeten ingevuld zijn", error.Text);
+            Assert.AreEqual("Gegevens moeten ingevuld zijn", error.Text);
             Console.WriteLine("? Test geslaagd.\n");
         }
     }

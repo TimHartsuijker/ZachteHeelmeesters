@@ -68,8 +68,13 @@ button[type="submit"]:hover {
   background-color: #00855f;
 }
 
-.error {
+
+.error-text {
   color: red;
-  margin-top: 1rem;
-  font-weight: 500;
+  margin-top: 5px;
+}
+
+.success-text {
+  color: green;
+  margin-top: 5px;
 }

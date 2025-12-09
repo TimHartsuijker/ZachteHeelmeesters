@@ -59,7 +59,7 @@ namespace SeleniumTests
             Console.WriteLine("Foutmelding gevonden: " + error.Text);
 
             Assert.AreEqual("inloggegevens zijn incorrect", error.Text);
-            Console.WriteLine("? Test geslaagd.\n");
+            Console.WriteLine(" Test geslaagd.\n");
         }
 
         // ------------------------
@@ -86,7 +86,7 @@ namespace SeleniumTests
             Console.WriteLine("Foutmelding gevonden: " + error.Text);
 
             Assert.AreEqual("inloggegevens zijn incorrect", error.Text);
-            Console.WriteLine("? Test geslaagd.\n");
+            Console.WriteLine(" Test geslaagd.\n");
         }
 
         // ------------------------
@@ -113,7 +113,7 @@ namespace SeleniumTests
             Console.WriteLine("Foutmelding gevonden: " + error.Text);
 
             Assert.AreEqual("inloggegevens zijn incorrect", error.Text);
-            Console.WriteLine("? Test geslaagd.\n");
+            Console.WriteLine(" Test geslaagd.\n");
         }
 
         // ------------------------
@@ -140,7 +140,7 @@ namespace SeleniumTests
             Console.WriteLine("Foutmelding gevonden: " + error.Text);
 
             Assert.AreEqual("Gegevens moeten ingevuld zijn", error.Text);
-            Console.WriteLine("? Test geslaagd.\n");
+            Console.WriteLine(" Test geslaagd.\n");
         }
 
         // ------------------------
@@ -167,7 +167,7 @@ namespace SeleniumTests
             Console.WriteLine("Foutmelding gevonden: " + error.Text);
 
             Assert.AreEqual("Gegevens moeten ingevuld zijn", error.Text);
-            Console.WriteLine("? Test geslaagd.\n");
+            Console.WriteLine(" Test geslaagd.\n");
         }
 
         // ------------------------
@@ -194,7 +194,7 @@ namespace SeleniumTests
             Console.WriteLine("Foutmelding gevonden: " + error.Text);
 
             Assert.AreEqual("Gegevens moeten ingevuld zijn", error.Text);
-            Console.WriteLine("? Test geslaagd.\n");
+            Console.WriteLine(" Test geslaagd.\n");
         }
     }
 }

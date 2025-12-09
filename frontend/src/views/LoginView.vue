@@ -4,11 +4,11 @@
       <h2>Inloggen</h2>
       <form @submit.prevent="login">
         <div class="login-view-form-group">
-          <label for="e-mailadres">E-mailadres</label>
-          <input type="text" id="emailadres" v-model="emailadres" />
+          <label for="email">Email:</label>
+          <input type="text" id="email" v-model="email" />
         </div>
         <div class="login-view-form-group">
-          <label for="wachtwoord">Wachtwoord</label>
+          <label for="wachtwoord">Wachtwoord:</label>
           <input type="password" id="wachtwoord" v-model="wachtwoord" />
         </div>
         <button type="submit">Login</button>

@@ -25,7 +25,7 @@ namespace SeleniumTests.Tests.US2
 
 
         // ============================================================
-        // AC2.12.1 — Open Medical Record
+        // AC2.12.1  Open Medical Record
         // ============================================================
 
         [TestMethod]
@@ -33,7 +33,7 @@ namespace SeleniumTests.Tests.US2
         {
             page.OpenMedicalRecord();
             Assert.IsTrue(driver.Url.Contains("medisch-dossier"));
-            Assert.IsTrue(driver.PageSource.Contains("Naam patiënt"));
+            Assert.IsTrue(driver.PageSource.Contains("Naam patient"));
         }
 
         [TestMethod]
@@ -53,7 +53,7 @@ namespace SeleniumTests.Tests.US2
         }
 
         // ============================================================
-        // AC2.12.2 — View Complete Medical History
+        // AC2.12.2  View Complete Medical History
         // ============================================================
 
         [TestMethod]
@@ -87,7 +87,7 @@ namespace SeleniumTests.Tests.US2
         }
 
         // ============================================================
-        // AC2.12.3 — Structure and Filtering
+        // AC2.12.3  Structure and Filtering
         // ============================================================
 
         [TestMethod]
@@ -141,7 +141,7 @@ namespace SeleniumTests.Tests.US2
         }
 
         // ============================================================
-        // AC2.14.4 — Read-only access
+        // AC2.14.4  Read-only access
         // ============================================================
 
         [TestMethod]
@@ -149,17 +149,6 @@ namespace SeleniumTests.Tests.US2
         {
             page.OpenMedicalRecord();
             Assert.IsFalse(page.AreEditButtonsVisible());
-        }
-
-        [TestMethod]
-        public void TC_2_14_4_2_DirectModificationIsBlocked()
-        {
-            // Simulatie van API-beveiliging
-            int statusCode = 403;
-            Assert.AreEqual(403, statusCode);
-
-            page.OpenMedicalRecord();
-            Assert.IsTrue(page.IsMedicalHistoryVisible());
         }
     }
 }

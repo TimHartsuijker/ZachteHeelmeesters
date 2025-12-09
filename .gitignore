@@ -1,0 +1,65 @@
+# ---------------------------------------------------
+# Backend Specifieke Regels
+# ---------------------------------------------------
+
+backend/.vs
+backend/obj
+backend/bin
+
+# ---------------------------------------------------
+# Selenium Tests Specifieke Regels
+# ---------------------------------------------------
+
+SeleniumTests/.vs
+SeleniumTests/obj
+SeleniumTests/bin/Debug/net8.0
+
+# ---------------------------------------------------
+# Frontend Specifieke Regels
+# ---------------------------------------------------
+
+# Logs
+frontend/logs
+frontend/*.log
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/pnpm-debug.log*
+frontend/lerna-debug.log*
+
+# Diverse bestanden en directories
+# Let op: we verwijderen hier OS-specifieke .DS_Store regels, 
+# die komen later in een algemene sectie te staan.
+frontend/dist-ssr
+frontend/coverage
+frontend/*.local
+
+# Editor directories and files (VSCode/Idea)
+# We negeren deze vaak globaal, maar hier specifiek voor frontend gehouden
+frontend/.vscode/*
+!frontend/.vscode/extensions.json
+frontend/.idea
+frontend/*.suo
+frontend/*.ntvs*
+frontend/*.njsproj
+frontend/*.sln
+frontend/*.sw?
+
+# TypeScript build info
+frontend/*.tsbuildinfo
+
+# ESLint cache
+frontend/.eslintcache
+
+# Cypress
+frontend/cypress/videos/
+frontend/cypress/screenshots/
+
+# Vitest
+frontend/__screenshots__/
+
+# Node module cache (specifiek path)
+frontend/node_modules/.vite/deps
+
+# Algemene OS bestanden
+.DS_Store
+Thumbs.db

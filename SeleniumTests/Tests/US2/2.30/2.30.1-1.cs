@@ -1,80 +1,76 @@
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
+using SeleniumTests.Pages;
+using System;
 
-namespace SeleniumTests;
-
-[TestClass]
-public class _2_30_1
+namespace SeleniumTests
 {
-	[TestMethod]
-	public void Dashboard_DisplaysWelcomeMessage()
-	{
-		// Arrange
-		IWebDriver driver = null;
+    [TestClass]
+    public class _2_30_1
+    {
+        private IWebDriver driver;
+        private WebDriverWait wait;
+        private string baseUrl = "https://localhost:5173";
 
-		try
-		{
-			Console.WriteLine("LOG [Step 1] Start test: Dashboard_DisplaysWelcomeMessage");
+        private LoginPage loginPage;
 
-			// Create a new Chrome browser instance
-			driver = new ChromeDriver();
-			var loginPage = new SeleniumTests.Pages.LoginPage(driver);
+        [TestInitialize]
+        public void Setup()
+        {
+            var options = new ChromeOptions();
+            options.AddArgument("--start-maximized");
+            options.AddArgument("--ignore-certificate-errors");
 
-			// Step 1: Go to the login page
-			loginPage.Navigate();
-			Console.WriteLine("LOG [Step 1] Navigated to login page.");
+            driver = new ChromeDriver(options);
+            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
 
-			// Step 2: Enter valid login credentials for a patient
-			loginPage.EnterEmail("patient@example.com");
-			loginPage.EnterPassword("Test123!");
-			Console.WriteLine("LOG [Step 2] Entered patient credentials.");
+            loginPage = new LoginPage(driver);
+        }
 
-			// Step 3: Click the login button
-			loginPage.ClickLogin();
-			Console.WriteLine("LOG [Step 3] Clicked login button.");
+        [TestCleanup]
+        public void Cleanup()
+        {
+            driver.Quit();
+            driver.Dispose();
+        }
 
-			// Step 4: Wait until the dashboard is loaded
-			// EXAMPLE SELECTOR – Adjust if your dashboard has a different identifier
-			var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-			wait.Until(driver => driver.FindElement(By.Id("dashboard-container")));
-			Console.WriteLine("LOG [Step 4] Dashboard screen loaded.");
+        [TestMethod]
+        public void TC_2_30_1_1_Dashboard_DisplaysWelcomeMessage()
+        {
+            Console.WriteLine("Test gestart: TC_2_30_1_1_Dashboard_DisplaysWelcomeMessage");
 
-			// Step 5: Check if a welcome message is displayed
-			// EXAMPLE: looking for an element containing a welcome text
-			// Replace selector with the actual one from your application
-			var welcomeMessage = driver.FindElement(By.XPath("//*[contains(text(),'Welkom')]"));
+            // Stap 1: Ga naar loginpagina
+            Console.WriteLine("Navigeren naar loginpagina...");
+            driver.Navigate().GoToUrl($"{baseUrl}/login");
+            Console.WriteLine("Navigatie voltooid!");
 
-			if (welcomeMessage.Displayed)
-			{
-				Console.WriteLine("LOG [Step 5] PASS: Welcome message is visible on the dashboard.");
-			}
-			else
-			{
-				Console.WriteLine("LOG [Step 5] FAIL: Welcome message not visible.");
-				throw new Exception("Welcome message not displayed.");
-			}
+            // Stap 2: Geldige inloggegevens invoeren
+            Console.WriteLine("Geldige inloggegevens invullen...");
+            loginPage.EnterEmail("patient@example.com");
+            loginPage.EnterPassword("Test123!");
+            Console.WriteLine("Inloggegevens ingevuld.");
 
-			// Step 6: Test completed
-			Console.WriteLine("LOG [Step 6] Test completed successfully.");
-		}
-		catch (NoSuchElementException ex)
-		{
-			Console.WriteLine("ERROR [E001] Element not found: " + ex.Message);
-			throw;
-		}
-		catch (Exception ex)
-		{
-			Console.WriteLine("ERROR [E999] Unexpected error: " + ex.ToString());
-			throw;
-		}
-		finally
-		{
-			if (driver != null)
-			{
-				driver.Quit();
-				Console.WriteLine("LOG WebDriver closed.");
-			}
-		}
-	}
+            // Stap 3: Klik op Inloggen
+            Console.WriteLine("Klikken op inloggen...");
+            loginPage.ClickLogin();
+            Console.WriteLine("Login verstuurd.");
+
+            // Stap 4: Wachten tot dashboard geladen is
+            Console.WriteLine("Wachten tot dashboard verschijnt...");
+            wait.Until(d => d.FindElement(By.Id("dashboard-container")));
+            Console.WriteLine("Dashboard succesvol geladen!");
+
+            // Stap 5: Check of welkomstboodschap zichtbaar is
+            Console.WriteLine("Controleren of de welkomstboodschap zichtbaar is...");
+            var welcomeMessage = driver.FindElement(By.XPath("//*[contains(text(),'Welkom')]"));
+
+            Assert.IsTrue(welcomeMessage.Displayed,
+                "Welkomstboodschap wordt niet weergegeven op het dashboard.");
+            Console.WriteLine("Welkomstboodschap succesvol gevonden!");
+
+            Console.WriteLine("Test succesvol afgerond.");
+        }
+    }
 }

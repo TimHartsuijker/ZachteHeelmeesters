@@ -1,39 +1,56 @@
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using SeleniumTests.Pages;
+using System;
 
-namespace SeleniumTests;
-
-[TestClass]
-public class _2_30_3_3
+namespace SeleniumTests
 {
-    [TestMethod]
-    public void Dashboard_OverviewReadable()
+    [TestClass]
+    public class _2_30_3_3
     {
-        IWebDriver driver = null;
+        private IWebDriver driver;
+        private string baseUrl = "https://localhost:5173";
+        private LoginPage loginPage;
 
-        try
+        [TestInitialize]
+        public void Setup()
         {
-            driver = new ChromeDriver();
-            var loginPage = new SeleniumTests.Pages.LoginPage(driver);
+            var options = new ChromeOptions();
+            options.AddArgument("--start-maximized");
+            options.AddArgument("--ignore-certificate-errors");
 
-            loginPage.Navigate();
+            driver = new ChromeDriver(options);
+            loginPage = new LoginPage(driver);
+            Console.WriteLine("Setup voltooid.");
+        }
+
+        [TestCleanup]
+        public void Cleanup()
+        {
+            driver.Quit();
+            driver.Dispose();
+        }
+
+        [TestMethod]
+        public void Dashboard_OverviewReadable()
+        {
+            Console.WriteLine("Test gestart: Dashboard_OverviewReadable");
+
+            // Stap 1: Navigeren naar loginpagina en inloggen
+            Console.WriteLine("Stap 1: Navigeren naar loginpagina...");
+            driver.Navigate().GoToUrl($"{baseUrl}/");
             loginPage.EnterEmail("patient@example.com");
             loginPage.EnterPassword("Test123!");
+            Console.WriteLine("Stap 1b: Inloggen...");
             loginPage.ClickLogin();
 
+            // Stap 2: Controleren structuur
             driver.FindElement(By.Id("dashboard-summary"));
-
-            // Example checks:
             bool hasSections = driver.FindElements(By.ClassName("summary-section")).Count >= 1;
+            Assert.IsTrue(hasSections, "Dashboard mist structuur of secties.");
 
-            if (!hasSections)
-                throw new Exception("Summary lacks grouping/sections.");
-
-            Console.WriteLine("PASS: Dashboard overview is structured and readable.");
-        }
-        finally
-        {
-            driver?.Quit();
+            Console.WriteLine("Dashboard-overzicht is gestructureerd en leesbaar. Test geslaagd!");
         }
     }
 }

@@ -1,49 +1,73 @@
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
+using SeleniumTests.Pages;
+using System;
 
-namespace SeleniumTests;
-
-[TestClass]
-public class _2_30_2_1
+namespace SeleniumTests
 {
-    [TestMethod]
-    public void NavigationMenu_VisibleAfterLogin()
+    [TestClass]
+    public class _2_30_2_1
     {
-        IWebDriver driver = null;
+        private IWebDriver driver;
+        private WebDriverWait wait;
+        private string baseUrl = "https://localhost:5173";
 
-        try
+        private LoginPage loginPage;
+
+        [TestInitialize]
+        public void Setup()
         {
-            Console.WriteLine("LOG Start test: Navigation menu visible after login");
+            var options = new ChromeOptions();
+            options.AddArgument("--start-maximized");
+            options.AddArgument("--ignore-certificate-errors");
 
-            driver = new ChromeDriver();
-            var loginPage = new SeleniumTests.Pages.LoginPage(driver);
+            driver = new ChromeDriver(options);
+            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
 
-            // Step 1: Navigate to login page
-            loginPage.Navigate();
+            loginPage = new LoginPage(driver);
 
-            // Step 2: Enter valid patient login
-            loginPage.EnterEmail("patient@example.com");
-            loginPage.EnterPassword("Test123!");
-
-            // Step 3: Click Login
-            loginPage.ClickLogin();
-
-            // Step 4: Wait until dashboard loads
-            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-            wait.Until(d => d.FindElement(By.Id("dashboard-container")));
-
-            // Step 5: Check if navigation menu is visible
-            var navMenu = driver.FindElement(By.Id("navigation-menu")); // Adjust ID to your app
-
-            if (!navMenu.Displayed)
-                throw new Exception("Navigation menu is NOT visible.");
-
-            Console.WriteLine("PASS: Navigation menu is visible after login.");
+            Console.WriteLine("Setup voltooid. Browser gestart.");
         }
-        finally
+
+        [TestCleanup]
+        public void Cleanup()
         {
-            driver?.Quit();
+            Console.WriteLine("Test afgerond. Browser wordt afgesloten.");
+            driver.Quit();
+            driver.Dispose();
+        }
+
+        [TestMethod]
+        public void NavigationMenu_VisibleAfterLogin()
+        {
+            Console.WriteLine("Test gestart: NavigationMenu_VisibleAfterLogin");
+
+            // Stap 1: Navigeren naar loginpagina
+            Console.WriteLine("Stap 1: Navigeren naar loginpagina...");
+            driver.Navigate().GoToUrl($"{baseUrl}/");
+            Console.WriteLine("Navigatie voltooid!");
+
+            // Stap 2: Geldige login invoeren
+            Console.WriteLine("Stap 2: Email invoeren...");
+            loginPage.EnterEmail("patient@example.com");
+            Console.WriteLine("Stap 2b: Wachtwoord invoeren...");
+            loginPage.EnterPassword("Test123!");
+            Console.WriteLine("Stap 2c: Inloggen...");
+            loginPage.ClickLogin();
+            Console.WriteLine("Inloggen voltooid!");
+
+            // Stap 3: Wachten tot dashboard geladen is
+            Console.WriteLine("Stap 3: Wachten op dashboard...");
+            wait.Until(d => d.FindElement(By.Id("dashboard-container")));
+            Console.WriteLine("Dashboard geladen!");
+
+            // Stap 4: Controleren of navigatiemenu zichtbaar is
+            Console.WriteLine("Stap 4: Controleren navigatiemenu...");
+            var navMenu = driver.FindElement(By.Id("navigation-menu"));
+            Assert.IsTrue(navMenu.Displayed, "Het navigatiemenu is niet zichtbaar na het inloggen.");
+            Console.WriteLine("Navigatiemenu is zichtbaar! Test geslaagd.");
         }
     }
 }

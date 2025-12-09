@@ -1,57 +1,74 @@
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
+using SeleniumTests.Pages;
+using System;
 
-namespace SeleniumTests;
-
-[TestClass]
-public class _2_30_1_4
+namespace SeleniumTests
 {
-    [TestMethod]
-    public void Dashboard_WelcomeMessageWithoutName()
+    [TestClass]
+    public class _2_30_1_4
     {
-        IWebDriver driver = null;
+        private IWebDriver driver;
+        private WebDriverWait wait;
+        private string baseUrl = "https://localhost:5173";
 
-        try
+        private LoginPage loginPage;
+
+        [TestInitialize]
+        public void Setup()
         {
-            driver = new ChromeDriver();
-            var loginPage = new SeleniumTests.Pages.LoginPage(driver);
+            var options = new ChromeOptions();
+            options.AddArgument("--start-maximized");
+            options.AddArgument("--ignore-certificate-errors");
 
-            // Step 1: Navigate to login
-            loginPage.Navigate();
+            driver = new ChromeDriver(options);
+            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            loginPage = new LoginPage(driver);
+        }
 
-            // Step 2: Enter credentials for patient with NO name stored in DB
+        [TestCleanup]
+        public void Cleanup()
+        {
+            driver.Quit();
+            driver.Dispose();
+        }
+
+        [TestMethod]
+        public void TC_2_30_1_4_WelcomeMessageWithoutName()
+        {
+            Console.WriteLine("Test gestart: TC_2_30_1_4_WelcomeMessageWithoutName");
+
+            // Stap 1: Navigeren naar loginpagina
+            Console.WriteLine("Stap 1: Navigeren naar loginpagina...");
+            driver.Navigate().GoToUrl($"{baseUrl}/login");
+            Console.WriteLine("Navigatie voltooid!");
+
+            // Stap 2: Inloggen met account zonder naam
+            Console.WriteLine("Stap 2: Inloggen met account zonder naam...");
             loginPage.EnterEmail("noname@example.com");
             loginPage.EnterPassword("Test123!");
-
-            // Step 3: Login
             loginPage.ClickLogin();
+            Console.WriteLine("Login verstuurd!");
 
-            // Step 4: Wait for dashboard
-            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-            wait.Until(driver => driver.FindElement(By.Id("dashboard-container")));
+            // Stap 3: Wachten tot dashboard geladen is
+            Console.WriteLine("Stap 3: Dashboard laden...");
+            wait.Until(d => d.FindElement(By.Id("dashboard-container")));
+            Console.WriteLine("Dashboard succesvol geladen!");
 
-            // Step 5: Check welcome message
-            var welcomeMessage = driver.FindElement(By.XPath("//*[contains(text(),'Welkom')]"));
+            // Stap 4: Controleren welkomstboodschap
+            Console.WriteLine("Stap 4: Controleren welkomstboodschap...");
+            var welcome = driver.FindElement(By.XPath("//*[contains(text(),'Welkom')]"));
+            string text = welcome.Text;
 
-            string text = welcomeMessage.Text;
+            Assert.IsFalse(text.Contains("@") || text.Contains("null"),
+                "Fallback welkomsttekst bevat ongeldige placeholders.");
+            Assert.IsTrue(text.Trim().Equals("Welkom!") || text.Trim() == "Welkom",
+                $"Onverwachte tekst: {text}");
 
-            // Example: “Welkom!” instead of “Welkom John”
-            if (text.Contains("@") || text.Contains("null"))
-                throw new Exception("Invalid fallback welcome message.");
-
-            // Ensure patient name is NOT present
-            if (text.Split(' ').Length > 1)
-            {
-                Console.WriteLine($"FAIL: Unexpected name found in fallback message: {text}");
-                throw new Exception("Name should not appear in message.");
-            }
-
-            Console.WriteLine("PASS: Welcome message shown without patient name.");
-        }
-        finally
-        {
-            driver?.Quit();
+            Console.WriteLine("PASS: Welkomstboodschap zonder naam correct weergegeven.");
+            Console.WriteLine("Test succesvol afgerond.");
         }
     }
 }

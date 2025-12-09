@@ -1,51 +1,77 @@
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
+using SeleniumTests.Pages;
+using System;
 
-namespace SeleniumTests;
-
-[TestClass]
-public class _2_30_1_5
+namespace SeleniumTests
 {
-    [TestMethod]
-    public void Dashboard_NameMatchesDatabase()
+    [TestClass]
+    public class _2_30_1_5
     {
-        IWebDriver driver = null;
+        private IWebDriver driver;
+        private WebDriverWait wait;
+        private string baseUrl = "https://localhost:5173";
 
-        try
+        private LoginPage loginPage;
+
+        [TestInitialize]
+        public void Setup()
         {
-            driver = new ChromeDriver();
-            var loginPage = new SeleniumTests.Pages.LoginPage(driver);
+            var options = new ChromeOptions();
+            options.AddArgument("--start-maximized");
+            options.AddArgument("--ignore-certificate-errors");
 
-            // Expected name from database for this specific account
-            string expectedName = "John Doe"; // Change according to your test database
+            driver = new ChromeDriver(options);
+            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            loginPage = new LoginPage(driver);
+        }
 
-            // Step 1: Navigate
-            loginPage.Navigate();
+        [TestCleanup]
+        public void Cleanup()
+        {
+            driver.Quit();
+            driver.Dispose();
+        }
 
-            // Step 2: Login with patient account whose name exists in DB
+        [TestMethod]
+        public void TC_2_30_1_5_Dashboard_NameMatchesDatabase()
+        {
+            Console.WriteLine("Test gestart: TC_2_30_1_5_Dashboard_NameMatchesDatabase");
+
+            string expectedName = "John Doe"; // aanpassen aan database
+
+            // Stap 1: Navigeren naar loginpagina
+            Console.WriteLine("Stap 1: Navigeren naar loginpagina...");
+            driver.Navigate().GoToUrl($"{baseUrl}/login");
+            Console.WriteLine("Navigatie voltooid!");
+
+            // Stap 2: Inloggegevens invoeren
+            Console.WriteLine("Stap 2: Inloggegevens invullen...");
             loginPage.EnterEmail("patient@example.com");
             loginPage.EnterPassword("Test123!");
+            Console.WriteLine("Inloggegevens ingevuld!");
+
+            // Stap 3: Klik op Inloggen
+            Console.WriteLine("Stap 3: Klikken op inloggen...");
             loginPage.ClickLogin();
+            Console.WriteLine("Login verstuurd!");
 
-            // Step 3: Wait for dashboard
-            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-            wait.Until(driver => driver.FindElement(By.Id("dashboard-container")));
+            // Stap 4: Wachten tot dashboard geladen is
+            Console.WriteLine("Stap 4: Dashboard laden...");
+            wait.Until(d => d.FindElement(By.Id("dashboard-container")));
+            Console.WriteLine("Dashboard succesvol geladen!");
 
-            // Step 4: Retrieve welcome message
+            // Stap 5: Ophalen en controleren welkomsttekst
+            Console.WriteLine("Stap 5: Controleren naam in welkomstboodschap...");
             var message = driver.FindElement(By.XPath("//*[contains(text(),'Welkom')]"));
 
-            if (!message.Text.Contains(expectedName))
-            {
-                Console.WriteLine($"FAIL: Expected '{expectedName}', got '{message.Text}'");
-                throw new Exception("Displayed name does not match database name.");
-            }
+            Assert.IsTrue(message.Text.Contains(expectedName),
+                $"Naam komt niet overeen. Verwacht: {expectedName} — Kreeg: {message.Text}");
 
-            Console.WriteLine("PASS: Welcome message matches database name.");
-        }
-        finally
-        {
-            driver?.Quit();
+            Console.WriteLine("PASS: Welkomstnaam komt overeen met database.");
+            Console.WriteLine("Test succesvol afgerond.");
         }
     }
 }

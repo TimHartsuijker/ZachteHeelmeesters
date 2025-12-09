@@ -10,6 +10,7 @@ backend/bin
 # Selenium Tests Specifieke Regels
 # ---------------------------------------------------
 
+SeleniumTests/.vs
 SeleniumTests/obj
 SeleniumTests/bin/Debug/net8.0
 

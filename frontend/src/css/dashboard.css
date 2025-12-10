@@ -4,7 +4,7 @@
 
 .dashboard-main {
   min-height: 100px; 
-  left: -75%;
+  left: -7%;
   position: relative;
 }
 
@@ -15,7 +15,7 @@
 }
 
 .dashboard-overzicht {
-  width: 100%;
+  width: 1400px;
   height: 500px;
   background: var(--dashboard-bg-color);
   padding: 24px;
@@ -35,3 +35,22 @@
   line-height: 1.55;
   color: #333;
 }
+.dashboard-grid {
+  display: flex;
+  gap: 24px;            /* ruimte tussen de panels */
+  margin-top: 24px;
+}
+
+.panel {
+  flex: 1;              /* panels worden even breed */
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+  box-sizing: border-box;
+}
+
+.panel h2 {
+  margin-top: 0;
+}
+

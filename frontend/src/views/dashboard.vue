@@ -34,8 +34,19 @@ onMounted(async () => {
 
     <div class="dashboard-overzicht">
       <h2>Overzicht</h2>
-      <p>Hier komt een overzicht van belangrijke informatie.</p>
+        <section class="dashboard-grid">
+            <div class="panel panel-left">
+                <h2>Afspraken</h2>
+                <p>Hier komen de aankomende afspraken</p>
+            </div>
+
+            <div class="panel panel-right">
+                <h2>Doorverwijzingen</h2>
+                <p>Hier komen de Doorverwijzingen.</p>
+            </div>
+        </section>
     </div>
+    
   </main>
 </template>
 

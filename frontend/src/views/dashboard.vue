@@ -27,33 +27,15 @@ onMounted(async () => {
 <template>
   <Navbar />
 
-  <main>
-    <div class="dashboard-content">
-      <h1>Welkom op het Dashboard</h1>
+  <main class="dashboard-main">
+    <div class="welcome-box">
+      <h1>Welkom op het Dashboard {naam}</h1>
+    </div>
 
-      <h2>Patiënten</h2>
-
-      <p v-if="patients.length === 0">Patiënten laden…</p>
-
-      <ul v-else class="patient-list">
-        <li v-for="p in patients" :key="p.id" class="patient-item">
-          {{ p.name }}
-        </li>
-      </ul>
+    <div class="dashboard-overzicht">
+      <h2>Overzicht</h2>
+      <p>Hier komt een overzicht van belangrijke informatie.</p>
     </div>
   </main>
 </template>
 
-<style scoped>
-.patient-list {
-  padding: 0;
-  list-style: none;
-}
-
-.patient-item {
-  background: #eef4ff;
-  padding: 12px 15px;
-  margin-bottom: 10px;
-  border-radius: 8px;
-}
-</style>

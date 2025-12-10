@@ -30,6 +30,10 @@ CREATE TABLE gebruikers(
     achternaam VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL,
     wachtwoord VARCHAR(100) NOT NULL,
+    Straatnaam VARCHAR(100) NOT NULL,
+    Huisnummer VARCHAR(100) NOT NULL,
+    Postcode VARCHAR(6) NOT NULL,
+    Telefoonnummer INT(15) NOT NULL,
     rol VARCHAR(50) NOT NULL,
     systeembeheerder BIT NOT NULL,
     FOREIGN KEY (rol) REFERENCES rollen(rolID),
@@ -56,18 +60,19 @@ CREATE TABLE medischdossierentry (
 );
 
 CREATE TABLE afdelingen(
-afdelingID VARCHAR(50) NOT NULL,
-naam VARCHAR(100) NOT NULL,
-PRIMARY KEY (afdelingID)
+    afdelingID VARCHAR(50) NOT NULL,
+    naam VARCHAR(100) NOT NULL,
+    PRIMARY KEY (afdelingID)
 );
 
 CREATE TABLE afspraken(
-datumtijd DATETIME not null,
-behandeling VARCHAR(50) NOT NULL,
-afdeling VARCHAR(50) NOT NULL,
-arts INT NOT NULL,
-FOREIGN KEY (arts) REFERENCES gebruikers(gebruikersID),
-FOREIGN KEY (behandeling) REFERENCES behandelingen(zorgcode),
-FOREIGN KEY (afdeling) REFERENCES afdelingen(afdelingID)
+    datumtijd DATETIME not null,
+    behandeling VARCHAR(50) NOT NULL,
+    afdeling VARCHAR(50) NOT NULL,
+    arts INT NOT NULL,
+    PRIMARY KEY (datumtijd, arts),
+    FOREIGN KEY (arts) REFERENCES gebruikers(gebruikersID),
+    FOREIGN KEY (behandeling) REFERENCES behandelingen(zorgcode),
+    FOREIGN KEY (afdeling) REFERENCES afdelingen(afdelingID)
 );
 

@@ -1,4 +1,4 @@
-﻿namespace BackendLogin.Models
+﻿namespace backend.Models
 {
     public class LoginAttempt
     {

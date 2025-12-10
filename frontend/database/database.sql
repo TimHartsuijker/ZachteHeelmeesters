@@ -32,7 +32,7 @@ CREATE TABLE gebruikers(
     wachtwoord VARCHAR(100) NOT NULL,
     Straatnaam VARCHAR(100) NOT NULL,
     Huisnummer VARCHAR(100) NOT NULL,
-    Postcode VARCHAR(100) NOT NULL,
+    Postcode VARCHAR(6) NOT NULL,
     Telefoonnummer INT(15) NOT NULL,
     rol VARCHAR(50) NOT NULL,
     systeembeheerder BIT NOT NULL,

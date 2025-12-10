@@ -1,99 +1,132 @@
 ﻿using OpenQA.Selenium;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SeleniumTests.P_O_M
 {
-    public class MedischDossierPage
+    public class DossierPage
     {
         private readonly IWebDriver driver;
 
-        public MedischDossierPage(IWebDriver driver)
+        public DossierPage(IWebDriver driver)
         {
             this.driver = driver;
         }
 
-        // ---------------------------
-        // URL van het medisch dossier
-        // ---------------------------
-        public string Url => "http://localhost:5000/medisch-dossier"; // aanpassen indien nodig
+        // URL van de dossierpagina
+        public string Url => "http://localhost:5000/dossier"; // Later vervangen
 
+        // ---------- FILTERS ----------
+        private By FilterTypeAfspraak => By.XPath("//span[contains(text(),'Afspraak')]");
+        private By FilterTypeBehandeling => By.XPath("//span[contains(text(),'Behandeling')]");
+        private By DateFromInput => By.XPath("(//input[@type='text'])[1]");
+        private By DateToInput => By.XPath("(//input[@type='text'])[2]");
+        private By ApplyFilterButton => By.XPath("//button[contains(text(),'Toepassen')]");
 
-        // ---------------------------
-        // Locators (alle elementen)
-        // ---------------------------
+        // ---------- ENTRY STRUCTUUR ----------
+        // Elke entry begint met datum + toggle
+        private By EntryRoot => By.XPath("//div[contains(@class,'entry-root')]");
 
-        // AC2.12.1 - Knop om het medisch dossier te openen
-        private By BtnOpenMedicalRecord => By.Id("open-medical-record-btn");
+        // Datum label: '12-11-2024 -'
+        private By EntryDate => By.XPath(".//span[contains(@class,'entry-date')]");
 
-        // AC2.12.2 - Medische geschiedenis entries
-        private By MedicalHistoryEntries => By.CssSelector(".medical-history-entry");
+        // Toggle per entry
+        private By EntryToggleBtn => By.XPath(".//button[contains(@class,'entry-toggle')]");
 
-        // AC2.12.3 - Filter sectie
-        private By FilterComponent => By.Id("filter-component");
-        private By FilterDateInput => By.Id("filter-date");
-        private By FilterCategoryInput => By.Id("filter-category");
-        private By ApplyFilterButton => By.Id("apply-filter");
+        // Content-blokken binnen een entry
+        private By WordDocumentBlock => By.XPath(".//div[contains(text(),'Word document')]");
+        private By NoteBlock => By.XPath(".//div[contains(text(),'notitie')]");
+        private By ImageBlock => By.XPath(".//div[contains(text(),'afbeelding')]");
 
-        // AC2.12.4 - Mag niet zichtbaar zijn
-        private By EditButtons => By.CssSelector(".edit-button");
+        // Auteur (eindigt met naam, dynamisch)
+        private By EntryAuthor => By.XPath(".//span[contains(@class,'entry-author')]");
 
-
-        // ---------------------------
-        // Navigatie
-        // ---------------------------
+        // ---------- GENERIEKE METHODS ----------
 
         public void Navigate()
         {
             driver.Navigate().GoToUrl(Url);
         }
 
-
-        // ---------------------------
-        // Acties
-        // ---------------------------
-
-        // AC2.12.1 - Dossier openen
-        public void OpenMedicalRecord()
+        public void SelectTypeAfspraak()
         {
-            driver.FindElement(BtnOpenMedicalRecord).Click();
+            driver.FindElement(FilterTypeAfspraak).Click();
         }
 
-        // Filteren van medische geschiedenis
-        public void FilterByDate(string date)
+        public void SelectTypeBehandeling()
         {
-            var dateInput = driver.FindElement(FilterDateInput);
-            dateInput.Clear();
-            dateInput.SendKeys(date);
+            driver.FindElement(FilterTypeBehandeling).Click();
+        }
 
+        public void SetDateFrom(string date)
+        {
+            var input = driver.FindElement(DateFromInput);
+            input.Clear();
+            input.SendKeys(date);
+        }
+
+        public void SetDateTo(string date)
+        {
+            var input = driver.FindElement(DateToInput);
+            input.Clear();
+            input.SendKeys(date);
+        }
+
+        public void ClickApplyFilters()
+        {
             driver.FindElement(ApplyFilterButton).Click();
         }
 
-        public void FilterByCategory(string category)
-        {
-            var categoryInput = driver.FindElement(FilterCategoryInput);
-            categoryInput.Clear();
-            categoryInput.SendKeys(category);
+        // ---------- ENTRY INTERACTIE ----------
 
-            driver.FindElement(ApplyFilterButton).Click();
+        public IReadOnlyCollection<IWebElement> GetAllEntries()
+        {
+            return driver.FindElements(EntryRoot);
         }
 
-        public bool IsMedicalHistoryVisible()
+        public IWebElement GetEntryByDate(string date)
         {
-            return driver.FindElements(MedicalHistoryEntries).Count > 0;
+            return GetAllEntries()
+                .FirstOrDefault(e => e.FindElement(EntryDate).Text.Contains(date));
         }
 
-        public int GetMedicalHistoryCount()
+        public void ExpandEntry(IWebElement entry)
         {
-            return driver.FindElements(MedicalHistoryEntries).Count;
+            entry.FindElement(EntryToggleBtn).Click();
         }
 
-        public bool AreEditButtonsVisible()
+        public bool EntryContainsWordDocument(IWebElement entry)
         {
-            return driver.FindElements(EditButtons).Any(e => e.Displayed);
+            return entry.FindElements(WordDocumentBlock).Any();
         }
 
-        public bool IsFilterComponentDisplayed()
+        public bool EntryContainsCategory(IWebElement entry, string category)
         {
-            return driver.FindElement(FilterComponent).Displayed;
+            By blockSelector = category.ToLower() switch
+            {
+                "word document" => WordDocumentBlock,
+                "notitie" => NoteBlock,
+                "afbeelding" => ImageBlock,
+                _ => throw new KeyNotFoundException($"Categorie '{category}' is onbekend.")
+            };
+
+            return entry.FindElements(blockSelector).Any();
         }
+
+        public bool EntryContainsNote(IWebElement entry)
+        {
+            return entry.FindElements(NoteBlock).Any();
+        }
+
+        public bool EntryContainsImage(IWebElement entry)
+        {
+            return entry.FindElements(ImageBlock).Any();
+        }
+
+        public string GetEntryAuthor(IWebElement entry)
+        {
+            return entry.FindElement(EntryAuthor).Text;
+        }
+
     }
 }

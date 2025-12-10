@@ -66,6 +66,7 @@ datumtijd DATETIME not null,
 behandeling VARCHAR(50) NOT NULL,
 afdeling VARCHAR(50) NOT NULL,
 arts INT NOT NULL,
+PRIMARY KEY (datumtijd, arts),
 FOREIGN KEY (arts) REFERENCES gebruikers(gebruikersID),
 FOREIGN KEY (behandeling) REFERENCES behandelingen(zorgcode),
 FOREIGN KEY (afdeling) REFERENCES afdelingen(afdelingID)

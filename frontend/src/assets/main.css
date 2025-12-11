@@ -1,4 +1,20 @@
+@import "tailwindcss";
+
+@theme {
+  --color-green-lightest: #ECFAE5;
+  --color-green-light: #DDF6D2;
+  --color-green: #CAE8BD;
+  --color-green-dark: #B0DB9C;
+  --color-green-darkest: #88C070;
+
+  --color-gray-light: #EEEEEE;
+  --color-gray-default: #DDDDDD;
+  --color-gray-dark: #BBBBBB;
+}
+
 @import './base.css';
+
+
 
 #app {
   max-width: 1280px;

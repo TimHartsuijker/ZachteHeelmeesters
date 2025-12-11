@@ -19,7 +19,7 @@ create table behandelingen (
 );
 
 CREATE TABLE rollen(
-    rolID VARCHAR(50) NOT NULL,
+    rolID INT NOT NULL,
     rolnaam VARCHAR(100) NOT NULL,
     PRIMARY KEY (rolID)
 );

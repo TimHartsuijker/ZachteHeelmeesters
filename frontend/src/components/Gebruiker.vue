@@ -5,17 +5,18 @@
     <span class="user-field">
       <label for="role-select"><strong>Rol:</strong></label>
       <select v-model="selectedRole" class="role-select" id="role-select">
-        <option value="patiënt">Patiënt</option>
-        <option value="huisarts">Huisarts</option>
-        <option value="specialist">Specialist</option>
-        <option value="admin">Admin</option>
+        <option v-for="rol in rollen" :key="rol.rolID" :value="rol.rolnaam">
+          {{ rol.rolnaam.charAt(0).toUpperCase() + rol.rolnaam.slice(1) }}
+        </option>
       </select>
     </span>
     <span class="user-field">
       <strong>SB:</strong>
       <input type="checkbox" v-model="permissionSB" style="margin-left:0.5rem; accent-color:#B0DB9C;" />
     </span>
-    <button class="save-btn" @click="saveUser">Save</button>
+    <button class="save-btn" @click="saveUser" :disabled="saving">
+      {{ saving ? 'Saving...' : 'Save' }}
+    </button>
   </div>
 </template>
 
@@ -23,51 +24,93 @@
 export default {
   name: "Gebruiker",
   props: {
+    userId: { type: Number, required: true },
     name: { type: String, required: true },
     email: { type: String, required: true },
     role: { type: String, required: true },
+    roleId: { type: Number, required: true },
     extraPermissionSB: { type: Boolean, required: true }
   },
   data() {
     return {
-      selectedRole: this.mapRole(this.role),
-      permissionSB: this.extraPermissionSB
+      selectedRole: this.role,
+      selectedRoleId: this.roleId,
+      permissionSB: this.extraPermissionSB,
+      originalRoleId: this.roleId,
+      originalPermissionSB: this.extraPermissionSB,
+      rollen: [],
+      saving: false
     }
   },
   methods: {
-    mapRole(role) {
-      // Accept both backend and display values for compatibility
-      switch (role.toLowerCase()) {
-        case "patiënt":
-        case "patient":
-          return "patiënt";
-        case "huisarts":
-          return "huisarts";
-        case "specialist":
-          return "specialist";
-        case "admin":
-          return "admin";
-        default:
-          return "patiënt";
+    async fetchRollen() {
+      try {
+        const response = await fetch('http://localhost:5016/api/rollen');
+        if (!response.ok) throw new Error('Failed to fetch roles');
+        this.rollen = await response.json();
+      } catch (error) {
+        console.error('Error fetching roles:', error);
+        // Fallback to default roles if API fails
+        this.rollen = [
+          { rolID: 1, rolnaam: 'patiënt' },
+          { rolID: 2, rolnaam: 'huisarts' },
+          { rolID: 3, rolnaam: 'specialist' },
+          { rolID: 4, rolnaam: 'admin' }
+        ];
       }
     },
-    saveUser() {
-      // Emit updated values to parent or handle API call here
-      this.$emit('update-user', {
-        name: this.name,
-        email: this.email,
-        role: this.selectedRole,
-        extraPermissionSB: this.permissionSB
-      });
+    async saveUser() {
+      // Check if any changes were made
+      if (this.selectedRoleId === this.originalRoleId && this.permissionSB === this.originalPermissionSB) {
+        alert('Geen wijzigingen om op te slaan.');
+        return;
+      }
+
+      this.saving = true;
+      try {
+        const response = await fetch(`http://localhost:5016/api/gebruikers/${this.userId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            rol: this.selectedRoleId,
+            systeembeheerder: this.permissionSB
+          })
+        });
+
+        if (!response.ok) throw new Error('Failed to update user');
+        
+        // Update original values after successful save
+        this.originalRoleId = this.selectedRoleId;
+        this.originalPermissionSB = this.permissionSB;
+        
+        alert('Wijzigingen zijn opgeslagen.');
+      } catch (error) {
+        console.error('Error updating user:', error);
+        alert('Failed to update user: ' + error.message);
+      } finally {
+        this.saving = false;
+      }
+    },
+    onRoleChange() {
+      const selected = this.rollen.find(r => r.rolnaam === this.selectedRole);
+      if (selected) {
+        this.selectedRoleId = selected.rolID;
+      }
     }
   },
   watch: {
     extraPermissionSB(newVal) {
       this.permissionSB = newVal;
+    },
+    selectedRole() {
+      this.onRoleChange();
     }
   },
-  mounted() {
+  async mounted() {
     console.log('Gebruiker.vue mounted');
+    await this.fetchRollen();
   }
 }
 </script>

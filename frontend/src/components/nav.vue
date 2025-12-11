@@ -32,6 +32,7 @@ export default {
   display: flex;
   align-items: center;
   font-size: 1.5rem;
+  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.07);
 }
 
 .navbar ul {
@@ -39,10 +40,11 @@ export default {
   margin: 0;
   padding: 0;
   display: flex;
+  gap: 2rem;
 }
 
 .navbar li {
-  margin-right: 1rem;
+  margin-right: 0;
 }
 
 .navbar a {
@@ -50,6 +52,14 @@ export default {
   text-decoration: none;
   font-weight: bold;
   font-size: 1.1rem;
+  transition: color 0.3s ease;
+  outline: none;
+}
+
+.navbar a:hover {
+  color: #fff;
+  background: none;
+  box-shadow: none;
 }
 
 body {

@@ -1,8 +1,36 @@
 <script setup>
 import NavBar from './components/nav.vue'
 import Gebruikers from './components/Gebruiker.vue'
+import { ref, onMounted } from 'vue'
 
-console.log('App.vue mounted');
+const users = ref([])
+const loading = ref(true)
+const error = ref(null)
+
+const fetchUsers = async () => {
+  try {
+    loading.value = true
+    const response = await fetch('http://localhost:5016/api/gebruikers')
+    if (!response.ok) throw new Error('Failed to fetch users')
+    users.value = await response.json()
+    error.value = null
+  } catch (err) {
+    console.error('Error fetching users:', err)
+    error.value = 'Cannot connect to backend. Make sure the backend is running (dotnet run in backend folder)'
+  } finally {
+    loading.value = false
+  }
+}
+
+const handleUpdateUser = async (userData) => {
+  console.log('Update user:', userData)
+  // API call to update user will be handled in Gebruiker component
+}
+
+onMounted(() => {
+  console.log('App.vue mounted')
+  fetchUsers()
+})
 </script>
 
 <template>
@@ -13,23 +41,24 @@ console.log('App.vue mounted');
   </header>
 
   <main class="main-users align-under-nav">
-    <Gebruikers
-      name="Jan Jansen"
-      email="jan.jansen@email.com"
-      role="Patiënt"
-      :extraPermissionSB="true"
-    />
-    <!-- Add more <Gebruikers ... /> here for additional users -->
+    <div v-if="loading" class="status-message">Loading users...</div>
+    <div v-else-if="error" class="status-message error">Error: {{ error }}</div>
+    <div v-else-if="users.length === 0" class="status-message">No users found</div>
+    <template v-else>
+      <Gebruikers
+        v-for="user in users"
+        :key="user.gebruikersID"
+        :userId="user.gebruikersID"
+        :name="`${user.voornaam} ${user.achternaam}`"
+        :email="user.email"
+        :role="user.rolnaam || ''"
+        :roleId="user.rol"
+        :extraPermissionSB="user.systeembeheerder"
+        @update-user="handleUpdateUser"
+      />
+    </template>
   </main>
 </template>
-
-<script>
-export default {
-  mounted() {
-    console.log('App.vue template rendered');
-  }
-}
-</script>
 
 <style scoped>
 header {
@@ -87,5 +116,14 @@ header {
 /* Remove .align-under-nav margin-top, not needed with padding-top */
 .align-under-nav {
   margin-top: 0;
+}
+.status-message {
+  padding: 2rem;
+  text-align: center;
+  font-size: 1.1rem;
+  color: #666;
+}
+.status-message.error {
+  color: #d32f2f;
 }
 </style>

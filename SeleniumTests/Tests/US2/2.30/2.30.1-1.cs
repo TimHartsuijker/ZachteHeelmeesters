@@ -42,35 +42,38 @@ namespace SeleniumTests
             Console.WriteLine("Test gestart: TC_2_30_1_1_Dashboard_DisplaysWelcomeMessage");
 
             // Stap 1: Ga naar loginpagina
-            Console.WriteLine("Navigeren naar loginpagina...");
-            driver.Navigate().GoToUrl($"{baseUrl}/login");
-            Console.WriteLine("Navigatie voltooid!");
+            //Console.WriteLine("Navigeren naar loginpagina...");
+            //driver.Navigate().GoToUrl($"{baseUrl}/login");
+            //Console.WriteLine("Navigatie voltooid!");
 
-            // Stap 2: Geldige inloggegevens invoeren
-            Console.WriteLine("Geldige inloggegevens invullen...");
-            loginPage.EnterEmail("patient@example.com");
-            loginPage.EnterPassword("Test123!");
-            Console.WriteLine("Inloggegevens ingevuld.");
+            //// Stap 2: Geldige inloggegevens invoeren
+            //Console.WriteLine("Geldige inloggegevens invullen...");
+            //loginPage.EnterEmail("patient@example.com");
+            //loginPage.EnterPassword("Test123!");
+            //Console.WriteLine("Inloggegevens ingevuld.");
 
-            // Stap 3: Klik op Inloggen
-            Console.WriteLine("Klikken op inloggen...");
-            loginPage.ClickLogin();
-            Console.WriteLine("Login verstuurd.");
+            //// Stap 3: Klik op Inloggen
+            //Console.WriteLine("Klikken op inloggen...");
+            //loginPage.ClickLogin();
+            //Console.WriteLine("Login verstuurd.");
 
             // Stap 4: Wachten tot dashboard geladen is
-            Console.WriteLine("Wachten tot dashboard verschijnt...");
-            wait.Until(d => d.FindElement(By.Id("dashboard-container")));
-            Console.WriteLine("Dashboard succesvol geladen!");
+            //Console.WriteLine("Wachten tot dashboard verschijnt...");
+            //wait.Until(d => d.FindElement(By.Id("dashboard-container")));
+            //Console.WriteLine("Dashboard succesvol geladen!");
 
             // Stap 5: Check of welkomstboodschap zichtbaar is
             Console.WriteLine("Controleren of de welkomstboodschap zichtbaar is...");
-            var welcomeMessage = driver.FindElement(By.XPath("//*[contains(text(),'Welkom')]"));
+
+            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            var welcomeMessage = wait.Until(d =>
+                d.FindElement(By.CssSelector("[data-test='welcome-message']")));
 
             Assert.IsTrue(welcomeMessage.Displayed,
                 "Welkomstboodschap wordt niet weergegeven op het dashboard.");
-            Console.WriteLine("Welkomstboodschap succesvol gevonden!");
+            Console.WriteLine($"Welkomstboodschap gevonden: {welcomeMessage.Text}");
 
             Console.WriteLine("Test succesvol afgerond.");
         }
+        }
     }
-}

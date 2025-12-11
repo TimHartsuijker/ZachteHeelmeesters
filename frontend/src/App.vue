@@ -1,25 +1,47 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
+import NavBar from './components/nav.vue'
+import Gebruikers from './components/Gebruiker.vue'
+
+console.log('App.vue mounted');
 </script>
 
 <template>
   <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
     <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+      <NavBar/>
     </div>
   </header>
 
-  <main>
-    <TheWelcome />
+  <main class="main-users align-under-nav">
+    <Gebruikers
+      name="Jan Jansen"
+      email="jan.jansen@email.com"
+      role="Patiënt"
+      :extraPermissionSB="true"
+    />
+    <!-- Add more <Gebruikers ... /> here for additional users -->
   </main>
 </template>
+
+<script>
+export default {
+  mounted() {
+    console.log('App.vue template rendered');
+  }
+}
+</script>
 
 <style scoped>
 header {
   line-height: 1.5;
+  width: 100vw;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+#app {
+  background-color: #ECFAE5;
 }
 
 .logo {
@@ -43,5 +65,27 @@ header {
     place-items: flex-start;
     flex-wrap: wrap;
   }
+}
+</style>
+
+<style>
+.main-users {
+  width: 80vw;
+  max-width: 80vw;
+  /* Remove margin-top, use padding-top to offset fixed header */
+  margin: 2rem auto;
+  background: #CAE8BD;
+  border-radius: 1.5rem;
+  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.07);
+  padding: 0 0 2.5rem 0;
+  margin-top: 112px; /* 70px min-height + 48px vertical padding + 20px gap */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 0;
+}
+/* Remove .align-under-nav margin-top, not needed with padding-top */
+.align-under-nav {
+  margin-top: 0;
 }
 </style>

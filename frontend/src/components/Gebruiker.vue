@@ -11,8 +11,14 @@
       </select>
     </span>
     <span class="user-field">
-      <strong>SB:</strong>
-      <input type="checkbox" v-model="permissionSB" style="margin-left:0.5rem; accent-color:#B0DB9C;" />
+      <label for="sb-checkbox-{{userId}}" class="sb-label"><strong>Systeembeheerder:</strong></label>
+      <input 
+        :id="`sb-checkbox-${userId}`"
+        type="checkbox" 
+        v-model="permissionSB" 
+        class="sb-checkbox"
+        :aria-label="`Systeembeheerder status voor ${name}`"
+      />
     </span>
     <button class="save-btn" @click="saveUser" :disabled="saving">
       {{ saving ? 'Saving...' : 'Save' }}
@@ -147,6 +153,28 @@ export default {
 }
 .save-btn:hover {
   background: #8FC97A;
+}
+.save-btn:focus {
+  outline: 2px solid #222;
+  outline-offset: 2px;
+}
+.save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.sb-label {
+  white-space: nowrap;
+}
+.sb-checkbox {
+  margin-left: 0.5rem;
+  accent-color: #B0DB9C;
+  cursor: pointer;
+  width: 1.2rem;
+  height: 1.2rem;
+}
+.sb-checkbox:focus {
+  outline: 2px solid #8FC97A;
+  outline-offset: 2px;
 }
 .role-select {
   margin-left: 0.5rem;

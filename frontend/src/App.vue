@@ -1,11 +1,19 @@
 <script setup>
 import NavBar from './components/nav.vue'
+import Filter from './components/Filter.vue'
 import Gebruikers from './components/Gebruiker.vue'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 
 const users = ref([])
+const rollen = ref([])
 const loading = ref(true)
 const error = ref(null)
+
+const filterOptions = ref({
+  search: "",
+  role: "",
+  sb: ""
+})
 
 const fetchUsers = async () => {
   try {
@@ -22,13 +30,60 @@ const fetchUsers = async () => {
   }
 }
 
+const fetchRollen = async () => {
+  try {
+    const response = await fetch('http://localhost:5016/api/rollen')
+    if (!response.ok) throw new Error('Failed to fetch roles')
+    rollen.value = await response.json()
+  } catch (error) {
+    console.error('Error fetching roles:', error)
+    rollen.value = [
+      { rolID: 1, rolnaam: 'patiënt' },
+      { rolID: 2, rolnaam: 'huisarts' },
+      { rolID: 3, rolnaam: 'specialist' },
+      { rolID: 4, rolnaam: 'admin' }
+    ]
+  }
+}
+
+const filteredUsers = computed(() => {
+  return users.value.filter(user => {
+    // Search filter (name and email)
+    if (filterOptions.value.search) {
+      const searchLower = filterOptions.value.search.toLowerCase()
+      const fullName = `${user.voornaam} ${user.achternaam}`.toLowerCase()
+      const emailLower = user.email.toLowerCase()
+      
+      const matchesSearch = fullName.includes(searchLower) || emailLower.includes(searchLower)
+      if (!matchesSearch) return false
+    }
+
+    // Role filter
+    if (filterOptions.value.role) {
+      if (user.rolnaam !== filterOptions.value.role) return false
+    }
+
+    // System admin filter
+    if (filterOptions.value.sb !== "") {
+      const sbValue = filterOptions.value.sb === "true"
+      if (user.systeembeheerder !== sbValue) return false
+    }
+
+    return true
+  })
+})
+
+const handleFilterChange = (filters) => {
+  filterOptions.value = filters
+}
+
 const handleUpdateUser = async (userData) => {
   console.log('Update user:', userData)
-  // API call to update user will be handled in Gebruiker component
 }
 
 onMounted(() => {
   console.log('App.vue mounted')
+  fetchRollen()
   fetchUsers()
 })
 </script>
@@ -41,12 +96,17 @@ onMounted(() => {
   </header>
 
   <main class="main-users align-under-nav">
+    <Filter 
+      :rollen="rollen"
+      @filter-change="handleFilterChange"
+    />
+    
     <div v-if="loading" class="status-message">Loading users...</div>
     <div v-else-if="error" class="status-message error">Error: {{ error }}</div>
-    <div v-else-if="users.length === 0" class="status-message">No users found</div>
+    <div v-else-if="filteredUsers.length === 0" class="status-message">No users found</div>
     <template v-else>
       <Gebruikers
-        v-for="user in users"
+        v-for="user in filteredUsers"
         :key="user.gebruikersID"
         :userId="user.gebruikersID"
         :name="`${user.voornaam} ${user.achternaam}`"

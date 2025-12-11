@@ -1,8 +1,8 @@
 <template>
-  <nav class="navbar">
+  <nav class="navbar" aria-label="Hoofdnavigatie">
     <ul>
       <li>
-        <a href="/Gebruikers.html">Gebruiker</a>
+        <a href="/Gebruikers.html" aria-current="page">Gebruikers</a>
       </li>
     </ul>
   </nav>

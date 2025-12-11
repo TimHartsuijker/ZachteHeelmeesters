@@ -43,6 +43,7 @@ frontend/*.ntvs*
 frontend/*.njsproj
 frontend/*.sln
 frontend/*.sw?
+frontend/node_modules/.vue-global-types/vue_3.5_0.d.ts
 
 # TypeScript build info
 frontend/*.tsbuildinfo

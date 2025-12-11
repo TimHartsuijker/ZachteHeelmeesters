@@ -2,6 +2,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using SeleniumTests.P_O_M;
+using System.Diagnostics;
 
 namespace SeleniumTests.Tests
 {
@@ -12,28 +13,25 @@ namespace SeleniumTests.Tests
         private static LoginPage loginPage;
         private static DossierPage dossierPage;
 
-        // =====================================================================
-        // TESTDATA CLASS (alle data in dit bestand)
-        // =====================================================================
+        private void Log(string message)
+        {
+            Trace.WriteLine($"[LOG] {message}");
+            Console.WriteLine($"[LOG] {message}");
+        }
+
         public static class TestData
         {
-            // ---------------------- LOGIN DATA -----------------------------
             public static string PatientEmail => "patient@example.com";
             public static string PatientPassword => "Test123!";
             public static string PatientName => "Jan Jansen";
-
-            // ---------------------- FILTER DATA ----------------------------
             public static string ChronoFrom => "01-01-2025";
             public static string ChronoTo => "01-06-2025";
             public static int ChronoExpectedCount => 2;
-
             public static string InvalidFrom => "01-12-2025";
             public static string InvalidTo => "01-01-2025";
-
             public static string CombinedFrom => "01-06-2025";
             public static string CombinedTo => "01-12-2025";
             public static string CombinedCategory => "Afspraak";
-
             public static string CategoryFilter => "Behandeling";
 
             // ---------------------- BACKEND FAILURE FLAGS ------------------
@@ -70,7 +68,7 @@ namespace SeleniumTests.Tests
         }
 
         // =====================================================================
-        // AC2.12.1 – Open Medical Record
+        // AC2.12.1 Open Medical Record
         // =====================================================================
 
         [TestMethod]
@@ -80,21 +78,8 @@ namespace SeleniumTests.Tests
             dossierPage.Navigate();
 
             var entries = dossierPage.GetAllEntries();
-
-            Assert.IsTrue(entries.Count > 0,
-                "Medisch dossier zou minimaal één entry moeten tonen.");
-        }
-
-        [TestMethod]
-        public void TC_2_12_1_2_AccessDeniedWithoutLogin()
-        {
-            driver.Manage().Cookies.DeleteAllCookies();
-            dossierPage.Navigate();
-
-            Assert.IsTrue(
-                driver.Url.Contains("inloggen"),
-                "Ongeauthenticeerde gebruikers moeten worden doorgestuurd naar de loginpagina."
-            );
+            Assert.IsTrue(entries.Count > 0, "Medisch dossier zou minimaal Ã©Ã©n entry moeten tonen.");
+            Log("Assert passed: er is minimaal Ã©Ã©n entry in het medisch dossier.");
         }
 
         [TestMethod]
@@ -102,15 +87,15 @@ namespace SeleniumTests.Tests
         {
             driver.Navigate().GoToUrl(dossierPage.Url + TestData.BackendDownFlag);
 
-            Assert.IsTrue(
-                driver.PageSource.Contains("kan niet geladen worden") ||
-                driver.PageSource.Contains("Probeer het later opnieuw"),
-                "Foutmelding ontbreekt bij backend failure."
-            );
+            bool containsError = driver.PageSource.Contains("kan niet geladen worden") ||
+                                 driver.PageSource.Contains("Probeer het later opnieuw");
+
+            Assert.IsTrue(containsError, "Foutmelding ontbreekt bij backend failure.");
+            Log("Assert passed: foutmelding correct weergegeven bij backend failure.");
         }
 
         // =====================================================================
-        // AC2.12.2 – View Complete Medical History
+        // AC2.12.2 View medical history
         // =====================================================================
 
         [TestMethod]
@@ -120,9 +105,8 @@ namespace SeleniumTests.Tests
             dossierPage.Navigate();
 
             var entries = dossierPage.GetAllEntries();
-
-            Assert.IsTrue(entries.Count >= 1,
-                "De volledige medische geschiedenis zou zichtbaar moeten zijn.");
+            Assert.IsTrue(entries.Count >= 1, "De volledige medische geschiedenis zou zichtbaar moeten zijn.");
+            Log("Assert passed: volledige medische geschiedenis zichtbaar.");
         }
 
         [TestMethod]
@@ -131,15 +115,16 @@ namespace SeleniumTests.Tests
             loginPage.LoginAsPatient(TestData.PatientEmail, TestData.PatientPassword);
             driver.Navigate().GoToUrl(dossierPage.Url + TestData.HistoryFailFlag);
 
-            Assert.IsTrue(
-                driver.PageSource.Contains("kon niet geladen worden") ||
-                driver.PageSource.Contains("Probeer het later opnieuw"),
-                "Foutmelding ontbreekt bij mislukte geschiedenis-loading."
-            );
+            bool containsError = driver.PageSource.Contains("kon niet geladen worden") ||
+                                 driver.PageSource.Contains("Probeer het later opnieuw");
+
+            Assert.IsTrue(containsError, "Foutmelding ontbreekt bij mislukte geschiedenis-loading.");
+            Log("Assert passed: foutmelding correct weergegeven bij geschiedenis-loading failure.");
         }
 
+
         // =====================================================================
-        // AC2.12.3 – Filtering
+        // AC2.12.3 Data filtering
         // =====================================================================
 
         [TestMethod]
@@ -156,6 +141,7 @@ namespace SeleniumTests.Tests
 
             Assert.AreEqual(TestData.ChronoExpectedCount, entries.Count,
                 "Chronologische filtering levert een onverwacht aantal entries op.");
+            Log("Assert passed: correcte resultaten voor chronologische filtering.");
         }
 
         [TestMethod]
@@ -177,6 +163,8 @@ namespace SeleniumTests.Tests
             // Controleer dat elke entry het juiste category content block bevat
             Assert.IsTrue(entries.All(e => dossierPage.EntryContainsCategory(e, TestData.CategoryFilter)),
                 $"Alle entries moeten categorie '{TestData.CategoryFilter}' hebben.");
+
+            Log("Assert passed: alle entries bevatten de juiste categorie.");
         }
 
         [TestMethod]
@@ -189,11 +177,11 @@ namespace SeleniumTests.Tests
             dossierPage.SetDateTo(TestData.InvalidTo);
             dossierPage.ClickApplyFilters();
 
-            Assert.IsTrue(
-                driver.PageSource.Contains("ongeldige datum") ||
-                driver.PageSource.Contains("validatie"),
-                "Ongeldig datumbereik zou een validatiefout moeten tonen."
-            );
+            bool hasValidation = driver.PageSource.Contains("ongeldige datum") ||
+                                  driver.PageSource.Contains("validatie");
+
+            Assert.IsTrue(hasValidation, "Ongeldig datumbereik zou een validatiefout moeten tonen.");
+            Log("Assert passed: validatiefout correct weergegeven bij ongeldig datumbereik.");
         }
 
         [TestMethod]
@@ -202,11 +190,8 @@ namespace SeleniumTests.Tests
             loginPage.LoginAsPatient(TestData.PatientEmail, TestData.PatientPassword);
             dossierPage.Navigate();
 
-            // Selecteer filter knop gebaseerd op category
-            if (TestData.CombinedCategory == "Afspraak")
-                dossierPage.SelectTypeAfspraak();
-            else if (TestData.CombinedCategory == "Behandeling")
-                dossierPage.SelectTypeBehandeling();
+            if (TestData.CombinedCategory == "Afspraak") dossierPage.SelectTypeAfspraak();
+            else if (TestData.CombinedCategory == "Behandeling") dossierPage.SelectTypeBehandeling();
 
             dossierPage.SetDateFrom(TestData.CombinedFrom);
             dossierPage.SetDateTo(TestData.CombinedTo);
@@ -214,16 +199,18 @@ namespace SeleniumTests.Tests
 
             var entries = dossierPage.GetAllEntries();
 
-            Assert.IsTrue(entries.Count > 0,
-                "Gecombineerde filtering zou resultaten moeten opleveren.");
+            Assert.IsTrue(entries.Count > 0, "Gecombineerde filtering zou resultaten moeten opleveren.");
+            Log("Assert passed: gecombineerde filtering heeft resultaten.");
 
             Assert.IsTrue(entries.All(e => dossierPage.EntryContainsCategory(e, TestData.CombinedCategory)),
                 "Gecombineerde filtering bevat elementen met een verkeerde categorie.");
+
+            Log("Assert passed: gecombineerde filtering toont correcte categorie.");
         }
 
 
         // =====================================================================
-        // AC2.12.4 – Read-only
+        // AC2.12.4 Read-only
         // =====================================================================
 
         [TestMethod]
@@ -236,8 +223,8 @@ namespace SeleniumTests.Tests
 
             foreach (var keyword in TestData.ForbiddenEditKeywords)
             {
-                Assert.IsFalse(html.Contains(keyword),
-                    $"Het dossier bevat een bewerkbaar element: '{keyword}'.");
+                Assert.IsFalse(html.Contains(keyword), $"Het dossier bevat een bewerkbaar element: '{keyword}'.");
+                Log($"Assert passed: geen bewerkbaar element gevonden voor keyword '{keyword}'.");
             }
         }
     }

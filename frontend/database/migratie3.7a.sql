@@ -22,8 +22,7 @@ IF NOT EXISTS (SELECT 1 FROM gebruikers WHERE email = 'patient@test.nl')
         Huisnummer, 
         Postcode, 
         Telefoonnummer, 
-        rol, 
-        systeembeheerder
+        rol
     ) VALUES (
         'Jan',
         'Testpersoon',
@@ -33,8 +32,7 @@ IF NOT EXISTS (SELECT 1 FROM gebruikers WHERE email = 'patient@test.nl')
         '123',
         '1234AB',
         '0612345678',
-        1,
-        0
+        1
     );
 
 IF NOT EXISTS (SELECT 1 FROM gebruikers WHERE email = 'huisarts@test.nl')
@@ -47,8 +45,7 @@ IF NOT EXISTS (SELECT 1 FROM gebruikers WHERE email = 'huisarts@test.nl')
         Huisnummer, 
         Postcode, 
         Telefoonnummer, 
-        rol, 
-        systeembeheerder
+        rol
     ) VALUES (
         'Emma',
         'Dokter',
@@ -58,6 +55,5 @@ IF NOT EXISTS (SELECT 1 FROM gebruikers WHERE email = 'huisarts@test.nl')
         '45',
         '5678CD',
         '0687654321',
-        2,
-        0
+        2
     );

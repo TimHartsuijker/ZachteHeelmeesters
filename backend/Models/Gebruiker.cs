@@ -13,5 +13,4 @@ public class Gebruiker
     public string Telefoonnummer { get; set; } = string.Empty;
     public int Rol { get; set; }
     public string? Rolnaam { get; set; }
-    public bool Systeembeheerder { get; set; }
 }

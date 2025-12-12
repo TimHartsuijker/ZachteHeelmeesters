@@ -11,8 +11,7 @@ const error = ref(null)
 
 const filterOptions = ref({
   search: "",
-  role: "",
-  sb: ""
+  role: ""
 })
 
 const fetchUsers = async () => {
@@ -63,12 +62,6 @@ const filteredUsers = computed(() => {
       if (user.rolnaam !== filterOptions.value.role) return false
     }
 
-    // System admin filter
-    if (filterOptions.value.sb !== "") {
-      const sbValue = filterOptions.value.sb === "true"
-      if (user.systeembeheerder !== sbValue) return false
-    }
-
     return true
   })
 })
@@ -113,7 +106,6 @@ onMounted(() => {
         :email="user.email"
         :role="user.rolnaam || ''"
         :roleId="user.rol"
-        :extraPermissionSB="user.systeembeheerder"
         @update-user="handleUpdateUser"
       />
     </template>

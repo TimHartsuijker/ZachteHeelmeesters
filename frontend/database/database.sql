@@ -35,7 +35,6 @@ CREATE TABLE gebruikers(
     Postcode VARCHAR(6) NOT NULL,
     Telefoonnummer VARCHAR(15) NOT NULL,
     rol INT NOT NULL,
-    systeembeheerder BIT NOT NULL,
     FOREIGN KEY (rol) REFERENCES rollen(rolID),
     PRIMARY KEY (gebruikersID)
 );

@@ -10,16 +10,6 @@
         </option>
       </select>
     </span>
-    <span class="user-field">
-      <label for="sb-checkbox-{{userId}}" class="sb-label"><strong>Systeembeheerder:</strong></label>
-      <input 
-        :id="`sb-checkbox-${userId}`"
-        type="checkbox" 
-        v-model="permissionSB" 
-        class="sb-checkbox"
-        :aria-label="`Systeembeheerder status voor ${name}`"
-      />
-    </span>
     <button class="save-btn" @click="saveUser" :disabled="saving">
       {{ saving ? 'Saving...' : 'Save' }}
     </button>
@@ -34,16 +24,13 @@ export default {
     name: { type: String, required: true },
     email: { type: String, required: true },
     role: { type: String, required: true },
-    roleId: { type: Number, required: true },
-    extraPermissionSB: { type: Boolean, required: true }
+    roleId: { type: Number, required: true }
   },
   data() {
     return {
       selectedRole: this.role,
       selectedRoleId: this.roleId,
-      permissionSB: this.extraPermissionSB,
       originalRoleId: this.roleId,
-      originalPermissionSB: this.extraPermissionSB,
       rollen: [],
       saving: false
     }
@@ -67,7 +54,7 @@ export default {
     },
     async saveUser() {
       // Check if any changes were made
-      if (this.selectedRoleId === this.originalRoleId && this.permissionSB === this.originalPermissionSB) {
+      if (this.selectedRoleId === this.originalRoleId) {
         alert('Geen wijzigingen om op te slaan.');
         return;
       }
@@ -80,8 +67,7 @@ export default {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            rol: this.selectedRoleId,
-            systeembeheerder: this.permissionSB
+            rol: this.selectedRoleId
           })
         });
 
@@ -89,7 +75,6 @@ export default {
         
         // Update original values after successful save
         this.originalRoleId = this.selectedRoleId;
-        this.originalPermissionSB = this.permissionSB;
         
         alert('Wijzigingen zijn opgeslagen.');
       } catch (error) {
@@ -107,9 +92,6 @@ export default {
     }
   },
   watch: {
-    extraPermissionSB(newVal) {
-      this.permissionSB = newVal;
-    },
     selectedRole() {
       this.onRoleChange();
     }

@@ -17,54 +17,60 @@ public class _3_7a_1
             // Step 1: Start test
             Console.WriteLine("LOG [Step 1] Start test: RoleChange_UserRoleIsChanged");
             driver = new ChromeDriver();
-            var loginPage = new SeleniumTests.Pages.LoginPage(driver);
 
-            // Step 2: Navigate to the portal
-            loginPage.Navigate();
-            Console.WriteLine("LOG [Step 2] Navigated to portal.");
+            // Step 2: Navigate directly to Gebruikers page
+            driver.Navigate().GoToUrl("http://localhost:5173/Gebruikers.html");
+            Console.WriteLine("LOG [Step 2] Navigated to Gebruikers page.");
 
-            // Step 3: Log in as system manager
-            loginPage.EnterEmail("email@example.com");
-            loginPage.EnterPassword("Test123!");
-            loginPage.ClickLogin();
-            Console.WriteLine("LOG [Step 3] Logged in as system manager.");
+            // Wait for page to load
+            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            wait.Until(d => d.FindElements(By.ClassName("user-row")).Count > 0);
+            Console.WriteLine("LOG [Step 3] Page loaded with users.");
 
-            // Step 4: Go to Gebruikers (Users) page
-            // WHEN TEST: Change selector (if needed)
-            driver.FindElement(By.LinkText("Gebruikers")).Click();
-            Console.WriteLine("LOG [Step 4] Navigated to 'Gebruikers' page.");
+            // Step 3: Find the first user's row in the overview
+            var userRows = driver.FindElements(By.ClassName("user-row"));
+            if (userRows.Count == 0)
+            {
+                throw new Exception("No users found on the page.");
+            }
+            var firstUserRow = userRows[0];
+            Console.WriteLine("LOG [Step 4] Found first user row.");
 
-            // Step 5: Find the user's row in the overview and change the role directly
-            // Find the row for the user by email
-            // user rows are divs with IDs like "user-email@example.com", use that for selection
-            var userDiv = driver.FindElement(By.Id("user-email@example.com"));
-            Console.WriteLine("LOG [Step 5] Found user div for 'email@example.com'.");
-
-            // Step 6: Change User role (select input in the user's row)
-            var roleSelect = userDiv.FindElement(By.Name("role"));
+            // Step 4: Change User role (select input in the user's row)
+            var roleSelect = firstUserRow.FindElement(By.ClassName("role-select"));
             var selectElement = new SelectElement(roleSelect);
-            string[] roles = { "Patiënt", "Huisarts", "Specialist", "Admin" };
             string currentRole = selectElement.SelectedOption.Text;
-            string newRole = roles.First(r => r != currentRole);
+            
+            // Get all available roles and pick one different from current
+            var availableRoles = selectElement.Options.Select(o => o.Text).ToList();
+            string newRole = availableRoles.First(r => r != currentRole);
             selectElement.SelectByText(newRole);
-            Console.WriteLine($"LOG [Step 6] Changed user role from '{currentRole}' to '{newRole}'.");
+            Console.WriteLine($"LOG [Step 5] Changed user role from '{currentRole}' to '{newRole}'.");
 
-            // Step 7: Click on "Save"
-            // WHEN TEST: Replace with selector for save button!!
-            // Only click the save button for this user, not other users
-            var saveButton = userDiv.FindElement(By.XPath(".//button[contains(text(),'Save')]"));
+            // Step 5: Click on "Save"
+            var saveButton = firstUserRow.FindElement(By.ClassName("save-btn"));
             saveButton.Click();
-            Console.WriteLine("LOG [Step 7] Clicked 'Save' button for user.");
+            Console.WriteLine("LOG [Step 6] Clicked 'Save' button for user.");
 
-            // Step 8: Refresh the page to ensure data is loaded from the database
+            // Wait for save to complete (alert appears)
+            Thread.Sleep(1000);
+            var alert = driver.SwitchTo().Alert();
+            string alertText = alert.Text;
+            alert.Accept();
+            Console.WriteLine($"LOG [Step 7] Alert message: '{alertText}'.");
+
+            // Step 6: Refresh the page to ensure data is loaded from the database
             driver.Navigate().Refresh();
+            wait.Until(d => d.FindElements(By.ClassName("user-row")).Count > 0);
             Console.WriteLine("LOG [Step 8] Page refreshed to reload data from database.");
 
-            // Step 9: Find the user's div again and check the role value
-            var userDivAfter = driver.FindElement(By.Id("user-email@example.com"));
-            var roleSelectAfter = userDivAfter.FindElement(By.Name("role"));
+            // Step 7: Find the first user's row again and check the role value
+            var userRowsAfter = driver.FindElements(By.ClassName("user-row"));
+            var firstUserRowAfter = userRowsAfter[0];
+            var roleSelectAfter = firstUserRowAfter.FindElement(By.ClassName("role-select"));
             var selectElementAfter = new SelectElement(roleSelectAfter);
             string selectedRoleAfter = selectElementAfter.SelectedOption.Text;
+            
             if (selectedRoleAfter == newRole)
             {
                 Console.WriteLine($"LOG [Step 9] PASS: Role in UI after refresh matches expected: '{newRole}'.");
@@ -75,7 +81,7 @@ public class _3_7a_1
                 throw new Exception("Role not updated in database/UI after refresh.");
             }
 
-            // Step 10: Test completed
+            // Step 8: Test completed
             Console.WriteLine("LOG [Step 10] Test completed successfully.");
         }
         catch (NoSuchElementException ex)
@@ -93,7 +99,7 @@ public class _3_7a_1
             if (driver != null)
             {
                 driver.Quit();
-                Console.WriteLine("LOG [Step 9] WebDriver closed.");
+                Console.WriteLine("LOG [Step 11] WebDriver closed.");
             }
         }
     }

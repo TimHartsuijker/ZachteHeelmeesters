@@ -37,8 +37,7 @@ public class GebruikersController : ControllerBase
                     g.Postcode,
                     g.Telefoonnummer,
                     g.rol,
-                    r.rolnaam,
-                    g.systeembeheerder
+                    r.rolnaam
                 FROM gebruikers g
                 LEFT JOIN rollen r ON g.rol = r.rolID
                 ORDER BY g.gebruikersID";
@@ -59,8 +58,7 @@ public class GebruikersController : ControllerBase
                     Postcode = reader.GetString(6),
                     Telefoonnummer = reader.GetString(7),
                     Rol = reader.GetInt32(8),
-                    Rolnaam = reader.IsDBNull(9) ? null : reader.GetString(9),
-                    Systeembeheerder = reader.GetBoolean(10)
+                    Rolnaam = reader.IsDBNull(9) ? null : reader.GetString(9)
                 });
             }
 
@@ -84,13 +82,12 @@ public class GebruikersController : ControllerBase
 
             var query = @"
                 UPDATE gebruikers 
-                SET rol = @rol, systeembeheerder = @systeembeheerder
+                SET rol = @rol
                 WHERE gebruikersID = @id";
 
             using var command = new SqlCommand(query, connection);
             command.Parameters.AddWithValue("@id", id);
             command.Parameters.AddWithValue("@rol", gebruiker.Rol);
-            command.Parameters.AddWithValue("@systeembeheerder", gebruiker.Systeembeheerder);
 
             var rowsAffected = await command.ExecuteNonQueryAsync();
 

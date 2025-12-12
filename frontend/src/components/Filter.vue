@@ -24,15 +24,6 @@
           </option>
         </select>
       </div>
-
-      <div class="filter-group">
-        <label for="sb-filter"><strong>Systeembeheerder:</strong></label>
-        <select v-model="selectedSB" id="sb-filter" class="filter-select" aria-label="Filteren op systeembeheerder status">
-          <option value="">Alle</option>
-          <option value="true">Ja</option>
-          <option value="false">Nee</option>
-        </select>
-      </div>
     </fieldset>
 
     <button v-if="hasActiveFilters" @click="clearFilters" class="clear-btn" aria-label="Alle filters wissen">
@@ -53,13 +44,12 @@ export default {
   data() {
     return {
       searchQuery: "",
-      selectedRole: "",
-      selectedSB: ""
+      selectedRole: ""
     };
   },
   computed: {
     hasActiveFilters() {
-      return this.searchQuery !== "" || this.selectedRole !== "" || this.selectedSB !== "";
+      return this.searchQuery !== "" || this.selectedRole !== "";
     }
   },
   watch: {
@@ -68,23 +58,18 @@ export default {
     },
     selectedRole() {
       this.emitFilters();
-    },
-    selectedSB() {
-      this.emitFilters();
     }
   },
   methods: {
     emitFilters() {
       this.$emit("filter-change", {
         search: this.searchQuery,
-        role: this.selectedRole,
-        sb: this.selectedSB
+        role: this.selectedRole
       });
     },
     clearFilters() {
       this.searchQuery = "";
       this.selectedRole = "";
-      this.selectedSB = "";
     }
   }
 };

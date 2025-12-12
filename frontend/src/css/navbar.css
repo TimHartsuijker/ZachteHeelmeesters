@@ -1,0 +1,45 @@
+:root {
+  --navbar-bg-color: #3f83cc;
+  --navbar-link-color: #ffffff;
+  --navbar-link-hover-color: #3e47c3;
+  --navbar-bg-hover-color: #6aacf3;
+}
+body,
+html {
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+.navbar {
+  background-color: var(--navbar-bg-color);
+  padding: 15px 20px;
+}
+
+.nav-menu {
+  list-style: none;
+  display: flex;
+  gap: 25px;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-menu a {
+  color: var(--navbar-link-color);
+  font-weight: 500;
+  text-decoration: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+}
+
+.nav-menu a:hover {
+  color: var(--navbar-link-color);
+  background-color: var(--navbar-bg-hover-color);
+}

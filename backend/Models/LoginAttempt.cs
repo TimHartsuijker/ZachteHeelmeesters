@@ -17,7 +17,6 @@
         {
             BlockCount++;
             BlockUntil = DateTime.UtcNow.Add(BlockDuration);
-            FailCount = 0;
         }
 
         public bool IsBlocked()
@@ -27,6 +26,7 @@
             if (DateTime.UtcNow >= BlockUntil)
             {
                 BlockUntil = null;
+                FailCount = 0;
                 return false;
             }
 
@@ -39,10 +39,9 @@
             return (BlockUntil.Value - DateTime.UtcNow).TotalMinutes;
         }
 
-        public void Reset()
+        public void ResetFailsOnly()
         {
             FailCount = 0;
-            BlockCount = 0;
             BlockUntil = null;
         }
     }

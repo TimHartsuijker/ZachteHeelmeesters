@@ -12,7 +12,7 @@ namespace SeleniumTests
     {
         private IWebDriver driver;
         private WebDriverWait wait;
-        private string baseUrl = "https://localhost:5173";
+        private string baseUrl = "http://localhost:5173";
         private LoginPage loginPage;
 
         [TestInitialize]
@@ -214,7 +214,7 @@ namespace SeleniumTests
 
             // Error message is displayed
             var error = wait.Until(d => d.FindElement(By.Id("login-error")));
-            Assert.AreEqual("Uw account is geblokkeerd. Controleer uw e-mail om uw account te deblokkeren.", error.Text);
+            Assert.AreEqual("Uw account is permanent geblokkeerd. Controleer uw e-mail om uw account te deblokkeren.", error.Text);
             Assert.IsFalse(driver.Url.Contains("/dashboard"), "Gebruiker is doorgestuurd naar het dashboard terwijl het account geblokkeerd zou moeten zijn.");
         }
     }

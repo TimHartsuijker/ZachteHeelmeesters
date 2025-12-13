@@ -48,6 +48,7 @@ namespace SeleniumTests
 
             
             Console.WriteLine("Controleren of emailveld zichtbaar is...");
+            wait.Until(drv => loginPage.IsEmailFieldDisplayed());
             Assert.IsTrue(loginPage.IsEmailFieldDisplayed(),
                 "Het e-mailadres veld is niet zichtbaar.");
             Console.WriteLine("Emailveld is zichtbaar!");

@@ -58,7 +58,7 @@ namespace SeleniumTests
             var error = wait.Until(d => d.FindElement(By.Id("login-error")));
             Console.WriteLine("Foutmelding gevonden: " + error.Text);
 
-            Assert.AreEqual("inloggegevens zijn incorrect", error.Text);
+            Assert.AreEqual("Inloggegevens zijn incorrect", error.Text);
             Console.WriteLine(" Test geslaagd.\n");
         }
 
@@ -85,7 +85,7 @@ namespace SeleniumTests
             var error = wait.Until(d => d.FindElement(By.Id("login-error")));
             Console.WriteLine("Foutmelding gevonden: " + error.Text);
 
-            Assert.AreEqual("inloggegevens zijn incorrect", error.Text);
+            Assert.AreEqual("Inloggegevens zijn incorrect", error.Text);
             Console.WriteLine(" Test geslaagd.\n");
         }
 
@@ -112,7 +112,7 @@ namespace SeleniumTests
             var error = wait.Until(d => d.FindElement(By.Id("login-error")));
             Console.WriteLine("Foutmelding gevonden: " + error.Text);
 
-            Assert.AreEqual("inloggegevens zijn incorrect", error.Text);
+            Assert.AreEqual("Inloggegevens zijn incorrect", error.Text);
             Console.WriteLine(" Test geslaagd.\n");
         }
 

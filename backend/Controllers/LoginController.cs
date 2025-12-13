@@ -21,56 +21,56 @@ namespace BackendLogin.Controllers
                 string.IsNullOrWhiteSpace(request.Email) ||
                 string.IsNullOrWhiteSpace(request.Wachtwoord))
             {
-                return BadRequest(new { message = "gegevens moeten ingevuld zijn" });
+                return BadRequest(new { message = "Gegevens moeten ingevuld zijn" });
             }
 
-            var attempts = loginAttempts.GetOrAdd(request.Email, new LoginAttempt());
+            // Gebruik account als sleutel
+            string key = correctEmail; // als je meerdere accounts hebt, gebruik database email
+            var attempts = loginAttempts.GetOrAdd(key, new LoginAttempt());
 
-            // 1. Permanente blokkade
+            // Permanente blokkade
             if (attempts.BlockCount >= 3)
             {
                 return Unauthorized(new
                 {
-                    message = "Uw account is geblokkeerd. Controleer uw e-mail om uw account te deblokkeren."
+                    message = "Uw account is permanent geblokkeerd. Controleer uw e-mail om uw account te deblokkeren."
                 });
             }
 
-            // 2. Tijdelijke blokkade (met resterende tijd)
+            // Tijdelijke blokkade
             if (attempts.IsBlocked())
             {
                 var minutesLeft = Math.Ceiling(attempts.BlockTimeLeft());
-
                 return Unauthorized(new
                 {
                     message = $"Uw account is nog {minutesLeft} minuten geblokkeerd."
                 });
             }
 
-            // 3. Juiste login
+            // Juiste login
             if (request.Email == correctEmail && request.Wachtwoord == correctPassword)
             {
-                attempts.Reset();
+                attempts.ResetFailsOnly();
                 return Ok(new
                 {
-                    message = "login ok",
-                    redirect = "/dashboard" // later aanpassen als nodig
+                    message = "Login ok",
+                    redirect = "/dashboard"
                 });
             }
 
-            // 4. Foute login
+            // Foute login
             attempts.RegisterFail();
 
             if (attempts.FailCount >= 3)
             {
-                attempts.Block(); // start 15 min blokkade
-
+                attempts.Block();
                 return Unauthorized(new
                 {
                     message = "Uw account is 15 minuten geblokkeerd."
                 });
             }
 
-            return Unauthorized(new { message = "inloggegevens zijn incorrect" });
+            return Unauthorized(new { message = "Inloggegevens zijn incorrect" });
         }
     }
 }

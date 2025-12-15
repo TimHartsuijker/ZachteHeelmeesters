@@ -15,17 +15,17 @@
           <input type="password" id="wachtwoord" v-model="wachtwoord" />
         </div>
 
-        
+        <!-- Foutmelding bij lege velden -->
         <p v-if="emptyError" id="empty-input-error" class="error-text">
           Gegevens moeten ingevuld zijn
         </p>
 
-       
+        <!-- Foutmelding bij incorrecte login -->
         <p v-if="loginError" id="login-error" class="error-text">
           {{ loginErrorMessage }}
         </p>
 
-
+        <!-- Succesmelding -->
         <p v-if="loginSuccess" class="success-text">
           {{ loginSuccess }}
         </p>
@@ -73,14 +73,14 @@ export default {
         });
 
         if (response.status === 200) {
-            console.log("Login gelukt!", response.data);
+          console.log("Login gelukt!", response.data);
 
- 
-            sessionStorage.setItem("isLoggedIn", "true");
+          // Sessie opslaan
+          sessionStorage.setItem("isLoggedIn", "true");
 
-  
-            window.location.href = "/dashboard";
-}
+          // Redirect naar dashboard
+          window.location.href = "/dashboard";
+        }
       } catch (error) {
         // Foutmelding van backend (401/400)
         if (error.response && error.response.data && error.response.data.message) {

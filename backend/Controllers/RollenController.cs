@@ -6,17 +6,17 @@ namespace backend.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class RollenController : ControllerBase
+public class RolesController : ControllerBase
 {
     private readonly IConfiguration _configuration;
 
-    public RollenController(IConfiguration configuration)
+    public RolesController(IConfiguration configuration)
     {
         _configuration = configuration;
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Rol>>> GetRollen()
+    public async Task<ActionResult<IEnumerable<Rol>>> GetRoles()
     {
         var rollen = new List<Rol>();
         var connectionString = _configuration.GetConnectionString("DefaultConnection");

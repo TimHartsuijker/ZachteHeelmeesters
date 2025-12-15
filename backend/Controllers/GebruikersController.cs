@@ -6,17 +6,17 @@ namespace backend.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class GebruikersController : ControllerBase
+public class UsersController : ControllerBase
 {
     private readonly IConfiguration _configuration;
 
-    public GebruikersController(IConfiguration configuration)
+    public UsersController(IConfiguration configuration)
     {
         _configuration = configuration;
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Gebruiker>>> GetGebruikers()
+    public async Task<ActionResult<IEnumerable<Gebruiker>>> GetUsers()
     {
         var gebruikers = new List<Gebruiker>();
         var connectionString = _configuration.GetConnectionString("DefaultConnection");
@@ -71,7 +71,7 @@ public class GebruikersController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateGebruiker(int id, [FromBody] Gebruiker gebruiker)
+    public async Task<ActionResult> UpdateUser(int id, [FromBody] Gebruiker gebruiker)
     {
         var connectionString = _configuration.GetConnectionString("DefaultConnection");
 

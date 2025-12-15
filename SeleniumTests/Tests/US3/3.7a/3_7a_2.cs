@@ -8,73 +8,78 @@ namespace SeleniumTests;
 public class _3_7a_2
 {
     [TestMethod]
-    public void AddSystemManagerPermission_UserPermissionIsAdded()
+    public void SaveWithoutChanges_ShowsNoChangesAlert()
     {
         // Arrange
         IWebDriver driver = null;
         try
         {
-            // Step 1: Start test
-            Console.WriteLine("LOG [Step 1] Start test: AddSystemManagerPermission_UserPermissionIsAdded");
+            Console.WriteLine("LOG [Step 1] Start test: SaveWithoutChanges_ShowsNoChangesAlert");
             driver = new ChromeDriver();
-            var loginPage = new SeleniumTests.Pages.LoginPage(driver);
 
-            // Step 2: Navigate to the portal
-            loginPage.Navigate();
-            Console.WriteLine("LOG [Step 2] Navigated to portal.");
+            // Step 2: Navigate directly to Gebruikers page
+            driver.Navigate().GoToUrl("http://localhost:5173/Gebruikers.html");
+            Console.WriteLine("LOG [Step 2] Navigated to Gebruikers page.");
 
-            // Step 3: Log in as system manager
-            loginPage.EnterEmail("email@example.com");
-            loginPage.EnterPassword("Test123!");
-            loginPage.ClickLogin();
-            Console.WriteLine("LOG [Step 3] Logged in as system manager.");
+            // Wait for page to load
+            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            wait.Until(d => d.FindElements(By.ClassName("user-row")).Count > 0);
+            Console.WriteLine("LOG [Step 3] Page loaded with users.");
 
-            // Step 4: Go to Gebruikers (Users) page
-            driver.FindElement(By.LinkText("Gebruikers")).Click();
-            Console.WriteLine("LOG [Step 4] Navigated to 'Gebruikers' page.");
-
-            // Step 5: Find the user's div by ID and toggle the System Manager permission
-            var userDiv = driver.FindElement(By.Id("user-email@example.com"));
-            Console.WriteLine("LOG [Step 5] Found user div for 'email@example.com'.");
-
-            // Find the permission checkbox (input name="systemManager" or similar)
-            var permissionCheckbox = userDiv.FindElement(By.Name("systemManager"));
-            bool isChecked = permissionCheckbox.Selected;
-            if (!isChecked)
+            // Step 3: Find the first user's row
+            var userRows = driver.FindElements(By.ClassName("user-row"));
+            if (userRows.Count == 0)
             {
-                permissionCheckbox.Click();
-                Console.WriteLine("LOG [Step 6] System Manager permission enabled (checkbox checked).");
+                throw new Exception("No users found on the page.");
             }
-            else
-            {
-                Console.WriteLine("LOG [Step 6] System Manager permission was already enabled.");
-            }
+            var firstUserRow = userRows[0];
+            Console.WriteLine("LOG [Step 4] Found first user row.");
 
-            // Step 7: Click Save button for this user
-            var saveButton = userDiv.FindElement(By.XPath(".//button[contains(text(),'Save')]"));
+            // Step 4: Click Save button without making changes
+            var saveButton = firstUserRow.FindElement(By.ClassName("save-btn"));
             saveButton.Click();
-            Console.WriteLine("LOG [Step 7] Clicked 'Save' button for user.");
+            Console.WriteLine("LOG [Step 5] Clicked 'Save' button without changing any fields.");
 
-            // Step 8: Refresh the page to ensure data is loaded from the database
-            driver.Navigate().Refresh();
-            Console.WriteLine("LOG [Step 8] Page refreshed to reload data from database.");
-
-            // Step 9: Find the user's div again and check the permission value
-            var userDivAfter = driver.FindElement(By.Id("user-email@example.com"));
-            var permissionCheckboxAfter = userDivAfter.FindElement(By.Name("systemManager"));
-            bool isCheckedAfter = permissionCheckboxAfter.Selected;
-            if (isCheckedAfter)
+            // Step 5: Wait for alert and verify message
+            try
             {
-                Console.WriteLine("LOG [Step 9] PASS: System Manager permission is enabled after refresh.");
+                wait.Until(d => {
+                    try
+                    {
+                        d.SwitchTo().Alert();
+                        return true;
+                    }
+                    catch (NoAlertPresentException)
+                    {
+                        return false;
+                    }
+                });
+                
+                IAlert alert = driver.SwitchTo().Alert();
+                string alertText = alert.Text;
+                Console.WriteLine($"LOG [Step 6] Alert shown: '{alertText}'");
+                
+                if (alertText.Trim() == "Geen wijzigingen om op te slaan.")
+                {
+                    Console.WriteLine("LOG [Step 7] PASS: Correct alert message shown.");
+                }
+                else
+                {
+                    Console.WriteLine("LOG [Step 7] FAIL: Incorrect alert message.");
+                    alert.Accept();
+                    throw new Exception("Unexpected alert message: " + alertText);
+                }
+                alert.Accept();
+                Console.WriteLine("LOG [Step 8] Alert accepted.");
             }
-            else
+            catch (WebDriverTimeoutException)
             {
-                Console.WriteLine("LOG [Step 9] FAIL: System Manager permission is NOT enabled after refresh.");
-                throw new Exception("Permission not updated in database/UI after refresh.");
+                Console.WriteLine("LOG [Step 6] FAIL: No alert appeared after clicking save without changes.");
+                throw new Exception("Expected alert did not appear.");
             }
 
-            // Step 10: Test completed
-            Console.WriteLine("LOG [Step 10] Test completed successfully.");
+            // Step 6: Test completed
+            Console.WriteLine("LOG [Step 9] Test completed successfully.");
         }
         catch (NoSuchElementException ex)
         {
@@ -91,7 +96,7 @@ public class _3_7a_2
             if (driver != null)
             {
                 driver.Quit();
-                Console.WriteLine("LOG [Step 11] WebDriver closed.");
+                Console.WriteLine("LOG [Step 10] WebDriver closed.");
             }
         }
     }

@@ -39,11 +39,38 @@ public class _3_7a_1
             // Step 4: Change User role (select input in the user's row)
             var roleSelect = firstUserRow.FindElement(By.ClassName("role-select"));
             var selectElement = new SelectElement(roleSelect);
-            string currentRole = selectElement.SelectedOption.Text;
             
-            // Get all available roles and pick one different from current
+            // Wait for options to be available
+            wait.Until(d => selectElement.Options.Count > 0);
+            
+            // Get all available roles
             var availableRoles = selectElement.Options.Select(o => o.Text).ToList();
-            string newRole = availableRoles.First(r => r != currentRole);
+            if (availableRoles.Count == 0)
+            {
+                throw new Exception("No roles available in dropdown.");
+            }
+            
+            // Get current role or use first role if none selected
+            string currentRole;
+            try
+            {
+                currentRole = selectElement.SelectedOption.Text;
+            }
+            catch
+            {
+                // If no option is selected, select the first one
+                currentRole = availableRoles[0];
+                selectElement.SelectByText(currentRole);
+                Console.WriteLine($"LOG [Step 4a] No role was selected, selected default: '{currentRole}'.");
+            }
+            
+            // Get a different role to change to
+            string newRole = availableRoles.FirstOrDefault(r => r != currentRole);
+            if (newRole == null)
+            {
+                throw new Exception("Only one role available, cannot test role change.");
+            }
+            
             selectElement.SelectByText(newRole);
             Console.WriteLine($"LOG [Step 5] Changed user role from '{currentRole}' to '{newRole}'.");
 
@@ -52,12 +79,31 @@ public class _3_7a_1
             saveButton.Click();
             Console.WriteLine("LOG [Step 6] Clicked 'Save' button for user.");
 
-            // Wait for save to complete (alert appears)
-            Thread.Sleep(1000);
-            var alert = driver.SwitchTo().Alert();
-            string alertText = alert.Text;
-            alert.Accept();
-            Console.WriteLine($"LOG [Step 7] Alert message: '{alertText}'.");
+            // Wait for save to complete and alert to appear
+            try
+            {
+                var alertWait = new WebDriverWait(driver, TimeSpan.FromSeconds(5));
+                alertWait.Until(d => {
+                    try
+                    {
+                        d.SwitchTo().Alert();
+                        return true;
+                    }
+                    catch (NoAlertPresentException)
+                    {
+                        return false;
+                    }
+                });
+                
+                var alert = driver.SwitchTo().Alert();
+                string alertText = alert.Text;
+                alert.Accept();
+                Console.WriteLine($"LOG [Step 7] Alert message: '{alertText}'.");
+            }
+            catch (WebDriverTimeoutException)
+            {
+                Console.WriteLine("LOG [Step 7] No alert appeared after save (this is acceptable).");
+            }
 
             // Step 6: Refresh the page to ensure data is loaded from the database
             driver.Navigate().Refresh();

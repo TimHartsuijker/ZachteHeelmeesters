@@ -38,7 +38,7 @@ export default {
   methods: {
     async fetchRollen() {
       try {
-        const response = await fetch('http://localhost:5016/api/rollen');
+        const response = await fetch('http://localhost:5016/api/roles');
         if (!response.ok) throw new Error('Failed to fetch roles');
         this.rollen = await response.json();
       } catch (error) {
@@ -61,7 +61,7 @@ export default {
 
       this.saving = true;
       try {
-        const response = await fetch(`http://localhost:5016/api/gebruikers/${this.userId}`, {
+        const response = await fetch(`http://localhost:5016/api/users/${this.userId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json'

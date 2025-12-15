@@ -17,7 +17,7 @@ const filterOptions = ref({
 const fetchUsers = async () => {
   try {
     loading.value = true
-    const response = await fetch('http://localhost:5016/api/gebruikers')
+    const response = await fetch('http://localhost:5016/api/users')
     if (!response.ok) throw new Error('Failed to fetch users')
     users.value = await response.json()
     error.value = null
@@ -31,7 +31,7 @@ const fetchUsers = async () => {
 
 const fetchRollen = async () => {
   try {
-    const response = await fetch('http://localhost:5016/api/rollen')
+    const response = await fetch('http://localhost:5016/api/roles')
     if (!response.ok) throw new Error('Failed to fetch roles')
     rollen.value = await response.json()
   } catch (error) {
@@ -40,7 +40,8 @@ const fetchRollen = async () => {
       { rolID: 1, rolnaam: 'patiënt' },
       { rolID: 2, rolnaam: 'huisarts' },
       { rolID: 3, rolnaam: 'specialist' },
-      { rolID: 4, rolnaam: 'admin' }
+      { rolID: 4, rolnaam: 'administrator' }
+      { rolID: 5, rolnaam: 'Systeembeheerder' }
     ]
   }
 }

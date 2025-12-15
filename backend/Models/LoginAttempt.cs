@@ -6,7 +6,7 @@
         public int BlockCount { get; set; } = 0;
         public DateTime? BlockUntil { get; set; } = null;
 
-        private static readonly TimeSpan BlockDuration = TimeSpan.FromMinutes(15);
+        private static readonly TimeSpan BlockDuration = TimeSpan.FromMinutes(1);
 
         public void RegisterFail()
         {

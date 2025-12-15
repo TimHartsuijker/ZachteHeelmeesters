@@ -24,30 +24,30 @@ namespace BackendLogin.Controllers
                 return BadRequest(new { message = "Gegevens moeten ingevuld zijn" });
             }
 
-            // Gebruik account als sleutel
-            string key = correctEmail; // als je meerdere accounts hebt, gebruik database email
-            var attempts = loginAttempts.GetOrAdd(key, new LoginAttempt());
+            // 🔑 Sessie-gebaseerde blokkade
+            string sessionKey = HttpContext.Session.Id;
+            var attempts = loginAttempts.GetOrAdd(sessionKey, new LoginAttempt());
 
-            // Permanente blokkade
+            // 1. Permanente blokkade
             if (attempts.BlockCount >= 3)
             {
                 return Unauthorized(new
                 {
-                    message = "Uw account is permanent geblokkeerd. Controleer uw e-mail om uw account te deblokkeren."
+                    message = "Uw account is permanent geblokkeerd."
                 });
             }
 
-            // Tijdelijke blokkade
+            // 2. Tijdelijke blokkade
             if (attempts.IsBlocked())
             {
                 var minutesLeft = Math.Ceiling(attempts.BlockTimeLeft());
                 return Unauthorized(new
                 {
-                    message = $"Uw account is nog {minutesLeft} minuten geblokkeerd."
+                    message = $"U bent nog {minutesLeft} minuten geblokkeerd."
                 });
             }
 
-            // Juiste login
+            // 3. Juiste login
             if (request.Email == correctEmail && request.Wachtwoord == correctPassword)
             {
                 attempts.ResetFailsOnly();
@@ -58,7 +58,7 @@ namespace BackendLogin.Controllers
                 });
             }
 
-            // Foute login
+            // 4. Foute login
             attempts.RegisterFail();
 
             if (attempts.FailCount >= 3)
@@ -66,7 +66,7 @@ namespace BackendLogin.Controllers
                 attempts.Block();
                 return Unauthorized(new
                 {
-                    message = "Uw account is 15 minuten geblokkeerd."
+                    message = "Uw account is 15 minuten geblokkeerd"
                 });
             }
 

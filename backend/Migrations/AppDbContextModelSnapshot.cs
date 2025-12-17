@@ -22,10 +22,28 @@ namespace backend.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("SpecialismUser", b =>
+                {
+                    b.Property<int>("SpecialismsId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SpecialistsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("SpecialismsId", "SpecialistsId");
+
+                    b.HasIndex("SpecialistsId");
+
+                    b.ToTable("SpecialismSpecialists", (string)null);
+                });
+
             modelBuilder.Entity("backend.Models.Appointment", b =>
                 {
-                    b.Property<int>("SpecialistId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("AppointmentDateTime")
                         .HasColumnType("datetime2");
@@ -36,14 +54,24 @@ namespace backend.Migrations
                     b.Property<int>("PatientId")
                         .HasColumnType("int");
 
+                    b.Property<int>("ReferralId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SpecialistId")
+                        .HasColumnType("int");
+
                     b.Property<int>("TreatmentId")
                         .HasColumnType("int");
 
-                    b.HasKey("SpecialistId", "AppointmentDateTime");
+                    b.HasKey("Id");
 
                     b.HasIndex("DepartmentId");
 
                     b.HasIndex("PatientId");
+
+                    b.HasIndex("ReferralId");
+
+                    b.HasIndex("SpecialistId");
 
                     b.HasIndex("TreatmentId");
 
@@ -89,24 +117,107 @@ namespace backend.Migrations
             modelBuilder.Entity("backend.Models.MedicalRecordEntry", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("PatientId")
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AppointmentId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PatientId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppointmentId");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("PatientId");
+
+                    b.ToTable("MedicalRecordEntries");
+                });
+
+            modelBuilder.Entity("backend.Models.MedicalRecordFile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("FileSize")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("MedicalRecordEntryId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UploadedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MedicalRecordEntryId");
+
+                    b.ToTable("MedicalRecordFiles");
+                });
+
+            modelBuilder.Entity("backend.Models.Referral", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DoctorId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PatientId")
+                        .HasColumnType("int");
+
                     b.Property<int>("TreatmentId")
                         .HasColumnType("int");
 
-                    b.HasKey("Id", "PatientId");
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.HasIndex("DoctorId");
 
                     b.HasIndex("PatientId");
 
                     b.HasIndex("TreatmentId");
 
-                    b.ToTable("MedicalRecordEntries");
+                    b.ToTable("Referrals");
                 });
 
             modelBuilder.Entity("backend.Models.Role", b =>
@@ -179,14 +290,9 @@ namespace backend.Migrations
                     b.Property<int>("SpecialismId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("SpecialismId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Treatments");
                 });
@@ -267,6 +373,21 @@ namespace backend.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("SpecialismUser", b =>
+                {
+                    b.HasOne("backend.Models.Specialism", null)
+                        .WithMany()
+                        .HasForeignKey("SpecialismsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("backend.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("SpecialistsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("backend.Models.Appointment", b =>
                 {
                     b.HasOne("backend.Models.Department", "Department")
@@ -278,6 +399,12 @@ namespace backend.Migrations
                     b.HasOne("backend.Models.User", "Patient")
                         .WithMany("PatientAppointments")
                         .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("backend.Models.Referral", "Referral")
+                        .WithMany("Appointments")
+                        .HasForeignKey("ReferralId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -297,6 +424,8 @@ namespace backend.Migrations
 
                     b.Navigation("Patient");
 
+                    b.Navigation("Referral");
+
                     b.Navigation("Specialist");
 
                     b.Navigation("Treatment");
@@ -313,7 +442,7 @@ namespace backend.Migrations
                     b.HasOne("backend.Models.User", "Specialist")
                         .WithMany("MedicalRecordAccessAsSpecialist")
                         .HasForeignKey("SpecialistId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Patient");
@@ -323,10 +452,54 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Models.MedicalRecordEntry", b =>
                 {
+                    b.HasOne("backend.Models.Appointment", "Appointment")
+                        .WithMany()
+                        .HasForeignKey("AppointmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("backend.Models.User", "CreatedBy")
+                        .WithMany("CreatedMedicalRecordEntries")
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("backend.Models.User", "Patient")
                         .WithMany("MedicalRecordEntries")
                         .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Appointment");
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("Patient");
+                });
+
+            modelBuilder.Entity("backend.Models.MedicalRecordFile", b =>
+                {
+                    b.HasOne("backend.Models.MedicalRecordEntry", "MedicalRecordEntry")
+                        .WithMany("Files")
+                        .HasForeignKey("MedicalRecordEntryId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MedicalRecordEntry");
+                });
+
+            modelBuilder.Entity("backend.Models.Referral", b =>
+                {
+                    b.HasOne("backend.Models.User", "Doctor")
+                        .WithMany("ReferralsAsDoctor")
+                        .HasForeignKey("DoctorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("backend.Models.User", "Patient")
+                        .WithMany("ReferralsAsPatient")
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("backend.Models.Treatment", "Treatment")
@@ -334,6 +507,8 @@ namespace backend.Migrations
                         .HasForeignKey("TreatmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Doctor");
 
                     b.Navigation("Patient");
 
@@ -348,10 +523,6 @@ namespace backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("backend.Models.User", null)
-                        .WithMany("Treatments")
-                        .HasForeignKey("UserId");
-
                     b.Navigation("Specialism");
                 });
 
@@ -359,7 +530,8 @@ namespace backend.Migrations
                 {
                     b.HasOne("backend.Models.Department", "Department")
                         .WithMany("Specialists")
-                        .HasForeignKey("DepartmentId");
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("backend.Models.User", "Doctor")
                         .WithMany("Patients")
@@ -369,7 +541,7 @@ namespace backend.Migrations
                     b.HasOne("backend.Models.Role", "Role")
                         .WithMany("Users")
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Department");
@@ -384,6 +556,16 @@ namespace backend.Migrations
                     b.Navigation("Specialists");
                 });
 
+            modelBuilder.Entity("backend.Models.MedicalRecordEntry", b =>
+                {
+                    b.Navigation("Files");
+                });
+
+            modelBuilder.Entity("backend.Models.Referral", b =>
+                {
+                    b.Navigation("Appointments");
+                });
+
             modelBuilder.Entity("backend.Models.Role", b =>
                 {
                     b.Navigation("Users");
@@ -396,6 +578,8 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Models.User", b =>
                 {
+                    b.Navigation("CreatedMedicalRecordEntries");
+
                     b.Navigation("MedicalRecordAccessAsPatient");
 
                     b.Navigation("MedicalRecordAccessAsSpecialist");
@@ -406,9 +590,11 @@ namespace backend.Migrations
 
                     b.Navigation("Patients");
 
-                    b.Navigation("SpecialistAppointments");
+                    b.Navigation("ReferralsAsDoctor");
 
-                    b.Navigation("Treatments");
+                    b.Navigation("ReferralsAsPatient");
+
+                    b.Navigation("SpecialistAppointments");
                 });
 #pragma warning restore 612, 618
         }

@@ -38,6 +38,8 @@ namespace backend.Models
         public Role Role { get; set; } = null!; // NP
 
         // For specialists and patients
+        public ICollection<Referral> ReferralsAsPatient { get; set; } = [];
+        public ICollection<Referral> ReferralsAsDoctor { get; set; } = [];
         public ICollection<Appointment> SpecialistAppointments { get; set; } = [];
         public ICollection<Appointment> PatientAppointments { get; set; } = [];
         public ICollection<MedicalRecordAccess> MedicalRecordAccessAsSpecialist { get; set; } = [];
@@ -55,6 +57,7 @@ namespace backend.Models
         // For specialists
         public int? DepartmentId { get; set; }
         public Department? Department { get; set; } // NP for specialist's department
-        public ICollection<Treatment> Treatments { get; set; } = []; // NP for specialist's treatments
+        public ICollection<Specialism> Specialisms { get; set; } = []; // NP for specialist's treatments
+        public ICollection<MedicalRecordEntry> CreatedMedicalRecordEntries { get; set; } = []; // NP for medical records created by specialist
     }
 }

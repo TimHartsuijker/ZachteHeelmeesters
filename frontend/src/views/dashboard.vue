@@ -3,7 +3,16 @@
 
   <main class="dashboard-main">
     <div class="welcome-box">
-      <h1 data-test="welcome-message">Welkom op het Dashboard {naam}</h1>
+      <!-- Loading state -->
+      <h1 v-if="loading" data-test="welcome-message">Welkom op het Dashboard</h1>
+      
+      <!-- Met naam -->
+      <h1 v-else-if="patient" data-test="welcome-message">
+        Welkom op het Dashboard, {{ patient.voornaam }}!
+      </h1>
+      
+      <!-- Fallback bij error -->
+      <h1 v-else data-test="welcome-message">Welkom op het Dashboard</h1>
     </div>
 
     <div class="dashboard-overzicht">
@@ -28,23 +37,24 @@ import '../css/dashboard.css'
 import '../css/navbar.css'
 
 import Navbar from '../components/Navbar.vue'
-import api from '../services/api'
+import { getPatient, type PatientResponse } from '../services/api'
 
 import { ref, onMounted } from 'vue'
 
-interface Patient {
-  id: number
-  name: string
-}
+// Patient data
+const patient = ref<PatientResponse | null>(null)
+const loading = ref(true)
 
-const patients = ref<Patient[]>([])
+// Hardcoded patient ID voor nu (later uit auth/session halen)
+const PATIENT_ID = 2 // Emma de Vries
 
 onMounted(async () => {
   try {
-    const res = await api.get('/patient') // <-- automatische koppeling
-    patients.value = res.data
+    patient.value = await getPatient(PATIENT_ID)
   } catch (err) {
-    console.error('Error bij ophalen patiënten:', err)
+    console.error('Error bij ophalen patiënt:', err)
+  } finally {
+    loading.value = false
   }
 })
 </script>

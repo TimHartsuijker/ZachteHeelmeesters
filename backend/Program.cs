@@ -1,16 +1,17 @@
-var builder = WebApplication.CreateBuilder(args);
+﻿var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
+// Add services to the container
 builder.Services.AddControllers();
 
+// CORS configuratie
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:5173", "http://localhost:3000") 
+        policy.WithOrigins("http://localhost:5174", "https://localhost:5174")
               .AllowAnyHeader()
-              .AllowAnyMethod();
+              .AllowAnyMethod()
+              .AllowCredentials(); // Voor cookies/JWT tokens (later bij authenticatie)
     });
 });
 
@@ -20,20 +21,20 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// Middleware in correcte volgorde - BELANGRIJK!
+app.UseCors("AllowFrontend");  // 1. CORS eerst
 
-app.UseCors("AllowFrontend");
+app.UseHttpsRedirection();      // 2. HTTPS redirect
 
-app.UseAuthorization();
+app.UseAuthorization();         // 3. Authorization
 
-app.MapControllers();
+app.MapControllers();           // 4. Controllers mappen
 
 app.Run();
-//cors

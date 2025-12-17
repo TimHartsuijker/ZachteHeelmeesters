@@ -1,6 +1,6 @@
 USE zachteheelmeester;
 
--- Drop tables in reverse order that they are created in the script below to avoid foreign key constraint errors
+-- Drop tables in reverse order...
 DROP TABLE IF EXISTS afspraken;
 DROP TABLE IF EXISTS afdelingen;
 DROP TABLE IF EXISTS medischdossierentry;
@@ -9,8 +9,8 @@ DROP TABLE IF EXISTS gebruikers;
 DROP TABLE IF EXISTS rollen;
 DROP TABLE IF EXISTS behandelingen;
 
-create table behandelingen (
-	zorgcode varchar(50) NOT NULL,
+CREATE TABLE behandelingen (
+    zorgcode varchar(50) NOT NULL,
     omschrijving varchar(255) NOT NULL,
     specialisme varchar(20) NOT NULL,
     tijdsduur INT NOT NULL,
@@ -34,7 +34,7 @@ CREATE TABLE gebruikers(
     Huisnummer VARCHAR(100) NOT NULL,
     Postcode VARCHAR(6) NOT NULL,
     Telefoonnummer VARCHAR(15) NOT NULL,
-    rol VARCHAR(50) NOT NULL,
+    rol INT NOT NULL,
     systeembeheerder BIT NOT NULL,
     FOREIGN KEY (rol) REFERENCES rollen(rolID),
     PRIMARY KEY (gebruikersID)
@@ -43,10 +43,8 @@ CREATE TABLE gebruikers(
 CREATE TABLE huisarts_patient (
     huisartsID INT NOT NULL,
     patientID INT NOT NULL,
-
     FOREIGN KEY (huisartsID) REFERENCES gebruikers(gebruikersID),
     FOREIGN KEY (patientID) REFERENCES gebruikers(gebruikersID),
-
     PRIMARY KEY (huisartsID, patientID)
 );
 
@@ -54,7 +52,6 @@ CREATE TABLE medischdossierentry (
     entryID INT IDENTITY(1,1) NOT NULL,
     patientID INT NOT NULL,
     datumtijd DATETIME NOT NULL,
-    -- nog geen idee wat hier verder moet komen
     FOREIGN KEY (patientID) REFERENCES gebruikers(gebruikersID),
     PRIMARY KEY (patientID, entryID)
 );
@@ -75,4 +72,4 @@ CREATE TABLE afspraken(
     FOREIGN KEY (behandeling) REFERENCES behandelingen(zorgcode),
     FOREIGN KEY (afdeling) REFERENCES afdelingen(afdelingID)
 );
-
+GO

@@ -1,22 +1,27 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace backend.Models
 {
-    [PrimaryKey(nameof(Id), nameof(PatientId))]
     public class MedicalRecordEntry
     {
-        [Required]
+        [Key]
         public int Id { get; set; }
 
         [Required]
         public int PatientId { get; set; }
         public User Patient { get; set; } = null!;
 
-        public int TreatmentId { get; set; }
-        public Treatment Treatment { get; set; } = null!;
+        [Required]
+        public int AppointmentId { get; set; }
+        public Appointment Appointment { get; set; } = null!;
+
+        [Required]
+        public int CreatedById { get; set; }
+        public User CreatedBy { get; set; } = null!;
 
         [Required]
         public DateTime CreatedAt { get; set; }
+
+        public ICollection<MedicalRecordFile> Files { get; set; } = [];
     }
 }

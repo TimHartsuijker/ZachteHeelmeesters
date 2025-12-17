@@ -1,11 +1,12 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 
-class CreateReferralTest
+internal class CreateReferralTest
 {
     private static IWebDriver driver;
 
-    static void Main(string[] args)
+    // Rename Main to Run to avoid multiple entry points
+    public static void Run(string[] args)
     {
         try
         {

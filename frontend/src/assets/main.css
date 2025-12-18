@@ -1,35 +1,80 @@
-@import './base.css';
-
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-weight: normal;
+/* LoginView.css of in <style scoped> */
+.login-view-page {
+  display: flex;
+  justify-content: center; /* horizontaal centreren */
+  align-items: center;     /* verticaal centreren */
+  height: 100vh;           /* hele viewport hoogte */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
+.login-view-card {
+  background: #DDF6D2;
+  padding: 2.5rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
 }
 
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
+.login-view-card h2 {
+  margin-bottom: 1.5rem;
+  color: #333;
+  font-size: 1.8rem;
 }
 
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
+.login-view-form-group {
+  display: flex;
+  
+  flex-direction: column;
+  margin-bottom: 1rem;
+  text-align: left;
+}
 
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
+.login-view-form-group label {
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #555;
+}
+
+.login-view-form-group input {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #B0DB9C23;
+  border-radius: 6px;
+  font-size: 1rem;
+  background: #B0DB9C;
+  transition: border 0.3s;
+}
+
+.login-view-form-group input:focus {
+  outline: none;
+  border-color: #00a676;
+}
+
+button[type="submit"] {
+  width: 50%;
+  padding: 0.75rem;
+  background-color: #00960c;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 15px;
+  transition: background-color 0.3s;
+}
+
+button[type="submit"]:hover {
+  background-color: #00855f;
+}
+
+
+.error-text {
+  color: red;
+  margin-top: 5px;
+}
+
+.success-text {
+  color: green;
+  margin-top: 5px;
 }

@@ -1,6 +1,6 @@
 ﻿using OpenQA.Selenium;
 
-namespace SeleniumTests.Pages
+namespace SeleniumTests.P_O_M
 {
     public class LoginPage
     {
@@ -12,10 +12,10 @@ namespace SeleniumTests.Pages
         }
 
         // URL van de inlogpagina
-        public string Url => "http://localhost:5000/inloggen"; // Later vervangen
+        public string Url => "http://localhost:5173/"; // Later vervangen
 
         private By EmailInput => By.Id("email");
-        private By PasswordInput => By.Id("password");
+        private By PasswordInput => By.Id("wachtwoord");
         private By LoginButton => By.Id("login-btn"); 
 
      
@@ -40,10 +40,10 @@ namespace SeleniumTests.Pages
 
         public void ClickLogin()
         {
-            driver.FindElement(By.XPath("//button[contains(text(), 'Log in')]")).Click();
+            driver.FindElement(LoginButton).Click();
         }
 
-     
+
         public bool IsEmailFieldDisplayed()
         {
             return driver.FindElement(EmailInput).Displayed;

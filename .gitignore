@@ -43,6 +43,7 @@ frontend/*.ntvs*
 frontend/*.njsproj
 frontend/*.sln
 frontend/*.sw?
+frontend/node_modules
 
 # TypeScript build info
 frontend/*.tsbuildinfo

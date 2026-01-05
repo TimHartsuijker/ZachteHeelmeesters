@@ -43,3 +43,57 @@ header {
   color: var(--navbar-link-color);
   background-color: var(--navbar-bg-hover-color);
 }
+/* Hamburger standaard verbergen (desktop) */
+.hamburger {
+  display: none;
+  font-size: 26px;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+/* Hamburger / dropdown voor alle schermen ≤1024px */
+@media (max-width: 1024px) {
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .hamburger {
+    display: block; /* hamburger zichtbaar */
+  }
+
+  .nav-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background-color: var(--navbar-bg-color);
+    flex-direction: column;
+    gap: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+
+  /* Open state */
+  .nav-menu.open {
+    max-height: 300px;
+  }
+
+  .nav-menu li {
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .nav-menu a {
+    display: block;
+    padding: 16px;
+    border-radius: 0;
+  }
+
+  .nav-menu a:hover {
+    background-color: var(--navbar-bg-hover-color);
+  }
+}

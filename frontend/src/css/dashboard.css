@@ -53,4 +53,62 @@
 .panel h2 {
   margin-top: 0;
 }
+/* =========================
+   ALLES T/M TABLET LIGGEND
+   (= MOBIELE LAYOUT)
+========================= */
+@media (max-width: 1024px) {
+  /* content altijd onder navbar */
+  .dashboard-main {
+    left: 0;
+    padding-top: 72px;
+    padding-left: 24px;
+    padding-right: 24px;
+  }
 
+  /* welcome box in normale flow */
+  .welcome-box {
+    position: relative;
+    top: 0;
+    margin-bottom: 24px;
+  }
+
+  /* overzicht schaalbaar */
+  .dashboard-overzicht {
+    width: 100%;
+    height: auto;
+    margin-top: 24px;
+  }
+
+  /* PANELS ONDER ELKAAR */
+  .dashboard-grid {
+    flex-direction: column;
+  }
+
+  .panel {
+    width: 100%;
+  }
+}
+
+/* =========================
+   TELEFOON FINETUNING
+========================= */
+@media (max-width: 480px) {
+  .dashboard-main {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .welcome-box h1 {
+    font-size: 20px;
+  }
+
+  .dashboard-overzicht {
+    padding: 16px;
+    border-radius: 10px;
+  }
+
+  .panel {
+    padding: 16px;
+  }
+}

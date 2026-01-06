@@ -76,3 +76,66 @@ CREATE TABLE afspraken(
     FOREIGN KEY (afdeling) REFERENCES afdelingen(afdelingID)
 );
 
+-- Seed a test doctor and availability for week of 2026-01-07
+DECLARE @DoctorRoleId VARCHAR(50) = 'DOCTOR';
+
+IF NOT EXISTS (SELECT 1 FROM rollen WHERE rolID = @DoctorRoleId)
+BEGIN
+    INSERT INTO rollen (rolID, rolnaam)
+    VALUES (@DoctorRoleId, 'Doctor');
+END;
+
+DECLARE @DoctorId INT;
+
+SELECT @DoctorId = gebruikersID FROM gebruikers WHERE email = 'testdoctor@example.com';
+
+IF @DoctorId IS NULL
+BEGIN
+    INSERT INTO gebruikers (
+        voornaam,
+        achternaam,
+        email,
+        wachtwoord,
+        Straatnaam,
+        Huisnummer,
+        Postcode,
+        Telefoonnummer,
+        rol,
+        systeembeheerder
+    ) VALUES (
+        'Test',
+        'Doctor',
+        'testdoctor@example.com',
+        'password',
+        'Teststraat',
+        '1A',
+        '1234AB',
+        316123456,
+        @DoctorRoleId,
+        0
+    );
+
+    SET @DoctorId = SCOPE_IDENTITY();
+END;
+
+-- Insert availability slots for 7 Jan 2026 from 10:00 to 15:30 in 15-minute increments
+IF @DoctorId IS NOT NULL AND OBJECT_ID('doctor_availability', 'U') IS NOT NULL
+BEGIN
+    DECLARE @SlotStart DATETIME = '2026-01-07T10:00:00';
+    DECLARE @SlotEnd DATETIME = '2026-01-07T15:30:00';
+
+    WHILE @SlotStart <= @SlotEnd
+    BEGIN
+        IF NOT EXISTS (
+            SELECT 1 FROM doctor_availability
+            WHERE doctor_id = @DoctorId AND date_time = @SlotStart
+        )
+        BEGIN
+            INSERT INTO doctor_availability (doctor_id, date_time, is_available, reason)
+            VALUES (@DoctorId, @SlotStart, 1, NULL);
+        END;
+
+        SET @SlotStart = DATEADD(MINUTE, 15, @SlotStart);
+    END;
+END;
+

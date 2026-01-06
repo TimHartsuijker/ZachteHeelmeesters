@@ -1,7 +1,7 @@
 <template>
   <div class="doctor-calendar">
     <div class="calendar-header">
-      <h2>Beschikbaarheidskalender</h2>
+      <h2>Agenda</h2>
       <div class="calendar-controls">
         <button @click="previousWeek" class="btn-nav">&lt;</button>
         <button @click="goToToday" class="btn-nav btn-nav-secondary">Vandaag</button>
@@ -18,6 +18,7 @@
       <button @click="showAvailablePeriodModal = true" class="btn btn-secondary">
         Periode beschikbaar maken
       </button>
+      <span class="user-info user-info-inline">Gebruiker: {{ userName }} ({{ userEmail }})</span>
     </div>
 
     <!-- Week view -->
@@ -51,7 +52,7 @@
               <div
                 v-for="slot in getSlots(day.date)"
                 :key="`${slot.date}-${slot.hour}-${slot.minute}`"
-                :class="['time-slot', { unavailable: isSlotUnavailable(slot.date, slot.hour, slot.minute) }]"
+                :class="['time-slot', { unavailable: isSlotUnavailable(slot.date, slot.hour, slot.minute), 'hour-boundary': isHourBoundary(slot.minute) }]"
                 @click="selectSlot(slot.date, slot.hour, slot.minute)"
               >
                 <span v-if="isSlotUnavailable(slot.date, slot.hour, slot.minute) && getSlotReason(slot.date, slot.hour, slot.minute)" class="unavailable-reason">
@@ -161,7 +162,11 @@
             <label for="slot-end-time-unavail">Tot en met:</label>
             <select id="slot-end-time-unavail" v-model="selectedSlot.endTime">
               <option value="">Alleen dit moment</option>
-                <option v-for="time in getUnavailableEndTimes()" :key="time" :value="time">
+              <option
+                v-for="time in getUnavailableEndTimes()"
+                :key="time"
+                :value="time"
+              >
                 {{ time }}
               </option>
             </select>
@@ -170,7 +175,11 @@
             <label for="slot-end-time">Tot en met:</label>
             <select id="slot-end-time" v-model="selectedSlot.endTime" required>
               <option value="">Selecteer eind tijd</option>
-              <option v-for="time in getEndTimesForSlot()" :key="time" :value="time">
+              <option
+                v-for="time in getEndTimesForSlot()"
+                :key="time"
+                :value="time"
+              >
                 {{ time }}
               </option>
             </select>
@@ -195,11 +204,11 @@ export default {
   props: {
     doctorId: {
       type: Number,
-      required: true
+      default: 1 // fallback for testing; replace with logged-in doctor ID later
     },
     apiBaseUrl: {
       type: String,
-      default: 'http://localhost:5000/api'
+      default: 'http://localhost:5016/api'
     }
   },
   data() {
@@ -222,7 +231,9 @@ export default {
         endDateTime: ''
       },
       loading: false,
-      error: null
+      error: null,
+      userName: 'Test Doctor',
+      userEmail: 'testdoctor@example.com'
     };
   },
   computed: {
@@ -256,7 +267,36 @@ export default {
       return days;
     }
   },
+  watch: {
+    'unavailablePeriod.startDateTime'(val) {
+      // Reset and prefill end time to the first available option to avoid empty required field
+      this.unavailablePeriod.endDateTime = '';
+      if (val) {
+        const options = this.getUnavailablePeriodEndTimes();
+        if (options.length > 0) {
+          this.unavailablePeriod.endDateTime = options[0];
+        }
+      }
+    }
+  },
   methods: {
+    pad(value) {
+      return String(value).padStart(2, '0');
+    },
+    toIso(dateString, hour, minute) {
+      // Build ISO string preserving local timezone
+      const year = dateString.split('-')[0];
+      const month = dateString.split('-')[1];
+      const day = dateString.split('-')[2];
+      const offsetMinutes = new Date().getTimezoneOffset();
+      const offsetHours = Math.abs(Math.floor(offsetMinutes / 60));
+      const offsetMins = Math.abs(offsetMinutes % 60);
+      const offsetSign = offsetMinutes <= 0 ? '+' : '-';
+      return `${year}-${month}-${day}T${this.pad(hour)}:${this.pad(minute)}:00${offsetSign}${this.pad(offsetHours)}:${this.pad(offsetMins)}`;
+    },
+    slotKey(dateString, hour, minute) {
+      return `${dateString}T${this.pad(hour)}:${this.pad(minute)}:00`;
+    },
     getMondayOfWeek(date) {
       const d = new Date(date);
       const day = d.getDay();
@@ -292,6 +332,9 @@ export default {
       }
       return slots;
     },
+    isHourBoundary(minute) {
+      return minute === 0;
+    },
     isSlotUnavailable(dateString, hour, minute) {
       const key = `${dateString}T${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:00`;
       return this.availabilities[key]?.isAvailable === false;
@@ -312,8 +355,7 @@ export default {
         minute: minute,
         isAvailable: this.availabilities[key]?.isAvailable !== false,
         reason: this.availabilities[key]?.reason || '',
-        endTime: '',
-        availabilityId: this.availabilities[key]?.availabilityId
+        endTime: ''
       };
       this.showHourModal = true;
     },
@@ -385,107 +427,164 @@ export default {
       const timeStr = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
       return `${dateStr} ${timeStr}`;
     },
-    saveSlot() {
+    async saveSlot() {
+      console.log('[saveSlot] selectedSlot', this.selectedSlot, 'doctorId', this.doctorId);
+      if (!this.selectedSlot) {
+        console.warn('[saveSlot] no selectedSlot');
+        return;
+      }
       if (this.selectedSlot.isAvailable && !this.selectedSlot.endTime) {
         alert('Selecteer alstublieft een eind tijd');
         return;
       }
-      
-      const startKey = `${this.selectedSlot.date}T${String(this.selectedSlot.hour).padStart(2, '0')}:${String(this.selectedSlot.minute).padStart(2, '0')}:00`;
-      
+
+      const startIso = this.toIso(this.selectedSlot.date, this.selectedSlot.hour, this.selectedSlot.minute);
+      let endIso = startIso;
+
       if (this.selectedSlot.isAvailable) {
-        // Mark all slots from start to end as available
         const [endHour, endMinute] = this.selectedSlot.endTime.split(':').map(Number);
-        let current = new Date(`${this.selectedSlot.date}T${String(this.selectedSlot.hour).padStart(2, '0')}:${String(this.selectedSlot.minute).padStart(2, '0')}:00`);
-        const end = new Date(`${this.selectedSlot.date}T${String(endHour).padStart(2, '0')}:${String(endMinute).padStart(2, '0')}:00`);
-        
-        while (current < end) {
-          const h = current.getHours();
-          const m = current.getMinutes();
-          const slotKey = `${this.selectedSlot.date}T${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:00`;
-          this.availabilities[slotKey] = {
-            dateTime: slotKey,
-            isAvailable: true,
-            reason: '',
-            availabilityId: this.availabilities[slotKey]?.availabilityId || null
-          };
-          current.setMinutes(current.getMinutes() + 15);
-        }
+        endIso = this.toIso(this.selectedSlot.date, endHour, endMinute);
+      } else if (this.selectedSlot.endTime) {
+        const [endHour, endMinute] = this.selectedSlot.endTime.split(':').map(Number);
+        endIso = this.toIso(this.selectedSlot.date, endHour, endMinute);
       } else {
-        // Mark slots as unavailable
-        if (this.selectedSlot.endTime) {
-          // Mark from start to end time as unavailable
-          const [endHour, endMinute] = this.selectedSlot.endTime.split(':').map(Number);
-          let current = new Date(`${this.selectedSlot.date}T${String(this.selectedSlot.hour).padStart(2, '0')}:${String(this.selectedSlot.minute).padStart(2, '0')}:00`);
-          const end = new Date(`${this.selectedSlot.date}T${String(endHour).padStart(2, '0')}:${String(endMinute).padStart(2, '0')}:00`);
-          
-          while (current <= end) {
-            const h = current.getHours();
-            const m = current.getMinutes();
-            const slotKey = `${this.selectedSlot.date}T${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:00`;
-            this.availabilities[slotKey] = {
-              dateTime: slotKey,
-              isAvailable: false,
-              reason: this.selectedSlot.reason,
-              availabilityId: this.availabilities[slotKey]?.availabilityId || null
-            };
-            current.setMinutes(current.getMinutes() + 15);
-          }
-        } else {
-          // Mark only single slot as unavailable
-          this.availabilities[startKey] = {
-            dateTime: startKey,
-            isAvailable: false,
-            reason: this.selectedSlot.reason,
-            availabilityId: this.selectedSlot.availabilityId
-          };
-        }
+        const temp = new Date(startIso);
+        temp.setMinutes(temp.getMinutes() + 15);
+        endIso = temp.toISOString();
       }
-      
+
+      const slots = this.buildSlots(
+        startIso,
+        endIso,
+        this.selectedSlot.isAvailable,
+        this.selectedSlot.reason
+      );
+      console.log('[saveSlot] payload JSON', JSON.stringify(slots, null, 2));
+
+      try {
+        const response = await fetch(`${this.apiBaseUrl}/doctoravailability/${this.doctorId}/bulk`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(slots)
+        });
+        console.log('[saveSlot] payload', slots, 'status', response.status);
+        if (!response.ok) {
+          const text = await response.text();
+          console.error('[saveSlot] error response', text);
+          throw new Error(`Opslaan mislukt: ${text}`);
+        }
+      } catch (err) {
+        console.error('[saveSlot] error', err);
+        this.error = err.message;
+      }
+
       this.showHourModal = false;
+      this.loadAvailabilities();
     },
-    deleteSlot() {
-      const key = `${this.selectedSlot.date}T${String(this.selectedSlot.hour).padStart(2, '0')}:${String(this.selectedSlot.minute).padStart(2, '0')}:00`;
-      delete this.availabilities[key];
+    async deleteSlot() {
+      const key = this.slotKey(this.selectedSlot.date, this.selectedSlot.hour, this.selectedSlot.minute);
+      const iso = this.toIso(this.selectedSlot.date, this.selectedSlot.hour, this.selectedSlot.minute);
+      try {
+        const response = await fetch(`${this.apiBaseUrl}/doctoravailability/${this.doctorId}?dateTime=${encodeURIComponent(iso)}`, {
+          method: 'DELETE'
+        });
+        if (!response.ok) throw new Error('Verwijderen mislukt');
+        delete this.availabilities[key];
+      } catch (err) {
+        this.error = err.message;
+      }
       this.showHourModal = false;
     },
     formatSlotTime(dateString, hour, minute) {
       const date = new Date(dateString + 'T00:00:00');
       return `${date.toLocaleDateString('nl-NL', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })} van ${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
     },
-    setUnavailablePeriod() {
-      const startDate = new Date(this.unavailablePeriod.startDateTime);
-      const endDate = new Date(this.unavailablePeriod.endDateTime);
-      
-      // Mark all hours within the period as unavailable
-      const current = new Date(startDate);
-      while (current < endDate) {
-        const dateString = current.toISOString().split('T')[0];
+    buildSlots(startIso, endIso, isAvailable, reason = '') {
+      const slots = [];
+      let current = new Date(startIso);
+      const end = new Date(endIso);
+      while (current < end) {
+        const year = current.getFullYear();
+        const month = String(current.getMonth() + 1).padStart(2, '0');
+        const day = String(current.getDate()).padStart(2, '0');
         const hour = current.getHours();
-        
-        for (let minute = 0; minute < 60; minute += 15) {
-          const slotKey = `${dateString}T${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:00`;
-          this.availabilities[slotKey] = {
-            dateTime: slotKey,
-            isAvailable: false,
-            reason: this.unavailablePeriod.reason,
-            availabilityId: null
-          };
-        }
-        
-        current.setHours(current.getHours() + 1);
+        const minute = current.getMinutes();
+        const slotIso = this.toIso(`${year}-${month}-${day}`, hour, minute);
+        slots.push({
+          doctorId: this.doctorId,
+          dateTime: slotIso,
+          isAvailable,
+          reason: isAvailable ? '' : reason
+        });
+        current.setMinutes(current.getMinutes() + 15);
       }
-      
+      return slots;
+    },
+    async setUnavailablePeriod() {
+      console.log('[UnavailablePeriod] submit', this.unavailablePeriod);
+      if (!this.unavailablePeriod.startDateTime || !this.unavailablePeriod.endDateTime) {
+        console.warn('[UnavailablePeriod] missing required fields', this.unavailablePeriod);
+        return;
+      }
+      const slots = this.buildSlots(
+        this.unavailablePeriod.startDateTime,
+        this.unavailablePeriod.endDateTime,
+        false,
+        this.unavailablePeriod.reason
+      );
+      console.log('[UnavailablePeriod] slots to save', slots);
+
+      try {
+        const response = await fetch(`${this.apiBaseUrl}/doctoravailability/${this.doctorId}/bulk`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(slots)
+        });
+        console.log('[UnavailablePeriod] response status', response.status);
+        if (!response.ok) {
+          const text = await response.text();
+          console.error('[UnavailablePeriod] error response', text);
+          throw new Error(`Opslaan mislukt: ${text}`);
+        }
+        const saved = await response.json();
+        console.log('[UnavailablePeriod] saved slots', saved);
+        saved.forEach(slot => {
+          const dt = new Date(slot.dateTime);
+          const key = this.slotKey(dt.toISOString().split('T')[0], dt.getUTCHours(), dt.getUTCMinutes());
+          this.availabilities[key] = slot;
+        });
+      } catch (err) {
+        console.error('[UnavailablePeriod] error', err);
+        this.error = err.message;
+      }
+
       this.unavailablePeriod = {
         startDateTime: '',
         endDateTime: '',
         reason: ''
       };
       this.showUnavailablePeriodModal = false;
+      this.loadAvailabilities();
     },
-    setAvailablePeriod() {
-      // TODO: Call API endpoint to set available period
-      console.log('Setting available period:', this.availablePeriod);
+    async setAvailablePeriod() {
+      if (!this.availablePeriod.startDateTime || !this.availablePeriod.endDateTime) return;
+      const slots = this.buildSlots(
+        this.availablePeriod.startDateTime,
+        this.availablePeriod.endDateTime,
+        true
+      );
+
+      try {
+        const response = await fetch(`${this.apiBaseUrl}/doctoravailability/${this.doctorId}/bulk`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(slots)
+        });
+        if (!response.ok) throw new Error('Opslaan mislukt');
+      } catch (err) {
+        this.error = err.message;
+      }
+
       this.availablePeriod = {
         startDateTime: '',
         endDateTime: ''
@@ -498,26 +597,41 @@ export default {
       const monday = this.getMondayOfWeek(this.currentDate);
       const sunday = new Date(monday);
       sunday.setDate(sunday.getDate() + 6);
-      
+      const endOfSunday = new Date(sunday);
+      endOfSunday.setHours(23, 59, 59, 999);
+
       const startDate = monday.toISOString();
-      const endDate = sunday.toISOString();
+      const endDate = endOfSunday.toISOString();
 
-      // TODO: Implement API call to fetch availabilities
-      // fetch(`${this.apiBaseUrl}/doctoravailability/${this.doctorId}?startDate=${startDate}&endDate=${endDate}`)
-      //   .then(response => response.json())
-      //   .then(data => {
-      //     this.availabilities = {};
-      //     data.forEach(slot => {
-      //       this.availabilities[slot.dateTime] = slot;
-      //     });
-      //     this.loading = false;
-      //   })
-      //   .catch(error => {
-      //     this.error = error.message;
-      //     this.loading = false;
-      //   });
-
-      this.loading = false;
+      fetch(`${this.apiBaseUrl}/doctoravailability/${this.doctorId}?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`)
+        .then(response => {
+          if (!response.ok) throw new Error('Kon beschikbaarheid niet laden');
+          return response.json();
+        })
+        .then(data => {
+          this.availabilities = {};
+          data.forEach(slot => {
+            const dt = new Date(slot.dateTime);
+            const year = dt.getFullYear();
+            const month = String(dt.getMonth() + 1).padStart(2, '0');
+            const day = String(dt.getDate()).padStart(2, '0');
+            const dateString = `${year}-${month}-${day}`;
+            const hour = dt.getHours();
+            const minute = dt.getMinutes();
+            const key = this.slotKey(dateString, hour, minute);
+            this.availabilities[key] = {
+              ...slot,
+              reason: slot.reason || '',
+              isAvailable: slot.isAvailable
+            };
+          });
+          console.log('[loadAvailabilities] loaded', Object.keys(this.availabilities).length, 'slots', this.availabilities);
+          this.loading = false;
+        })
+        .catch(error => {
+          this.error = error.message;
+          this.loading = false;
+        });
     }
   },
   mounted() {
@@ -561,6 +675,19 @@ export default {
   display: flex;
   gap: 15px;
   align-items: center;
+}
+
+.user-info {
+  font-weight: 600;
+  color: #333;
+  padding: 0.4rem 0.8rem;
+  background: #f2f7ed;
+  border: 1px solid #b0db9c;
+  border-radius: 6px;
+}
+
+.user-info-inline {
+  margin-left: auto;
 }
 
 .btn-nav {
@@ -608,6 +735,7 @@ export default {
   box-sizing: border-box;
   margin-left: auto;
   margin-right: auto;
+  align-items: center;
 }
 
 .btn {
@@ -771,6 +899,10 @@ export default {
   cursor: pointer;
   transition: background-color 0.2s;
   min-height: 15px;
+}
+
+.time-slot.hour-boundary {
+  border-top: 2px solid #B0DB9C;
 }
 
 .time-slot:hover {

@@ -1,13 +1,15 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Dashboard from '../views/dashboard.vue'
 import Patiëntprofiel from '../views/Patiëntprofiel.vue'
+import LoginView from '../views/LoginView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
     {
-      path: '/',
-      redirect: '/dashboard'
+      path: '/', 
+      name: 'login',
+      component: LoginView
     },
     {
       path: '/dashboard',

@@ -1,40 +1,45 @@
-﻿var builder = WebApplication.CreateBuilder(args);
+﻿using Microsoft.EntityFrameworkCore;
+using backend.Data;
 
-// Add services to the container
+var builder = WebApplication.CreateBuilder(args);
+
+// Controllers
 builder.Services.AddControllers();
 
-// CORS configuratie
+// Database
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// CORS ✅ MOET VOOR Build
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:5174", "https://localhost:5174")
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials(); // Voor cookies/JWT tokens (later bij authenticatie)
+        policy
+            .WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
     });
 });
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+// Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline
+// Swagger UI
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// Middleware in correcte volgorde - BELANGRIJK!
-app.UseCors("AllowFrontend");  // 1. CORS eerst
+app.UseHttpsRedirection();
 
-app.UseHttpsRedirection();      // 2. HTTPS redirect
+// CORS ✅ MOET HIER
+app.UseCors("AllowFrontend");
 
-app.UseAuthorization();         // 3. Authorization
-
-app.MapControllers();           // 4. Controllers mappen
-
+app.UseAuthorization();
+app.MapControllers();
 app.Run();

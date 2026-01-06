@@ -24,8 +24,8 @@
 </template>
 
 <script setup lang="ts">
-import '../css/dashboard.css'
-import '../css/navbar.css'
+import '../assets/dashboard.css'
+import '../assets/navbar.css'
 
 import Navbar from '../components/Navbar.vue'
 import api from '../services/api'

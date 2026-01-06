@@ -65,8 +65,8 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import '../css/patiëntprofiel.css';
-import '../css/navbar.css';
+import '../assets/patiëntprofiel.css';
+import '../assets/navbar.css';
 import Navbar from '../components/Navbar.vue';
 import { getPatient, type PatientResponse } from '../services/api';
 

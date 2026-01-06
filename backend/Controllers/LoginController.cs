@@ -1,6 +1,7 @@
 ﻿using backend.Data;
 using backend.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,7 +20,7 @@ namespace BackendLogin.Controllers
             _context = context;
             _passwordHasher = new PasswordHasher<User>();
         }
-        
+
 
         [HttpGet]
         public IActionResult TestEndpoint()
@@ -28,7 +29,7 @@ namespace BackendLogin.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        public async Task<IActionResult> Login([FromBody] backend.Models.LoginRequest request)
         {
             if (request == null ||
                 string.IsNullOrWhiteSpace(request.Email) ||
@@ -72,9 +73,3 @@ namespace BackendLogin.Controllers
         }
     }
 }
-
-
-
- 
-
-        

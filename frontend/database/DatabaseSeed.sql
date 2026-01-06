@@ -24,14 +24,14 @@ BEGIN
 END
 
 -- Patiënt gebruiker
-IF NOT EXISTS (SELECT 1 FROM gebruikers WHERE email = 'patiënt.devries@example.nl')
+IF NOT EXISTS (SELECT 1 FROM gebruikers WHERE email = 'gebruiker@example.com')
 BEGIN
     INSERT INTO gebruikers (
         voornaam, achternaam, email, wachtwoord,
         Straatnaam, Huisnummer, Postcode, Telefoonnummer,
         rol, systeembeheerder
     ) VALUES (
-        'Emma', 'de Vries', 'patiënt.devries@example.nl', 'hashed_pw_demo',
+        'Emma', 'de Vries', 'gebruiker@example.com', 'hashed_pw_demo',
         'Lindelaan', '45', '5678CD', '0687654321',
         1, 0
     );

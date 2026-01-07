@@ -37,6 +37,12 @@
   </div>
 </template>
 
+
+<style scoped>
+@import '../assets/main.css';
+</style>
+
+
 <script>
 import axios from "axios";
 

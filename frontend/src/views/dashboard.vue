@@ -23,10 +23,14 @@
   </main>
 </template>
 
-<script setup lang="ts">
-import '../assets/dashboard.css'
-import '../assets/navbar.css'
 
+<style scoped>
+@import '../assets/dashboard.css';
+@import '../assets/navbar.css';
+</style>
+
+
+<script setup lang="ts">
 import Navbar from '../components/Navbar.vue'
 import api from '../services/api'
 

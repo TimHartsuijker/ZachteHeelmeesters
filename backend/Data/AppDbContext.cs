@@ -16,7 +16,6 @@ namespace backend.Data
         public DbSet<Appointment> Appointments { get; set; } = null!;
         public DbSet<Specialism> Specialisms { get; set; } = null!;
         public DbSet<MedicalRecordAccess> MedicalRecordAccesses { get; set; } = null!;
-        public DbSet<LoginRequest> LoginRequest { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

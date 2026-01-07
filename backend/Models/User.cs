@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-
-// NP = Navigation Property
+using System.Collections.Generic;
 
 namespace backend.Models
 {
@@ -17,8 +16,8 @@ namespace backend.Models
 
         [Required, MaxLength(100)]
         public string Email { get; set; } = null!;
-
-        [Required, MaxLength(100)]
+        [Required]
+        //[Required, MaxLength(100)]
         public string PasswordHash { get; set; } = null!;
 
         [Required, MaxLength(100)]
@@ -32,32 +31,28 @@ namespace backend.Models
 
         [MaxLength(15)]
         public string? PhoneNumber { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public int RoleId { get; set; }
         public Role Role { get; set; } = null!; // NP
 
-        // For specialists and patients
-        public ICollection<Referral> ReferralsAsPatient { get; set; } = [];
-        public ICollection<Referral> ReferralsAsDoctor { get; set; } = [];
-        public ICollection<Appointment> SpecialistAppointments { get; set; } = [];
-        public ICollection<Appointment> PatientAppointments { get; set; } = [];
-        public ICollection<MedicalRecordAccess> MedicalRecordAccessAsSpecialist { get; set; } = [];
-        public ICollection<MedicalRecordAccess> MedicalRecordAccessAsPatient { get; set; } = [];
+        public ICollection<Referral> ReferralsAsPatient { get; set; } = new List<Referral>();
+        public ICollection<Referral> ReferralsAsDoctor { get; set; } = new List<Referral>();
+        public ICollection<Appointment> SpecialistAppointments { get; set; } = new List<Appointment>();
+        public ICollection<Appointment> PatientAppointments { get; set; } = new List<Appointment>();
+        public ICollection<MedicalRecordAccess> MedicalRecordAccessAsSpecialist { get; set; } = new List<MedicalRecordAccess>();
+        public ICollection<MedicalRecordAccess> MedicalRecordAccessAsPatient { get; set; } = new List<MedicalRecordAccess>();
 
-        // For patients
         public int? DoctorId { get; set; }
-        public User? Doctor { get; set; } // NP for patient's doctor
-        public ICollection<MedicalRecordEntry> MedicalRecordEntries { get; set; } = []; // NP for patient's medical records
+        public User? Doctor { get; set; }
+        public ICollection<MedicalRecordEntry> MedicalRecordEntries { get; set; } = new List<MedicalRecordEntry>();
 
-        // For doctors
         public string? PracticeName { get; set; }
-        public ICollection<User> Patients { get; set; } = []; // NP for doctor's patients
+        public ICollection<User> Patients { get; set; } = new List<User>();
 
-        // For specialists
         public int? DepartmentId { get; set; }
-        public Department? Department { get; set; } // NP for specialist's department
-        public ICollection<Specialism> Specialisms { get; set; } = []; // NP for specialist's treatments
-        public ICollection<MedicalRecordEntry> CreatedMedicalRecordEntries { get; set; } = []; // NP for medical records created by specialist
+        public Department? Department { get; set; }
+        public ICollection<Specialism> Specialisms { get; set; } = new List<Specialism>();
+        public ICollection<MedicalRecordEntry> CreatedMedicalRecordEntries { get; set; } = new List<MedicalRecordEntry>();
     }
 }

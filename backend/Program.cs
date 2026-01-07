@@ -28,6 +28,21 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+// MIGRATIONS + SEEDING (NA Build, VOOR Run)
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+    context.Database.Migrate(); // past migrations toe
+
+    DbSeederStatic.Seed(context);     // seed data
+
+    if (app.Environment.IsDevelopment())
+    {
+        DbSeederTest.Seed(context);    // alleen dev
+    }
+}
+
 // Swagger UI
 if (app.Environment.IsDevelopment())
 {

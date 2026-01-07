@@ -40,6 +40,8 @@
 <script>
 import axios from "axios";
 
+axios.defaults.baseURL = "https://localhost:7240"; // centralize if you have many calls
+
 export default {
   data() {
     return {
@@ -54,43 +56,32 @@ export default {
 
   methods: {
     async login() {
-      // Reset meldingen
       this.emptyError = false;
       this.loginError = false;
       this.loginErrorMessage = "";
       this.loginSuccess = "";
 
-      // Check op lege velden
       if (!this.email || !this.wachtwoord) {
         this.emptyError = true;
         return;
       }
 
       try {
-        const response = await axios.post("https://localhost:7240/api/login", {
+        const response = await axios.post("/api/login", {
           email: this.email,
           wachtwoord: this.wachtwoord,
         });
 
         if (response.status === 200) {
-          console.log("Login gelukt!", response.data);
-
-          // Sessie opslaan
           sessionStorage.setItem("isLoggedIn", "true");
-
-          // Redirect naar dashboard
+          // use router.push('/dashboard') if using Vue Router
           window.location.href = "/dashboard";
         }
-      } catch (error) {
-        // Foutmelding van backend (401/400)
-        if (error.response && error.response.data && error.response.data.message) {
-          this.loginErrorMessage = error.response.data.message;
-        } else {
-          this.loginErrorMessage = "Er is iets misgegaan bij het inloggen.";
-        }
-
+      } catch (err) {
+        const data = err?.response?.data;
+        this.loginErrorMessage = data?.message ?? "Er is iets misgegaan bij het inloggen.";
         this.loginError = true;
-        console.log("Fout bij inloggen:", this.loginErrorMessage);
+        console.log("Login error:", this.loginErrorMessage, err);
       }
     },
   },

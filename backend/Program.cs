@@ -13,6 +13,27 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Add session services
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+// Add CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("frontend", builder =>
+    {
+        builder.WithOrigins("http://localhost:5173", "http://localhost:5174", "http://localhost:3000", "http://localhost:5016")
+               .AllowAnyMethod()
+               .AllowAnyHeader()
+               .AllowCredentials();
+    });
+});
+
 // App bouwen
 var app = builder.Build();
 
@@ -40,13 +61,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// CORS inschakelen
-app.UseCors();
+// Apply CORS policy
+app.UseCors("frontend");
 
 // Session middleware toevoegen
 app.UseSession();
 
-app.UseCors("frontend");
 app.UseAuthorization();
 
 app.MapControllers();

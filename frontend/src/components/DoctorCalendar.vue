@@ -232,8 +232,8 @@ export default {
       },
       loading: false,
       error: null,
-      userName: 'Test Doctor',
-      userEmail: 'testdoctor@example.com'
+      userName: sessionStorage.getItem('userName') || 'Unknown',
+      userEmail: sessionStorage.getItem('userEmail') || 'unknown@example.com'
     };
   },
   computed: {
@@ -635,6 +635,7 @@ export default {
     }
   },
   mounted() {
+    console.log('DoctorCalendar mounted with doctorId:', this.doctorId);
     this.loadAvailabilities();
   }
 };

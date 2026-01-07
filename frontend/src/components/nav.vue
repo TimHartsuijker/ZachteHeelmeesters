@@ -2,7 +2,7 @@
   <nav class="navbar" aria-label="Hoofdnavigatie">
     <ul>
       <li>
-        <a href="/Agenda.html" aria-current="page">Agenda</a>
+        <router-link to="/agenda" aria-current="page">Agenda</router-link>
       </li>
     </ul>
   </nav>
@@ -32,6 +32,7 @@ export default {
   display: flex;
   align-items: center;
   font-size: 1.5rem;
+  font-family: Arial, sans-serif;
   box-shadow: 0 2px 16px 0 rgba(0,0,0,0.07);
 }
 
@@ -52,6 +53,7 @@ export default {
   text-decoration: none;
   font-weight: bold;
   font-size: 1.1rem;
+  font-family: Arial, sans-serif;
   transition: color 0.3s ease;
   outline: none;
 }
@@ -60,6 +62,15 @@ export default {
   color: #fff;
   background: none;
   box-shadow: none;
+}
+
+.navbar :deep(a) {
+  color: #222;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 1.1rem;
+  transition: color 0.3s ease;
+  outline: none;
 }
 
 body {

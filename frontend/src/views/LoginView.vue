@@ -67,7 +67,7 @@ export default {
       }
 
       try {
-        const response = await axios.post("https://localhost:7240/api/login", {
+        const response = await axios.post("http://localhost:5016/api/login", {
           email: this.email,
           wachtwoord: this.wachtwoord,
         });
@@ -77,14 +77,24 @@ export default {
 
           // Sessie opslaan
           sessionStorage.setItem("isLoggedIn", "true");
+          sessionStorage.setItem("userId", response.data.user.id);
+          sessionStorage.setItem("userEmail", response.data.user.email);
+          sessionStorage.setItem("userName", `${response.data.user.firstName} ${response.data.user.lastName}`);
+          sessionStorage.setItem("userRole", response.data.user.role);
 
-          // Redirect naar dashboard
-          window.location.href = "/dashboard";
+          // Redirect naar agenda
+          window.location.href = "/agenda";
         }
       } catch (error) {
+        // Log the full error for debugging
+        console.error("Full error:", error);
+        console.error("Error response:", error.response);
+        
         // Foutmelding van backend (401/400)
         if (error.response && error.response.data && error.response.data.message) {
           this.loginErrorMessage = error.response.data.message;
+        } else if (error.message) {
+          this.loginErrorMessage = `Fout: ${error.message}`;
         } else {
           this.loginErrorMessage = "Er is iets misgegaan bij het inloggen.";
         }

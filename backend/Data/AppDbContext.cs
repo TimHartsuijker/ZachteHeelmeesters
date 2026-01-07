@@ -16,6 +16,7 @@ namespace backend.Data
         public DbSet<Appointment> Appointments { get; set; } = null!;
         public DbSet<Specialism> Specialisms { get; set; } = null!;
         public DbSet<MedicalRecordAccess> MedicalRecordAccesses { get; set; } = null!;
+        public DbSet<DoctorAvailability> DoctorAvailabilities { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -156,6 +157,21 @@ namespace backend.Data
             modelBuilder.Entity<Treatment>()
                 .Property(t => t.Cost)
                 .HasPrecision(18, 2);
+
+            // DoctorAvailability Configuration
+            modelBuilder.Entity<DoctorAvailability>(entity =>
+            {
+                entity.ToTable("doctor_availability");
+                entity.HasKey(e => e.AvailabilityId);
+                entity.Property(e => e.AvailabilityId).HasColumnName("availability_id");
+                entity.Property(e => e.DoctorId).HasColumnName("doctor_id");
+                entity.Property(e => e.DateTime).HasColumnName("date_time");
+                entity.Property(e => e.IsAvailable).HasColumnName("is_available");
+                entity.Property(e => e.Reason).HasColumnName("reason");
+                entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+                entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
+                entity.HasIndex(e => new { e.DoctorId, e.DateTime }).IsUnique();
+            });
         }
     }
 }

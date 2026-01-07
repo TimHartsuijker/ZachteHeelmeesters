@@ -1,7 +1,20 @@
 <script setup>
+import { ref, onMounted } from 'vue'
 import NavBar from '../components/nav.vue'
 import DoctorCalendar from '../components/DoctorCalendar.vue'
-console.log('AgendaView.vue mounted');
+
+const doctorId = ref(null);
+
+onMounted(() => {
+  console.log('AgendaView.vue mounted');
+  const userId = sessionStorage.getItem('userId');
+  if (userId) {
+    doctorId.value = parseInt(userId);
+  } else {
+    // Redirect to login if not logged in
+    window.location.href = '/';
+  }
+});
 </script>
 
 <template>
@@ -12,7 +25,7 @@ console.log('AgendaView.vue mounted');
   </header>
 
   <main class="main-agenda align-under-nav">
-    <DoctorCalendar />
+    <DoctorCalendar v-if="doctorId" :doctor-id="doctorId" />
   </main>
 </template>
 

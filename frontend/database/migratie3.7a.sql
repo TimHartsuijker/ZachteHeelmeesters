@@ -14,46 +14,51 @@ IF NOT EXISTS (SELECT 1 FROM rollen WHERE rolID = 4)
 -- Password is 'Test123!' (you should hash this in production)
 IF NOT EXISTS (SELECT 1 FROM gebruikers WHERE email = 'patient@test.nl')
     INSERT INTO gebruikers (
-        voornaam, 
-        achternaam, 
-        email, 
-        wachtwoord, 
-        Straatnaam, 
-        Huisnummer, 
-        Postcode, 
-        Telefoonnummer, 
-        rol
-    ) VALUES (
-        'Jan',
-        'Testpersoon',
-        'patient@test.nl',
-        'Test123!',
-        'Teststraat',
-        '123',
-        '1234AB',
-        '0612345678',
-        1
-    );
+    voornaam, 
+    achternaam, 
+    email, 
+    wachtwoord, 
+    Straatnaam, 
+    Huisnummer, 
+    Postcode, 
+    Telefoonnummer, 
+    rol,
+    systeembeheerder
+) VALUES (
+    'Jan',
+    'Testpersoon',
+    'patient@test.nl',
+    'Test123!',
+    'Teststraat',
+    '123',
+    '1234AB',
+    '0612345678',
+    1,
+    0
+);
+
 
 IF NOT EXISTS (SELECT 1 FROM gebruikers WHERE email = 'huisarts@test.nl')
     INSERT INTO gebruikers (
-        voornaam, 
-        achternaam, 
-        email, 
-        wachtwoord, 
-        Straatnaam, 
-        Huisnummer, 
-        Postcode, 
-        Telefoonnummer, 
-        rol
-    ) VALUES (
-        'Emma',
-        'Dokter',
-        'huisarts@test.nl',
-        'Test123!',
-        'Dokterslaan',
-        '45',
-        '5678CD',
-        '0687654321',
-        2
-    );
+    voornaam, 
+    achternaam, 
+    email, 
+    wachtwoord, 
+    Straatnaam, 
+    Huisnummer, 
+    Postcode, 
+    Telefoonnummer, 
+    rol,
+    systeembeheerder
+) VALUES (
+    'Emma',
+    'Dokter',
+    'huisarts@test.nl',
+    'Test123!',
+    'Dokterslaan',
+    '45',
+    '5678CD',
+    '0687654321',
+    2,
+    0
+);

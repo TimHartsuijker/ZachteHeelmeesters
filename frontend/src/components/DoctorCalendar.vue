@@ -10,7 +10,7 @@
       </div>
     </div>
 
-    <!-- Quick actions for setting unavailable periods -->
+    <!-- Quick actions for setting unavailable/available periods -->
     <div class="quick-actions">
       <button @click="showUnavailablePeriodModal = true" class="btn btn-primary">
         Periode onbeschikbaar maken
@@ -52,6 +52,9 @@
               <div
                 v-for="slot in getSlots(day.date)"
                 :key="`${slot.date}-${slot.hour}-${slot.minute}`"
+                :data-date="slot.date"
+                :data-hour="slot.hour"
+                :data-minute="slot.minute"
                 :class="['time-slot', { unavailable: isSlotUnavailable(slot.date, slot.hour, slot.minute), 'hour-boundary': isHourBoundary(slot.minute) }]"
                 @click="selectSlot(slot.date, slot.hour, slot.minute)"
               >
@@ -283,16 +286,22 @@ export default {
     pad(value) {
       return String(value).padStart(2, '0');
     },
+    toLocalIsoFromDate(dateObj) {
+      const y = dateObj.getFullYear();
+      const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const d = String(dateObj.getDate()).padStart(2, '0');
+      const hh = String(dateObj.getHours()).padStart(2, '0');
+      const mm = String(dateObj.getMinutes()).padStart(2, '0');
+      const ss = String(dateObj.getSeconds()).padStart(2, '0');
+      return `${y}-${m}-${d}T${hh}:${mm}:${ss}`;
+    },
     toIso(dateString, hour, minute) {
-      // Build ISO string preserving local timezone
+      // Build ISO string in UTC format (no timezone offset)
+      // This ensures consistency when sending to backend and when retrieving
       const year = dateString.split('-')[0];
       const month = dateString.split('-')[1];
       const day = dateString.split('-')[2];
-      const offsetMinutes = new Date().getTimezoneOffset();
-      const offsetHours = Math.abs(Math.floor(offsetMinutes / 60));
-      const offsetMins = Math.abs(offsetMinutes % 60);
-      const offsetSign = offsetMinutes <= 0 ? '+' : '-';
-      return `${year}-${month}-${day}T${this.pad(hour)}:${this.pad(minute)}:00${offsetSign}${this.pad(offsetHours)}:${this.pad(offsetMins)}`;
+      return `${year}-${month}-${day}T${this.pad(hour)}:${this.pad(minute)}:00`;
     },
     slotKey(dateString, hour, minute) {
       return `${dateString}T${this.pad(hour)}:${this.pad(minute)}:00`;
@@ -400,15 +409,17 @@ export default {
       const times = [];
       const current = new Date(startDate);
       
-      // Generate times from start + 15 minutes to 23:45 on the same day, or to end of next day
-      while (current.toISOString().split('T')[0] <= this.getMaxDate()) {
+      // Generate times from start + 15 minutes to end of next day (local time)
+      while (true) {
+        const currentDateStr = `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, '0')}-${String(current.getDate()).padStart(2, '0')}`;
+        if (currentDateStr > this.getMaxDate()) break;
         // Skip to 15 minutes after start if same hour
         if (current.getHours() === startDate.getHours() && current.getMinutes() <= startDate.getMinutes()) {
           current.setMinutes(startDate.getMinutes() + 15);
         }
         
         if (current > startDate) {
-          times.push(current.toISOString());
+          times.push(this.toLocalIsoFromDate(current));
         }
         
         current.setMinutes(current.getMinutes() + 15);
@@ -419,7 +430,10 @@ export default {
     getMaxDate() {
       const date = new Date(this.unavailablePeriod.startDateTime);
       date.setDate(date.getDate() + 1); // Next day
-      return date.toISOString().split('T')[0];
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
     },
     formatEndTime(isoString) {
       const date = new Date(isoString);
@@ -450,7 +464,7 @@ export default {
       } else {
         const temp = new Date(startIso);
         temp.setMinutes(temp.getMinutes() + 15);
-        endIso = temp.toISOString();
+        endIso = this.toLocalIsoFromDate(temp);
       }
 
       const slots = this.buildSlots(
@@ -503,6 +517,16 @@ export default {
       const slots = [];
       let current = new Date(startIso);
       const end = new Date(endIso);
+      
+      // Round current to nearest 15-minute boundary
+      const minutes = current.getMinutes();
+      const roundedMinutes = Math.round(minutes / 15) * 15;
+      if (roundedMinutes !== minutes) {
+        current.setMinutes(roundedMinutes);
+      }
+      current.setSeconds(0);
+      current.setMilliseconds(0);
+      
       while (current < end) {
         const year = current.getFullYear();
         const month = String(current.getMonth() + 1).padStart(2, '0');
@@ -550,7 +574,11 @@ export default {
         console.log('[UnavailablePeriod] saved slots', saved);
         saved.forEach(slot => {
           const dt = new Date(slot.dateTime);
-          const key = this.slotKey(dt.toISOString().split('T')[0], dt.getUTCHours(), dt.getUTCMinutes());
+          const year = dt.getFullYear();
+          const month = String(dt.getMonth() + 1).padStart(2, '0');
+          const day = String(dt.getDate()).padStart(2, '0');
+          const dateString = `${year}-${month}-${day}`;
+          const key = this.slotKey(dateString, dt.getHours(), dt.getMinutes());
           this.availabilities[key] = slot;
         });
       } catch (err) {
@@ -595,13 +623,15 @@ export default {
     loadAvailabilities() {
       this.loading = true;
       const monday = this.getMondayOfWeek(this.currentDate);
+      monday.setHours(0, 0, 0, 0);
       const sunday = new Date(monday);
       sunday.setDate(sunday.getDate() + 6);
       const endOfSunday = new Date(sunday);
       endOfSunday.setHours(23, 59, 59, 999);
 
-      const startDate = monday.toISOString();
-      const endDate = endOfSunday.toISOString();
+      // Use local ISO without timezone to align with stored values
+      const startDate = this.toLocalIsoFromDate(monday);
+      const endDate = this.toLocalIsoFromDate(endOfSunday);
 
       fetch(`${this.apiBaseUrl}/doctoravailability/${this.doctorId}?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`)
         .then(response => {

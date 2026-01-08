@@ -59,10 +59,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-
-// Apply CORS policy
+// Apply CORS policy FIRST before any other middleware
 app.UseCors("frontend");
+
+app.UseHttpsRedirection();
 
 // Session middleware toevoegen
 app.UseSession();

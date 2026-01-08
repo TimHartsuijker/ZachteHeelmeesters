@@ -22,7 +22,6 @@ namespace backend.Data
         {
             base.OnModelCreating(modelBuilder);
 
-
             // Composite keys
             modelBuilder.Entity<MedicalRecordAccess>()
                 .HasKey(mra => new { mra.SpecialistId, mra.PatientId });
@@ -171,6 +170,12 @@ namespace backend.Data
                 entity.Property(e => e.CreatedAt).HasColumnName("created_at");
                 entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
                 entity.HasIndex(e => new { e.DoctorId, e.DateTime }).IsUnique();
+                
+                // Foreign key relationship to User
+                entity.HasOne<User>()
+                    .WithMany()
+                    .HasForeignKey(e => e.DoctorId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }

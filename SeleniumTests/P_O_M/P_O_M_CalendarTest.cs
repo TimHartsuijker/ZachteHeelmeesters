@@ -29,7 +29,7 @@ public class CalendarTestPage
     // Navigation
     public void Navigate()
     {
-        _driver.Navigate().GoToUrl("http://localhost:5173/calendar-test.html");
+        _driver.Navigate().GoToUrl("http://localhost:5173/agenda");
     }
 
     // Wait for page to load

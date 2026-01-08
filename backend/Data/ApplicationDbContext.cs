@@ -9,6 +9,7 @@ namespace backend.Data
         {
         }
 
+        public DbSet<User> Users => Set<User>();
         public DbSet<DoctorAvailability> DoctorAvailabilities => Set<DoctorAvailability>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -30,6 +31,13 @@ namespace backend.Data
                 entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
 
                 entity.HasIndex(e => new { e.DoctorId, e.DateTime }).IsUnique();
+
+                // Foreign key to users table (gebruikers)
+                entity.HasOne<User>()
+                    .WithMany()
+                    .HasForeignKey(e => e.DoctorId)
+                    .HasConstraintName("FK__doctor_av__docto__19DFD96B")
+                    .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }

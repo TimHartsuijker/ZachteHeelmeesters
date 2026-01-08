@@ -11,26 +11,30 @@ namespace backend.Data
 
             var passwordHasher = new PasswordHasher<User>();
 
-            // 🔹 Role seeden
-            if (!context.Roles.Any(r => r.RoleName == "Patient"))
+            // 🔹 Role seeden - ensure they exist first
+            var patientRole = context.Roles.FirstOrDefault(r => r.RoleName == "Patient");
+            if (patientRole == null)
             {
-                context.Roles.Add(new Role { RoleName = "Patient" });
+                patientRole = new Role { RoleName = "Patient" };
+                context.Roles.Add(patientRole);
                 context.SaveChanges();
+                Console.WriteLine("[DbSeederTest] Created Patient role");
             }
 
-            if (!context.Roles.Any(r => r.RoleName == "Doctor"))
+            var doctorRole = context.Roles.FirstOrDefault(r => r.RoleName == "Doctor");
+            if (doctorRole == null)
             {
-                context.Roles.Add(new Role { RoleName = "Doctor" });
+                doctorRole = new Role { RoleName = "Doctor" };
+                context.Roles.Add(doctorRole);
                 context.SaveChanges();
+                Console.WriteLine("[DbSeederTest] Created Doctor role");
             }
-
-            var patientRole = context.Roles.First(r => r.RoleName == "Patient");
-            var doctorRole = context.Roles.First(r => r.RoleName == "Doctor");
 
             // 🔹 Patient user seeden
-            if (!context.Users.Any(u => u.Email == "gebruiker@example.com"))
+            var patientUser = context.Users.FirstOrDefault(u => u.Email == "gebruiker@example.com");
+            if (patientUser == null)
             {
-                var user = new User
+                patientUser = new User
                 {
                     FirstName = "Test",
                     LastName = "Gebruiker",
@@ -43,16 +47,21 @@ namespace backend.Data
                     RoleId = patientRole.Id
                 };
 
-                user.PasswordHash = passwordHasher.HashPassword(user, "Wachtwoord123");
-
-                context.Users.Add(user);
+                patientUser.PasswordHash = passwordHasher.HashPassword(patientUser, "Wachtwoord123");
+                context.Users.Add(patientUser);
                 context.SaveChanges();
+                Console.WriteLine($"[DbSeederTest] Created Patient user with ID: {patientUser.Id}");
+            }
+            else
+            {
+                Console.WriteLine($"[DbSeederTest] Patient user already exists with ID: {patientUser.Id}");
             }
 
             // 🔹 Doctor user seeden
-            if (!context.Users.Any(u => u.Email == "testdoctor@example.com"))
+            var doctorUser = context.Users.FirstOrDefault(u => u.Email == "testdoctor@example.com");
+            if (doctorUser == null)
             {
-                var doctor = new User
+                doctorUser = new User
                 {
                     FirstName = "Test",
                     LastName = "Doctor",
@@ -65,10 +74,22 @@ namespace backend.Data
                     RoleId = doctorRole.Id
                 };
 
-                doctor.PasswordHash = passwordHasher.HashPassword(doctor, "password");
-
-                context.Users.Add(doctor);
+                doctorUser.PasswordHash = passwordHasher.HashPassword(doctorUser, "password");
+                context.Users.Add(doctorUser);
                 context.SaveChanges();
+                Console.WriteLine($"[DbSeederTest] Created Doctor user with ID: {doctorUser.Id}");
+            }
+            else
+            {
+                Console.WriteLine($"[DbSeederTest] Doctor user already exists with ID: {doctorUser.Id}");
+            }
+
+            // Verify both users exist
+            var allUsers = context.Users.ToList();
+            Console.WriteLine($"[DbSeederTest] Total users in database: {allUsers.Count}");
+            foreach (var user in allUsers)
+            {
+                Console.WriteLine($"[DbSeederTest]   - User ID {user.Id}: {user.Email}");
             }
         }
     }

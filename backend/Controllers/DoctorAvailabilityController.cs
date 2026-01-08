@@ -69,6 +69,13 @@ namespace backend.Controllers
             int doctorId,
             [FromBody] List<DoctorAvailability> availabilities)
         {
+            // Validate doctorId exists
+            var doctorExists = await _context.Users.AnyAsync(u => u.Id == doctorId);
+            if (!doctorExists)
+            {
+                return BadRequest($"Doctor with ID {doctorId} does not exist in the database.");
+            }
+
             if (availabilities.Any(a => a.DoctorId != doctorId))
                 return BadRequest("All entries must have matching doctor ID");
 
@@ -124,6 +131,13 @@ namespace backend.Controllers
             [FromQuery] DateTime endDateTime,
             [FromQuery] string? reason = null)
         {
+            // Validate doctorId exists
+            var doctorExists = await _context.Users.AnyAsync(u => u.Id == doctorId);
+            if (!doctorExists)
+            {
+                return BadRequest($"Doctor with ID {doctorId} does not exist in the database.");
+            }
+
             if (startDateTime >= endDateTime)
                 return BadRequest("Start date must be before end date");
 

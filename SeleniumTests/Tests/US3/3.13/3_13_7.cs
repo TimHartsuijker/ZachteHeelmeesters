@@ -41,20 +41,20 @@ namespace SeleniumTests
         {
             Console.WriteLine("Test: Successful admin login");
 
-            // Step 1: Navigate to admin login page
+            
             driver.Navigate().GoToUrl($"{baseUrl}/admin/login");
             Console.WriteLine("Admin login pagina geladen.");
 
 
-            // Step 3: Click login
+            
             driver.FindElement(By.Id("admin-login-btn")).Click();
             Console.WriteLine("Admin login uitgevoerd.");
 
-            // Stap 3: Wacht op foutmelding
+            
             var error = wait.Until(d => d.FindElement(By.Id("error-text")));
             Console.WriteLine("Foutmelding gevonden: " + error.Text);
 
-            // Stap 4: Controleer dat login geweigerd is
+            
             Assert.AreEqual("Gegevens moeten ingevuld zijn", error.Text);
             Console.WriteLine("Reguliere user is correct geweigerd bij admin login.");
         }

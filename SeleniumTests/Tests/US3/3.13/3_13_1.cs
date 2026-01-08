@@ -38,37 +38,35 @@ public class _3_13_1
         driver.Dispose();
     }
 
-    // ------------------------------------------------------------
-    // TC-3.13.1 — Access admin login page
-    // ------------------------------------------------------------
+    
     [TestMethod]
     public void TC_3_13_1_AccessAdminLoginPage()
     {
         Console.WriteLine("Test: Access admin login page");
 
-        // Step 1: Navigate to /
+        
         driver.Navigate().GoToUrl($"{baseUrl}/");
         Console.WriteLine("Startpagina geladen.");
 
-        // Verwacht: redirect naar /inloggen
+        
         Assert.IsTrue(
             driver.Url.Contains("/"),
             "Gebruiker is niet doorgestuurd naar de loginpagina."
         );
         Console.WriteLine("Gebruiker is doorgestuurd naar de reguliere loginpagina.");
 
-        // Step 2: Check of admin login knop zichtbaar is
+        
         Assert.IsTrue(
             loginPage.IsAdminLoginLinkDisplayed(),
             "Admin login knop is niet zichtbaar op de gebruikers-loginpagina."
         );
         Console.WriteLine("Admin login knop is zichtbaar.");
 
-        // Step 3: Klik op admin login knop
+        
         loginPage.ClickAdminLogin();
         Console.WriteLine("Op admin login knop geklikt.");
 
-        // Step 4: Verifieer aparte admin login pagina
+       
         wait.Until(d => d.Url.Contains("/admin/login"));
 
         Assert.IsTrue(

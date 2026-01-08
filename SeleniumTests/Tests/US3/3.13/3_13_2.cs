@@ -44,11 +44,11 @@ namespace SeleniumTests
         {
             Console.WriteLine("Test: Successful admin login");
 
-            // Step 1: Navigate to admin login page
+           
             driver.Navigate().GoToUrl($"{baseUrl}/admin/login");
             Console.WriteLine("Admin login pagina geladen.");
 
-            // Step 2: Enter admin credentials
+           
             driver.FindElement(By.Id("admin-username"))
                   .SendKeys("admin@example.com");
 
@@ -57,11 +57,11 @@ namespace SeleniumTests
 
             Console.WriteLine("Admin credentials ingevoerd.");
 
-            // Step 3: Click login
+            
             driver.FindElement(By.Id("admin-login-btn")).Click();
             Console.WriteLine("Admin login uitgevoerd.");
 
-            // Step 4: Verify redirect
+           
             wait.Until(d => d.Url.Contains("/admin/dashboard"));
 
             Assert.IsTrue(

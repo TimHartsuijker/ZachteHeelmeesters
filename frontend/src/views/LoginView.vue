@@ -31,6 +31,12 @@
         </p>
 
         <button type="submit" id="login-btn">Login</button>
+        <div class="admin-login-link">
+  <button id="admin-login-link" @click="goToAdminLogin">
+    Inloggen als beheerder
+  </button>
+</div>
+
       </form>
 
     </div>
@@ -53,6 +59,7 @@ export default {
   },
 
   methods: {
+    // 🔹 User login
     async login() {
       // Reset meldingen
       this.emptyError = false;
@@ -78,8 +85,8 @@ export default {
           // Sessie opslaan
           sessionStorage.setItem("isLoggedIn", "true");
 
-          // Redirect naar dashboard
-          window.location.href = "/dashboard";
+          // Redirect naar user dashboard
+          this.$router.push("/dashboard");
         }
       } catch (error) {
         // Foutmelding van backend (401/400)
@@ -93,6 +100,12 @@ export default {
         console.log("Fout bij inloggen:", this.loginErrorMessage);
       }
     },
+
+    // 🔹 Admin login knop (SPA navigatie, geen refresh)
+    goToAdminLogin() {
+      this.$router.push("/admin/login");
+    }
   },
 };
 </script>
+

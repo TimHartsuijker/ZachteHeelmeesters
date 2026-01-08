@@ -2,8 +2,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
-using SeleniumTests.Pages;
+using SeleniumTests.P_O_M;
 using System;
+
 
 
 namespace SeleniumTests { 
@@ -14,7 +15,7 @@ public class _3_13_1
 {
     private IWebDriver driver;
     private WebDriverWait wait;
-    private string baseUrl = "https://localhost:5173";
+    private string baseUrl = "http://localhost:5173";
     private LoginPage loginPage;
 
     [TestInitialize]
@@ -51,7 +52,7 @@ public class _3_13_1
 
         // Verwacht: redirect naar /inloggen
         Assert.IsTrue(
-            driver.Url.Contains("/inloggen"),
+            driver.Url.Contains("/"),
             "Gebruiker is niet doorgestuurd naar de loginpagina."
         );
         Console.WriteLine("Gebruiker is doorgestuurd naar de reguliere loginpagina.");

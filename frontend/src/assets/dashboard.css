@@ -2,113 +2,106 @@
   --dashboard-bg-color: #fbfcff;
 }
 
+/* =========================
+   MAIN LAYOUT
+========================= */
+
 .dashboard-main {
-  min-height: 100px; 
-  left: 0%;
-  position: relative;
+  max-width: 1400px;
+  margin: 0 auto;               /* centreert alles */
+  padding: 96px 32px 32px;      /* ruimte onder navbar */
+  box-sizing: border-box;
 }
+
+/* =========================
+   WELCOME
+========================= */
 
 .welcome-box {
-  position: absolute;
-  top: 3%;      
-  z-index: 2;
+  margin-bottom: 32px;
 }
+
+.welcome-box h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+/* =========================
+   OVERZICHT KAART
+========================= */
 
 .dashboard-overzicht {
-  width: 1400px;
-  height: 500px;
   background: var(--dashboard-bg-color);
-  padding: 24px;
-  border-radius: 12px;
+  padding: 32px;
+  border-radius: 14px;
   box-shadow: 0 8px 24px rgba(0,0,0,0.08);
   box-sizing: border-box;
-  margin-top: 96px;
 }
 
-/* Optioneel: typografie en spacing binnen de kaart */
 .dashboard-overzicht h2 {
-  margin: 0 0 12px 0;
+  margin: 0 0 16px 0;
+  font-size: 22px;
 }
 
 .dashboard-overzicht p {
   margin: 0;
-  line-height: 1.55;
+  line-height: 1.6;
   color: #333;
 }
+
+/* =========================
+   PANELS
+========================= */
+
 .dashboard-grid {
   display: flex;
-  gap: 24px;            /* ruimte tussen de panels */
-  margin-top: 24px;
+  gap: 24px;
+  margin-top: 32px;
 }
 
 .panel {
-  flex: 1;              /* panels worden even breed */
-  background: white;
-  padding: 20px;
+  flex: 1;
+  background: #ffffff;
+  padding: 24px;
   border-radius: 12px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.05);
   box-sizing: border-box;
 }
 
 .panel h2 {
-  margin-top: 0;
+  margin: 0 0 12px 0;
+  font-size: 18px;
 }
+
 /* =========================
-   ALLES T/M TABLET LIGGEND
-   (= MOBIELE LAYOUT)
+   TABLET & MOBIEL
 ========================= */
+
 @media (max-width: 1024px) {
-  /* content altijd onder navbar */
   .dashboard-main {
-    left: 0;
-    padding-top: 72px;
-    padding-left: 24px;
-    padding-right: 24px;
+    padding: 88px 24px 24px;
   }
 
-  /* welcome box in normale flow */
-  .welcome-box {
-    position: relative;
-    top: 0;
-    margin-bottom: 24px;
-  }
-
-  /* overzicht schaalbaar */
-  .dashboard-overzicht {
-    width: 100%;
-    height: auto;
-    margin-top: 24px;
-  }
-
-  /* PANELS ONDER ELKAAR */
   .dashboard-grid {
     flex-direction: column;
   }
-
-  .panel {
-    width: 100%;
-  }
 }
 
-/* =========================
-   TELEFOON FINETUNING
-========================= */
 @media (max-width: 480px) {
   .dashboard-main {
-    padding-left: 16px;
-    padding-right: 16px;
+    padding: 80px 16px 16px;
   }
 
   .welcome-box h1 {
-    font-size: 20px;
+    font-size: 22px;
   }
 
   .dashboard-overzicht {
-    padding: 16px;
-    border-radius: 10px;
+    padding: 20px;
   }
 
   .panel {
-    padding: 16px;
+    padding: 18px;
   }
 }

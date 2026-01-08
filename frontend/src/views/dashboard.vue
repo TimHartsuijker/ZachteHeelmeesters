@@ -3,7 +3,7 @@
 
   <main class="dashboard-main">
     <div class="welcome-box">
-      <h1 data-test="welcome-message">Welkom op het Dashboard {naam}</h1>
+      <h1 data-test="welcome-message">Welkom op het Dashboard {{ name }}</h1>
     </div>
 
     <div class="dashboard-overzicht">
@@ -23,32 +23,27 @@
   </main>
 </template>
 
+<script setup lang="ts">
+import Navbar from '../components/Navbar.vue'
+import api from '../services/api'
+import { ref, onMounted } from 'vue'
+
+const name = ref('')
+
+onMounted(async () => {
+  try {
+    const userId = sessionStorage.getItem('userId')
+    if (!userId) throw new Error('Niet ingelogd')
+
+    const res = await api.get(`/patient/${userId}`)
+    name.value = `${res.data.voornaam} ${res.data.achternaam}`
+  } catch (err) {
+    console.error('Error bij ophalen patiënt:', err)
+  }
+})
+</script>
 
 <style scoped>
 @import '../assets/dashboard.css';
 @import '../assets/navbar.css';
 </style>
-
-
-<script setup lang="ts">
-import Navbar from '../components/Navbar.vue'
-import api from '../services/api'
-
-import { ref, onMounted } from 'vue'
-
-interface Patient {
-  id: number
-  name: string
-}
-
-const patients = ref<Patient[]>([])
-
-onMounted(async () => {
-  try {
-    const res = await api.get('/patient') // <-- automatische koppeling
-    patients.value = res.data
-  } catch (err) {
-    console.error('Error bij ophalen patiënten:', err)
-  }
-})
-</script>

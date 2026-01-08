@@ -30,6 +30,9 @@
         <li @click="menuOpen = false">
           <RouterLink to="/afspraken">Medisch Dossier</RouterLink>
         </li>
+        <li @click="menuOpen = false">
+          <RouterLink to="/Patiëntprofiel">Mijn Profiel</RouterLink>
+        </li>
       </ul>
     </nav>
   </header>

@@ -10,7 +10,7 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// CORS ✅ MOET VOOR Build
+// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
@@ -28,22 +28,21 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// MIGRATIONS + SEEDING (NA Build, VOOR Run)
+// MIGRATIONS + SEEDING
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    context.Database.Migrate();
 
-    context.Database.Migrate(); // past migrations toe
-
-    DbSeederStatic.Seed(context);     // seed data
+    DbSeederStatic.Seed(context);
 
     if (app.Environment.IsDevelopment())
     {
-        DbSeederTest.Seed(context);    // alleen dev
+        DbSeederTest.Seed(context);
     }
 }
 
-// Swagger UI
+// Swagger
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -51,10 +50,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-// CORS ✅ MOET HIER
 app.UseCors("AllowFrontend");
 
-app.UseAuthorization();
+// ❌ Verwijder authentication/authorization
+// app.UseAuthentication();
+// app.UseAuthorization();
+
 app.MapControllers();
 app.Run();

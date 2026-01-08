@@ -78,11 +78,12 @@ export default {
           wachtwoord: this.wachtwoord,
         });
 
-        if (response.status === 200) {
-          sessionStorage.setItem("isLoggedIn", "true");
-          // use router.push('/dashboard') if using Vue Router
-          window.location.href = "/dashboard";
-        }
+        // Sla user ID op in sessionStorage
+        sessionStorage.setItem("userId", response.data.user.id);
+
+        // Navigeer naar dashboard
+        window.location.href = "/dashboard";
+
       } catch (err) {
         const data = err?.response?.data;
         this.loginErrorMessage = data?.message ?? "Er is iets misgegaan bij het inloggen.";

@@ -41,6 +41,90 @@ namespace backend.Data
                 context.Users.Add(user);
                 context.SaveChanges();
             }
+
+
+            // =====================
+            // Additional SQL-based seed (converted to EF Core)
+            // =====================
+
+            // ---------------------
+            // Seed Roles
+            // ---------------------
+            if (!context.Roles.Any(r => r.RoleName == "GeneralPractitioner"))
+            {
+                context.Roles.Add(new Role { RoleName = "GeneralPractitioner" });
+            }
+
+            if (!context.Roles.Any(r => r.RoleName == "Doctor"))
+            {
+                context.Roles.Add(new Role { RoleName = "Doctor" });
+            }
+
+            context.SaveChanges();
+
+            var gpRole = context.Roles.First(r => r.RoleName == "GeneralPractitioner");
+
+            // ---------------------
+            // Seed General Practitioner user
+            // ---------------------
+            if (!context.Users.Any(u => u.Email == "gp.jansen@example.nl"))
+            {
+                var gpUser = new User
+                {
+                    FirstName = "Jan",
+                    LastName = "Jansen",
+                    Email = "gp.jansen@example.nl",
+                    StreetName = "Village Street",
+                    HouseNumber = "12A",
+                    PostalCode = "1234AB",
+                    PhoneNumber = "0612345678",
+                    CreatedAt = DateTime.UtcNow,
+                    RoleId = gpRole.Id,
+                    PracticeName = "Jansen General Practice"
+                };
+
+                gpUser.PasswordHash = passwordHasher.HashPassword(gpUser, "Wachtwoord123");
+
+                context.Users.Add(gpUser);
+                context.SaveChanges();
+            }
+
+            // ---------------------
+            // Seed Patient user (Emma de Vries)
+            // ---------------------
+            if (!context.Users.Any(u => u.Email == "devries@example.com"))
+            {
+                var patientUser = new User
+                {
+                    FirstName = "Emma",
+                    LastName = "de Vries",
+                    Email = "devries@example.com",
+                    StreetName = "Lime Tree Avenue",
+                    HouseNumber = "45",
+                    PostalCode = "5678CD",
+                    PhoneNumber = "0687654321",
+                    CreatedAt = DateTime.UtcNow,
+                    RoleId = patientRole.Id
+                };
+
+                patientUser.PasswordHash = passwordHasher.HashPassword(patientUser, "Wachtwoord123");
+
+                context.Users.Add(patientUser);
+                context.SaveChanges();
+            }
+
+            // ---------------------
+            // Link General Practitioner to Patient
+            // (replacement for huisarts_patient table)
+            // ---------------------
+            var gp = context.Users.First(u => u.Email == "gp.jansen@example.nl");
+            var patient = context.Users.First(u => u.Email == "devries@example.com");
+
+            if (patient.DoctorId == null)
+            {
+                patient.DoctorId = gp.Id;
+                context.SaveChanges();
+            }
         }
     }
 }

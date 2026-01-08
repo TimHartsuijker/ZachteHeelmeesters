@@ -25,7 +25,7 @@
         </div>
         
         <!-- Data weergeven -->
-        <template v-else-if="patient">
+        <div v-else-if="patient" class="patient-data">
           <p>
             <strong>Voornaam:</strong> {{ patient.voornaam }} <br>
             <strong>Achternaam:</strong> {{ patient.achternaam }}
@@ -51,7 +51,7 @@
             <strong>Postcode:</strong> {{ patient.postcode }} <br>
             <strong>Plaats:</strong> {{ patient.plaats }}
           </p>
-        </template>
+        </div>
       </div>
     </section>
     
@@ -71,30 +71,29 @@
 
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
-import Navbar from '../components/Navbar.vue';
-import { getPatient, type PatientResponse } from '../services/api';
+import { ref, onMounted } from 'vue'
+import Navbar from '../components/Navbar.vue'
+import { getMyPatient, PatientResponse } from '../services/api'
 
+// --------------------
 // Reactive state
-const patient = ref<PatientResponse | null>(null);
-const loading = ref(true);
-const error = ref<string | null>(null);
+// --------------------
+const patient = ref<PatientResponse | null>(null)
+const loading = ref(true)
+const error = ref<string | null>(null)
 
-// Hardcoded patient ID voor nu (later uit auth/session halen)
-const PATIENT_ID = 2; // Emma de Vries uit je seed
-
+// --------------------
+// Data ophalen
+// --------------------
 onMounted(async () => {
   try {
-    const data = await getPatient(PATIENT_ID);
-    console.log('[Patient API response]', data); // ← Log de volledige payload
-    patient.value = data;
-  } catch (e) {
-    console.error('Fout bij ophalen patient:', e);
-    error.value = 'Kon gegevens niet ophalen. Probeer het later opnieuw.';
+    patient.value = await getMyPatient()
+  } catch (e: any) {
+    console.error('Fout bij ophalen patiënt:', e)
+    error.value = e.message || 'Niet ingelogd of sessie verlopen'
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-});
+})
 </script>
-
 

@@ -118,24 +118,3 @@ BEGIN
     SET @DoctorId = SCOPE_IDENTITY();
 END;
 
--- Insert availability slots for 7 Jan 2026 from 10:00 to 15:30 in 15-minute increments
-IF @DoctorId IS NOT NULL AND OBJECT_ID('doctor_availability', 'U') IS NOT NULL
-BEGIN
-    DECLARE @SlotStart DATETIME = '2026-01-07T10:00:00';
-    DECLARE @SlotEnd DATETIME = '2026-01-07T15:30:00';
-
-    WHILE @SlotStart <= @SlotEnd
-    BEGIN
-        IF NOT EXISTS (
-            SELECT 1 FROM doctor_availability
-            WHERE doctor_id = @DoctorId AND date_time = @SlotStart
-        )
-        BEGIN
-            INSERT INTO doctor_availability (doctor_id, date_time, is_available, reason)
-            VALUES (@DoctorId, @SlotStart, 1, NULL);
-        END;
-
-        SET @SlotStart = DATEADD(MINUTE, 15, @SlotStart);
-    END;
-END;
-

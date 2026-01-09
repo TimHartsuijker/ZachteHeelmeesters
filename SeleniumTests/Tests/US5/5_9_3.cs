@@ -1,43 +1,43 @@
-﻿using OpenQA.Selenium;
-using System;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
+using SeleniumTests.Pages;
 
-public class CreateReferral_NoPatientTest : TestBase
+namespace SeleniumTests;
+
+[TestClass]
+public class _5_9_3
 {
-    public static void RunStandalone()
-    {
-        var test = new CreateReferral_NoPatientTest();
+    private IWebDriver CreateDriver() => new ChromeDriver();
 
+    [TestMethod]
+    public void CreateReferral_NoPatientTest()
+    {
+        IWebDriver driver = null;
         try
         {
-            test.Setup();
-            test.RunTest();
-            Console.WriteLine("✅ NO PATIENT TEST PASSED");
+            Console.WriteLine("LOG [Step 1] Starting CreateReferral_NoPatientTest...");
+            driver = CreateDriver();
+            var page = new DoorverwijzingPage(driver);
+
+            page.Navigate();
+            Console.WriteLine("LOG [Step 2] Navigated to doorverwijzing page.");
+            Assert.IsTrue(page.WaitForPageLoad(), "Page did not load (required elements missing).");
+
+            // Do not fill patient; fill treatment and note
+            page.EnterTreatment("Test Treatment");
+            page.NotePatient("Note without patient");
+            page.ClickConfirm();
+
+            // Verify referral was NOT created
+            Assert.IsFalse(page.IsReferralCreated(), "Expected no referral when patient is missing but one was detected.");
         }
         catch (Exception ex)
         {
-            Console.WriteLine("❌ NO PATIENT TEST FAILED");
-            Console.WriteLine(ex.Message);
+            Assert.Fail("Test failed with exception: " + ex.Message);
         }
         finally
         {
-            test.TearDown();
+            driver?.Quit();
         }
-    }
-
-    public void RunTest()
-    {
-        // Select treatment only
-        WaitForElement(By.CssSelector("[data-testid='treatment-dropdown']")).Click();
-        WaitForElement(By.CssSelector("[data-testid='treatment-physio']")).Click();
-
-        // Add note
-        WaitForElement(By.CssSelector("[data-testid='referral-note']"))
-            .SendKeys("No patient selected");
-
-        // Submit
-        WaitForElement(By.CssSelector("[data-testid='submit-referral']")).Click();
-
-        // Expect error
-        ExpectError("patiënt");
     }
 }

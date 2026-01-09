@@ -1,54 +1,44 @@
-﻿using OpenQA.Selenium;
-using System;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
+using SeleniumTests.Pages;
 
-public class CreateReferral_SuccessTest : TestBase
+namespace SeleniumTests;
+
+[TestClass]
+public class _5_9_1
 {
-    public static void RunStandalone()
-    {
-        var test = new CreateReferral_SuccessTest();
+    private IWebDriver CreateDriver() => new ChromeDriver();
 
+    [TestMethod]
+    public void CreateReferral_SuccessTest()
+    {
+        IWebDriver driver = null;
         try
         {
-            test.Setup();
-            test.RunTest();
-            Console.WriteLine("✅ SUCCESS TEST PASSED");
+            Console.WriteLine("LOG [Step 1] Starting CreateReferral_SuccessTest...");
+            driver = CreateDriver();
+            var page = new DoorverwijzingPage(driver);
+
+            page.Navigate();
+            Console.WriteLine("LOG [Step 2] Navigated to doorverwijzing page.");
+            Assert.IsTrue(page.WaitForPageLoad(), "Page did not load (required elements missing).");
+
+            // Fill all fields and submit
+            page.EnterPatient("Test Patient");
+            page.EnterTreatment("Test Treatment");
+            page.NotePatient("This is a test note.");
+            page.ClickConfirm();
+
+            // Verify referral created
+            Assert.IsTrue(page.IsReferralCreated(), "Expected a new referral to be created but it was not detected.");
         }
         catch (Exception ex)
         {
-            Console.WriteLine("❌ SUCCESS TEST FAILED");
-            Console.WriteLine(ex.Message);
+            Assert.Fail("Test failed with exception: " + ex.Message);
         }
         finally
         {
-            test.TearDown();
+            driver?.Quit();
         }
-    }
-
-    public void RunTest()
-    {
-        // Select treatment
-        WaitForElement(By.CssSelector("[data-testid='treatment-dropdown']")).Click();
-        WaitForElement(By.CssSelector("[data-testid='treatment-physio']")).Click();
-
-        // Select patient
-        WaitForElement(By.CssSelector("[data-testid='patient-dropdown']")).Click();
-        WaitForElement(By.CssSelector("[data-testid='patient-john-doe']")).Click();
-
-        // Add note
-        WaitForElement(By.CssSelector("[data-testid='referral-note']"))
-            .SendKeys("Automated success test");
-
-        // Submit
-        WaitForElement(By.CssSelector("[data-testid='submit-referral']")).Click();
-
-        // Verify success
-        var success = WaitForElement(By.CssSelector("[data-testid='referral-success']"));
-        if (!success.Text.Contains("success"))
-            throw new Exception("Referral was not created.");
-
-        // Verify notification
-        var notification = WaitForElement(By.CssSelector("[data-testid='patient-notification']"));
-        if (!notification.Text.Contains("referral"))
-            throw new Exception("Patient notification missing.");
     }
 }

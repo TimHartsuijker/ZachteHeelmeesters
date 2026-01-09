@@ -28,19 +28,19 @@ public class UsersController : ControllerBase
 
             var query = @"
                 SELECT 
-                    g.gebruikersID, 
-                    g.voornaam, 
-                    g.achternaam, 
-                    g.email, 
-                    g.Straatnaam,
-                    g.Huisnummer,
-                    g.Postcode,
-                    g.Telefoonnummer,
-                    g.rol,
-                    r.rolnaam
-                FROM gebruikers g
-                LEFT JOIN rollen r ON g.rol = r.rolID
-                ORDER BY g.gebruikersID";
+                    u.Id, 
+                    u.FirstName, 
+                    u.LastName, 
+                    u.Email, 
+                    u.StreetName,
+                    u.HouseNumber,
+                    u.PostalCode,
+                    u.PhoneNumber,
+                    u.RoleId,
+                    r.RoleName
+                FROM dbo.Users u
+                LEFT JOIN dbo.Roles r ON u.RoleId = r.Id
+                ORDER BY u.Id";
 
             using var command = new SqlCommand(query, connection);
             using var reader = await command.ExecuteReaderAsync();
@@ -81,9 +81,9 @@ public class UsersController : ControllerBase
             await connection.OpenAsync();
 
             var query = @"
-                UPDATE gebruikers 
-                SET rol = @rol
-                WHERE gebruikersID = @id";
+                UPDATE dbo.Users
+                SET RoleId = @rol
+                WHERE Id = @id";
 
             using var command = new SqlCommand(query, connection);
             command.Parameters.AddWithValue("@id", id);

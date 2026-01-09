@@ -1,8 +1,6 @@
+using backend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
-using backend.Models;
-
-namespace backend.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -26,7 +24,7 @@ public class RolesController : ControllerBase
             using var connection = new SqlConnection(connectionString);
             await connection.OpenAsync();
 
-            var query = "SELECT rolID, rolnaam FROM rollen ORDER BY rolID";
+            var query = "SELECT Id, RoleName FROM dbo.Roles ORDER BY Id";
             using var command = new SqlCommand(query, connection);
             using var reader = await command.ExecuteReaderAsync();
 

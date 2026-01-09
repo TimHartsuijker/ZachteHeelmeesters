@@ -28,6 +28,15 @@ namespace backend.Models
 
         [Required, StringLength(6)]
         public string PostalCode { get; set; } = null!;
+        
+        [Required, StringLength(9), RegularExpression(@"^\d{9}$")]
+        public string CitizenServiceNumber { get; set; } = null!;
+
+        [Required]
+        public DateTime DateOfBirth { get; set; }
+
+        [AllowedValues("Man", "Vrouw", "Ander", "Zeg ik liever niet")]
+        public string Gender { get; set; } = null!;
 
         [MaxLength(15)]
         public string? PhoneNumber { get; set; }

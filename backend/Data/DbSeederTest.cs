@@ -12,11 +12,7 @@ namespace backend.Data
             var passwordHasher = new PasswordHasher<User>();
 
             // 🔹 Role seeden
-            if (!context.Roles.Any(r => r.RoleName == "Patient"))
-            {
-                context.Roles.Add(new Role { RoleName = "Patient" });
-                context.SaveChanges();
-            }
+           
 
             var patientRole = context.Roles.First(r => r.RoleName == "Patient");
 
@@ -41,12 +37,8 @@ namespace backend.Data
                 context.Users.Add(user);
                 context.SaveChanges();
             }
-            // 🔹 Admin role seeden
-            if (!context.Roles.Any(r => r.RoleName == "Admin"))
-            {
-                context.Roles.Add(new Role { RoleName = "Admin" });
-                context.SaveChanges();
-            }
+            
+            
 
             var adminRole = context.Roles.First(r => r.RoleName == "Admin");
 

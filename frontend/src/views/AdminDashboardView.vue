@@ -33,7 +33,7 @@ export default {
   },
   methods: {
     viewUsers() {
-      this.message = "Gebruikerslijst getoond (voorbeeld).";
+      this.$router.push("/admin/users");
     },
     openSettings() {
       this.message = "Instellingen geopend (voorbeeld).";

@@ -4,8 +4,8 @@
     <span class="user-field"><strong>Email:</strong> {{ email }}</span>
     <span class="user-field">
       <label for="role-select"><strong>Rol:</strong></label>
-      <select v-model="selectedRole" class="role-select" id="role-select">
-        <option v-for="rol in rollen" :key="rol.rolID" :value="rol.rolnaam">
+      <select v-model="selectedRoleId" class="role-select" id="role-select">
+        <option v-for="rol in rollen" :key="rol.rolID" :value="rol.rolID">
           {{ rol.rolnaam.charAt(0).toUpperCase() + rol.rolnaam.slice(1) }}
         </option>
       </select>
@@ -23,27 +23,25 @@ export default {
     userId: { type: Number, required: true },
     name: { type: String, required: true },
     email: { type: String, required: true },
-    role: { type: String, required: true },
-    roleId: { type: Number, required: true }
+    roleId: { type: Number, required: true } // we gebruiken rolID, niet rolnaam
   },
   data() {
     return {
-      selectedRole: this.role,
+      rollen: [],
       selectedRoleId: this.roleId,
       originalRoleId: this.roleId,
-      rollen: [],
       saving: false
     }
   },
   methods: {
     async fetchRollen() {
       try {
-        const response = await fetch('http://localhost:5016/api/roles');
+        const response = await fetch('https://localhost:7240/api/roles');
         if (!response.ok) throw new Error('Failed to fetch roles');
         this.rollen = await response.json();
       } catch (error) {
         console.error('Error fetching roles:', error);
-        // Fallback to default roles if API fails
+        // fallback indien backend niet werkt
         this.rollen = [
           { rolID: 1, rolnaam: 'patiënt' },
           { rolID: 2, rolnaam: 'huisarts' },
@@ -53,7 +51,6 @@ export default {
       }
     },
     async saveUser() {
-      // Check if any changes were made
       if (this.selectedRoleId === this.originalRoleId) {
         alert('Geen wijzigingen om op te slaan.');
         return;
@@ -61,21 +58,15 @@ export default {
 
       this.saving = true;
       try {
-        const response = await fetch(`http://localhost:5016/api/users/${this.userId}`, {
+        const response = await fetch(`https://localhost:7240/api/users/${this.userId}`, {
           method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            rol: this.selectedRoleId
-          })
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ Rol: this.selectedRoleId }) // exact property zoals backend verwacht
         });
 
         if (!response.ok) throw new Error('Failed to update user');
-        
-        // Update original values after successful save
+
         this.originalRoleId = this.selectedRoleId;
-        
         alert('Wijzigingen zijn opgeslagen.');
       } catch (error) {
         console.error('Error updating user:', error);
@@ -83,26 +74,13 @@ export default {
       } finally {
         this.saving = false;
       }
-    },
-    onRoleChange() {
-      const selected = this.rollen.find(r => r.rolnaam === this.selectedRole);
-      if (selected) {
-        this.selectedRoleId = selected.rolID;
-      }
-    }
-  },
-  watch: {
-    selectedRole() {
-      this.onRoleChange();
     }
   },
   async mounted() {
-    console.log('Gebruiker.vue mounted');
     await this.fetchRollen();
   }
 }
 </script>
-
 
 <style scoped>
 .user-row {
@@ -143,20 +121,6 @@ export default {
 .save-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-}
-.sb-label {
-  white-space: nowrap;
-}
-.sb-checkbox {
-  margin-left: 0.5rem;
-  accent-color: #B0DB9C;
-  cursor: pointer;
-  width: 1.2rem;
-  height: 1.2rem;
-}
-.sb-checkbox:focus {
-  outline: 2px solid #8FC97A;
-  outline-offset: 2px;
 }
 .role-select {
   margin-left: 0.5rem;

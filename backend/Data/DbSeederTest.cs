@@ -32,6 +32,9 @@ namespace backend.Data
                     HouseNumber = "1",
                     PostalCode = "1234AB",
                     PhoneNumber = "0612345678",
+                    CitizenServiceNumber = "123456789", // uniek maken!
+                    DateOfBirth = new DateTime(1990, 1, 1),
+                    Gender = "Man",
                     CreatedAt = DateTime.UtcNow,
                     RoleId = patientRole.Id
                 };
@@ -41,6 +44,7 @@ namespace backend.Data
                 context.Users.Add(user);
                 context.SaveChanges();
             }
+
             // 🔹 Admin role seeden
             if (!context.Roles.Any(r => r.RoleName == "Admin"))
             {
@@ -62,6 +66,9 @@ namespace backend.Data
                     HouseNumber = "99",
                     PostalCode = "9999AA",
                     PhoneNumber = "0600000000",
+                    CitizenServiceNumber = "123466789", // uniek maken!
+                    DateOfBirth = new DateTime(1980, 1, 1),
+                    Gender = "Man",
                     CreatedAt = DateTime.UtcNow,
                     RoleId = adminRole.Id
                 };
@@ -71,7 +78,6 @@ namespace backend.Data
                 context.Users.Add(admin);
                 context.SaveChanges();
             }
-
         }
     }
 }

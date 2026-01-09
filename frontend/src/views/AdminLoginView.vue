@@ -21,6 +21,9 @@
         <button type="submit" id="admin-login-btn">
           Login als beheerder
         </button>
+        <div class="login-link">
+          <p> <button type="button" @click="goToLogin">terug</button></p>
+        </div>
       </form>
 
     </div>
@@ -74,7 +77,11 @@ export default {
         this.loginErrorMessage =
           (error.response && error.response.data.message) || "Admin login mislukt";
       }
+      
     },
+    goToLogin() {
+      this.$router.push("/");
+    }
   },
 };
 </script>

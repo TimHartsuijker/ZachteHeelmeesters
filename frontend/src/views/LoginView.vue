@@ -32,8 +32,14 @@
 
         <button type="submit" id="login-btn">Login</button>
         <div class="admin-login-link">
-  <button id="admin-login-link" @click="goToAdminLogin">
-    Inloggen als beheerder
+            <button id="admin-login-link" @click="goToAdminLogin">
+                Inloggen als beheerder
+            </button>
+        </div>
+
+        <div class="register-link">
+  <button id="go-to-register" @click="$router.push('/register')">
+    Nog geen account? Registreer hier
   </button>
 </div>
 

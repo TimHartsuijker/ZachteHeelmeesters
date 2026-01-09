@@ -1,0 +1,32 @@
+import { createRouter, createWebHistory } from 'vue-router'
+import LoginView from '../views/LoginView.vue'
+import AdminLoginView from "../views/AdminLoginView.vue";
+import AdminDashboardView from "../views/AdminDashboardView.vue";
+
+const routes = [
+  { 
+    path: '/', 
+    name: 'login',
+    component: LoginView
+  },
+  
+
+  {
+    path: "/admin/login",
+    name: "AdminLogin",
+    component: AdminLoginView
+  },
+  {
+    path: "/admin/dashboard",
+    name: "AdminDashboard",
+    component: AdminDashboardView,
+    meta: { requiresAdmin: true }, // optioneel, handig voor route guards
+  }
+]
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes,
+})
+
+export default router

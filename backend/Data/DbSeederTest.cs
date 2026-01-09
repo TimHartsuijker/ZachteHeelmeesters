@@ -41,6 +41,37 @@ namespace backend.Data
                 context.Users.Add(user);
                 context.SaveChanges();
             }
+            // 🔹 Admin role seeden
+            if (!context.Roles.Any(r => r.RoleName == "Admin"))
+            {
+                context.Roles.Add(new Role { RoleName = "Admin" });
+                context.SaveChanges();
+            }
+
+            var adminRole = context.Roles.First(r => r.RoleName == "Admin");
+
+            // 🔹 Admin user seeden
+            if (!context.Users.Any(u => u.Email == "admin@example.com"))
+            {
+                var admin = new User
+                {
+                    FirstName = "System",
+                    LastName = "Administrator",
+                    Email = "admin@example.com",
+                    StreetName = "Adminstraat",
+                    HouseNumber = "99",
+                    PostalCode = "9999AA",
+                    PhoneNumber = "0600000000",
+                    CreatedAt = DateTime.UtcNow,
+                    RoleId = adminRole.Id
+                };
+
+                admin.PasswordHash = passwordHasher.HashPassword(admin, "Admin123");
+
+                context.Users.Add(admin);
+                context.SaveChanges();
+            }
+
         }
     }
 }

@@ -19,8 +19,8 @@
         <label for="role-filter"><strong>Rol:</strong></label>
         <select v-model="selectedRole" id="role-filter" class="filter-select" aria-label="Filteren op rol">
           <option value="">Alle rollen</option>
-          <option v-for="rol in rollen" :key="rol.rolID" :value="rol.rolnaam">
-            {{ rol.rolnaam.charAt(0).toUpperCase() + rol.rolnaam.slice(1) }}
+          <option v-for="rol in rollen" :key="rol.id" :value="rol.roleName">
+            {{ rol && rol.roleName ? rol.roleName.charAt(0).toUpperCase() + rol.roleName.slice(1) : 'Laden...' }}
           </option>
         </select>
       </div>

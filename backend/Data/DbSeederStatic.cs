@@ -12,10 +12,10 @@ namespace backend.Data
             if (!context.Roles.Any())
             {
                 context.Roles.AddRange(
-                    new Role { Id = 1, RoleName = "Patient" },
-                    new Role { Id = 2, RoleName = "Admin" },
-                    new Role { Id = 3, RoleName = "Huisarts" },
-                    new Role { Id = 4, RoleName = "Specialist" }
+                    new Role {RoleName = "Patiënt" },
+                    new Role {RoleName = "Admin" },
+                    new Role {RoleName = "Huisarts" },
+                    new Role {RoleName = "Specialist" }
                 );
             }
            

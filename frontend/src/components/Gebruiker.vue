@@ -5,8 +5,8 @@
     <span class="user-field">
       <label for="role-select"><strong>Rol:</strong></label>
       <select v-model="selectedRoleId" class="role-select" id="role-select">
-        <option v-for="rol in rollen" :key="rol.rolID" :value="rol.rolID">
-          {{ rol.rolnaam.charAt(0).toUpperCase() + rol.rolnaam.slice(1) }}
+        <option v-for="rol in rollen" :key="rol.id" :value="rol.id">
+          {{ rol.roleName.charAt(0).toUpperCase() + rol.roleName.slice(1) }}
         </option>
       </select>
     </span>
@@ -43,10 +43,10 @@ export default {
         console.error('Error fetching roles:', error);
         // fallback indien backend niet werkt
         this.rollen = [
-          { rolID: 1, rolnaam: 'patiënt' },
-          { rolID: 2, rolnaam: 'huisarts' },
-          { rolID: 3, rolnaam: 'specialist' },
-          { rolID: 4, rolnaam: 'admin' }
+          { id: 1, roleName: 'Patiënt' },
+          { id: 2, roleName: 'Huisarts' },
+          { id: 3, roleName: 'Specialist' },
+          { id: 4, roleName: 'Administrator' }
         ];
       }
     },
@@ -61,7 +61,7 @@ export default {
         const response = await fetch(`https://localhost:7240/api/users/${this.userId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ Rol: this.selectedRoleId }) // exact property zoals backend verwacht
+          body: JSON.stringify({ roleId: Number(this.selectedRoleId) })
         });
 
         if (!response.ok) throw new Error('Failed to update user');

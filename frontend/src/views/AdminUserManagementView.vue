@@ -37,35 +37,32 @@ const fetchRollen = async () => {
   } catch (error) {
     console.error('Error fetching roles:', error)
     rollen.value = [
-      { rolID: 1, rolnaam: 'patiënt' },
-      { rolID: 2, rolnaam: 'huisarts' },
-      { rolID: 3, rolnaam: 'specialist' },
-      { rolID: 4, rolnaam: 'administrator' },
+      { rolID: 1, rolnaam: 'Patiënt' },
+      { rolID: 2, rolnaam: 'Huisarts' },
+      { rolID: 3, rolnaam: 'Specialist' },
+      { rolID: 4, rolnaam: 'Administrator' },
       { rolID: 5, rolnaam: 'Systeembeheerder' }
     ]
   }
 }
 
+// AdminUserManagementView.vue
 const filteredUsers = computed(() => {
   return users.value.filter(user => {
-    // Search filter (name and email)
-    if (filterOptions.value.search) {
-      const searchLower = filterOptions.value.search.toLowerCase()
-      const fullName = `${user.voornaam} ${user.achternaam}`.toLowerCase()
-      const emailLower = user.email.toLowerCase()
-      
-      const matchesSearch = fullName.includes(searchLower) || emailLower.includes(searchLower)
-      if (!matchesSearch) return false
-    }
+    // Voeg extra checks toe (user.firstName || "") om undefined errors te voorkomen
+    const firstName = user.firstName || "";
+    const lastName = user.lastName || "";
+    const email = user.email || "";
 
-    // Role filter
-    if (filterOptions.value.role) {
-      if (user.rolnaam !== filterOptions.value.role) return false
-    }
+    const searchLower = filterOptions.value.search.toLowerCase();
+    const fullName = `${firstName} ${lastName}`.toLowerCase();
+    
+    const matchesSearch = fullName.includes(searchLower) || email.toLowerCase().includes(searchLower);
+    const matchesRole = !filterOptions.value.role || user.roleName === filterOptions.value.role;
 
-    return true
-  })
-})
+    return matchesSearch && matchesRole;
+  });
+});
 
 const handleFilterChange = (filters) => {
   filterOptions.value = filters
@@ -98,18 +95,17 @@ onMounted(() => {
     <div v-if="loading" class="status-message">Loading users...</div>
     <div v-else-if="error" class="status-message error">Error: {{ error }}</div>
     <div v-else-if="filteredUsers.length === 0" class="status-message">No users found</div>
-    <template v-else>
+    <div v-else>
       <Gebruikers
         v-for="user in filteredUsers"
-        :key="user.gebruikersID"
-        :userId="user.gebruikersID"
-        :name="`${user.voornaam} ${user.achternaam}`"
+        :key="user.id"
+        :userId="user.id"
+        :name="`${user.firstName} ${user.lastName}`"
         :email="user.email"
-        :role="user.rolnaam || ''"
-        :roleId="user.rol"
+        :roleId="user.roleId" 
         @update-user="handleUpdateUser"
       />
-    </template>
+    </div>
   </main>
 </template>
 

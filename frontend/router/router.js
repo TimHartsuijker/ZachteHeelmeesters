@@ -1,8 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import DoctorCalendar from '../src/components/DoctorCalendar.vue'
 
 const routes = [
     { 
-        path: '', name: '', //component: 
+        path: '/', 
+        name: 'Calendar', 
+        component: DoctorCalendar
     }
 ]
 

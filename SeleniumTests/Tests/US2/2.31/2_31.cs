@@ -49,13 +49,18 @@ public class _2_31
     {
         string FIRSTNAME = "New";
         string LASTNAME = "User";
+        string STREETNAME = "Main Street";
+        string HOUSENUMBER = "123";
+        string POSTALCODE = "1234AB";
+        string CITIZENSERVICENUMBER = "123456789";
+        string GENDER = "Man";
         string PHONE_NUMBER = "0611223344";
         string EMAIL = "newuser@example.com";
         string PASSWORD = "NewUserPassword";
 
         Console.WriteLine("Test started: Registration with empty fields");
         // Test with empty first name
-        registrationPage.Register("", LASTNAME, PHONE_NUMBER, EMAIL, PASSWORD);
+        registrationPage.Register("", LASTNAME, STREETNAME, HOUSENUMBER, POSTALCODE, CITIZENSERVICENUMBER, GENDER, PHONE_NUMBER, EMAIL, PASSWORD);
         wait.Until(d => registrationPage.IsErrorMessageDisplayed());
         Assert.AreEqual("All fields must be filled in", registrationPage.GetErrorMessage());
 

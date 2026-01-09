@@ -15,6 +15,12 @@ namespace SeleniumTests.P_O_M
 
         private static By FirstNameInput => By.Id("firstname");
         private static By LastNameInput => By.Id("lastname");
+        private static By DateOfBirthInput => By.Id("dateofbirth");
+        private static By GenderInput => By.Id("gender");
+        private static By StreetnameInput => By.Id("streetname");
+        private static By HousenumberInput => By.Id("housenumber");
+        private static By PostalcodeInput => By.Id("postalcode");
+        private static By CitizenServiceNumberInput => By.Id("csn");
         private static By PhoneNumberInput => By.Id("phonenumber");
         private static By EmailInput => By.Id("email");
         private static By PasswordInput => By.Id("password");
@@ -27,52 +33,17 @@ namespace SeleniumTests.P_O_M
             driver.Navigate().GoToUrl(Url);
         }
 
-        public void EnterFirstName(string firstname)
+        public void EnterData(By locator, string value)
         {
-            Console.WriteLine($"Entering FirstName: {firstname}");
+            string locatorValue = locator.ToString().Split(':')[1].Trim();
+            Console.WriteLine($"Entering {locatorValue}: {value}");
 
-            var input = driver.FindElement(FirstNameInput);
+            var input = driver.FindElement(locator);
             input.Clear();
-            input.SendKeys(firstname);
+            input.SendKeys(value);
         }
 
-        public void EnterLastName(string lastname)
-        {
-            Console.WriteLine($"Entering LastName: {lastname}");
-
-            var input = driver.FindElement(LastNameInput);
-            input.Clear();
-            input.SendKeys(lastname);
-        }
-
-        public void EnterPhoneNumber(string phone_number)
-        {
-            Console.WriteLine($"Entering PhoneNumber: {phone_number}");
-
-            var input = driver.FindElement(PhoneNumberInput);
-            input.Clear();
-            input.SendKeys(phone_number);
-        }
-
-        public void EnterEmail(string email)
-        {
-            Console.WriteLine($"Entering Email: {email}");
-
-            var input = driver.FindElement(EmailInput);
-            input.Clear();
-            input.SendKeys(email);
-        }
-
-        public void EnterPassword(string password)
-        {
-            Console.WriteLine($"Entering Password: {password}");
-
-            var input = driver.FindElement(PasswordInput);
-            input.Clear();
-            input.SendKeys(password);
-        }
-
-        public void Register(string firstname, string lastname, string phone_number, string email, string password)
+        public void Register(string firstname, string lastname, string streetname, string housenumber, string postalcode, string citizenservicenumber, string dateofbirth, string gender, string phone_number, string email, string password)
         {
             Navigate();
 
@@ -82,94 +53,51 @@ namespace SeleniumTests.P_O_M
             }
             
             Console.WriteLine("Registrationpage loaded.");
-
             
-            EnterFirstName(firstname);
-            EnterLastName(lastname);
-            EnterPhoneNumber(phone_number);
-            EnterEmail(email);
-            EnterPassword(password);
+            EnterData(FirstNameInput, firstname);
+            EnterData(LastNameInput, lastname);
+            EnterData(EmailInput, email);
+            EnterData(PasswordInput, password);
+            EnterData(StreetnameInput, streetname);
+            EnterData(HousenumberInput, housenumber);
+            EnterData(PostalcodeInput, postalcode);
+            EnterData(CitizenServiceNumberInput, citizenservicenumber);
+            EnterData(DateOfBirthInput, dateofbirth);
+            EnterData(GenderInput, gender);
+            EnterData(PhoneNumberInput, phone_number);
 
             Console.WriteLine("Clicking the register button");
             driver.FindElement(RegisterButton).Click();
         }
 
-        public bool IsFirstNameFieldDisplayed()
+        public bool IsDisplayed(By locator)
         {
             try
             {
-                return driver.FindElement(FirstNameInput).Displayed;
+                return driver.FindElement(locator).Displayed;
             }
             catch (NoSuchElementException)
             {
-                Console.WriteLine("First name field not found.");
+                string locatorValue = locator.ToString().Split(':')[1].Trim();
+                Console.WriteLine($"{locatorValue} field not found.");
                 return false;
             }
         }
 
-        public bool IsLastNameFieldDisplayed()
+        public bool IsAllDisplayed()
         {
-            try 
-            {
-                return driver.FindElement(LastNameInput).Displayed;
-            }
-            catch (NoSuchElementException)
-            {
-                Console.WriteLine("Last name field not found.");
-                return false;
-            }
-        }
-
-        public bool IsPhoneNumberFieldDisplayed()
-        {
-            try 
-            {
-                return driver.FindElement(PhoneNumberInput).Displayed;
-            }
-            catch (NoSuchElementException)
-            {
-                Console.WriteLine("Phone number field not found.");
-                return false;
-            }
-        }
-
-        public bool IsEmailFieldDisplayed()
-        {
-            try 
-            {
-                return driver.FindElement(EmailInput).Displayed;
-            }
-            catch (NoSuchElementException)
-            {
-                Console.WriteLine("Email field not found.");
-                return false;
-            }
-        }
-
-        public bool IsPasswordFieldDisplayed()
-        {
-            try
-            {
-                return driver.FindElement(PasswordInput).Displayed;
-            }
-            catch (NoSuchElementException)
-            {
-                Console.WriteLine("Password field not found.");
-                return false;
-            }
-        }
-
-        public bool IsRegisterButtonDisplayed()
-        {
-            try
-            {
-                return driver.FindElement(RegisterButton).Displayed;
-            }
-            catch (NoSuchElementException)
-            {
-                Console.WriteLine("Register button not found.");
-                return false;
-            }
+            return IsDisplayed(FirstNameInput) &&
+                    IsDisplayed(LastNameInput) && 
+                    IsDisplayed(DateOfBirthInput) &&
+                    IsDisplayed(GenderInput) &&
+                    IsDisplayed(StreetnameInput) &&
+                    IsDisplayed(HousenumberInput) &&
+                    IsDisplayed(PostalcodeInput) &&
+                    IsDisplayed(CitizenServiceNumberInput) &&
+                    IsDisplayed(PhoneNumberInput) &&
+                    IsDisplayed(EmailInput) &&
+                    IsDisplayed(PasswordInput) &&
+                    IsDisplayed(RegisterButton);
         }
 
         public bool IsErrorMessageDisplayed()
@@ -184,17 +112,6 @@ namespace SeleniumTests.P_O_M
                 return false;
             }
         }
-
-        public bool IsAllDisplayed()
-        {
-                return IsFirstNameFieldDisplayed() &&
-            IsLastNameFieldDisplayed() &&
-            IsPhoneNumberFieldDisplayed() &&
-            IsEmailFieldDisplayed() &&
-            IsPasswordFieldDisplayed() &&
-            IsRegisterButtonDisplayed();
-        }
-
 
         public string GetErrorMessage()
         {

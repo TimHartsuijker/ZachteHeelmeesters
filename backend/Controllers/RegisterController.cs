@@ -33,26 +33,26 @@ namespace backend.Controllers
                 request.DateOfBirth == default ||
                 string.IsNullOrWhiteSpace(request.Gender))
             {
-                return BadRequest(new { message = "All fields must be filled in" });
+                return BadRequest(new { message = "Alle velden moeten ingevuld zijn." });
             }
 
             // 2️⃣ Controleer of email al bestaat
             if (_context.Users.Any(u => u.Email == request.Email))
             {
-                return BadRequest(new { message = "The email that was used is already registered" });
+                return BadRequest(new { message = "Dit email is al geregistreerd." });
             }
 
             // 3️⃣ Controleer of CitizenServiceNumber al bestaat
             if (_context.Users.Any(u => u.CitizenServiceNumber == request.CitizenServiceNumber))
             {
-                return BadRequest(new { message = "The Citizen Service Number is already registered" });
+                return BadRequest(new { message = "Dit BSN nummer is al geregistreerd." });
             }
 
             // 4️⃣ Haal Patient role op
             var patientRole = _context.Roles.FirstOrDefault(r => r.RoleName == "Patient");
             if (patientRole == null)
             {
-                return BadRequest(new { message = "Patient role not found. Please seed roles first." });
+                return BadRequest(new { message = "Rol Patiënt niet gevonden, seed de database." });
             }
 
             // 5️⃣ Maak nieuwe user aan
@@ -79,7 +79,7 @@ namespace backend.Controllers
             _context.Users.Add(user);
             _context.SaveChanges();
 
-            return Ok(new { message = "User registered successfully" });
+            return Created("/" , new { message = "Gebruiker correct geregistreerd!" });
         }
     }
 }

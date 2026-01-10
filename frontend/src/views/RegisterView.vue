@@ -82,7 +82,9 @@
         <p v-if="registerError" class="error-text">{{ registerErrorMessage }}</p>
         <p v-if="registerSuccess" class="success-text">{{ registerSuccess }}</p>
 
-        <button type="submit">Registreren</button>
+        <button type="submit" :disabled="isSubmitting">
+          {{ isSubmitting ? 'Bezig met registreren...' : 'Registreren' }}
+        </button>
 
         <div class="login-link">
           <p>Heb je al een account? <button type="button" @click="goToLogin">Inloggen</button></p>
@@ -93,77 +95,87 @@
   </div>
 </template>
 
-<script>
-import axios from "axios";
+<script setup>
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import axios from 'axios';
 
-export default {
-  data() {
-    return {
-      firstName: "",
-      lastName: "",
-      streetName: "",
-      houseNumber: "",
-      postalCode: "",
-      citizenServiceNumber: "",
-      dateOfBirth: "",
-      gender: "",
-      phoneNumber: "",
-      email: "",
-      password: "",
-      emptyError: false,
-      registerError: false,
-      registerErrorMessage: "",
-      registerSuccess: "",
-    };
-  },
-  methods: {
-    async register() {
-      // Reset meldingen
-      this.emptyError = false;
-      this.registerError = false;
-      this.registerErrorMessage = "";
-      this.registerSuccess = "";
+// Router initialiseren voor navigatie
+const router = useRouter();
 
-      // Check op lege velden
-      if (!this.firstName || !this.lastName || !this.streetName || !this.houseNumber ||
-          !this.postalCode || !this.citizenServiceNumber || !this.dateOfBirth || !this.gender ||
-          !this.phoneNumber || !this.email || !this.password) {
-        this.emptyError = true;
-        return;
-      }
+// Formulier velden
+const firstName = ref("");
+const lastName = ref("");
+const streetName = ref("");
+const houseNumber = ref("");
+const postalCode = ref("");
+const citizenServiceNumber = ref("");
+const dateOfBirth = ref("");
+const gender = ref("");
+const phoneNumber = ref("");
+const email = ref("");
+const password = ref("");
 
-      try {
-        const response = await axios.post("https://localhost:7240/api/register", {
-          firstName: this.firstName,
-          lastName: this.lastName,
-          streetName: this.streetName,
-          houseNumber: this.houseNumber,
-          postalCode: this.postalCode,
-          citizenServiceNumber: this.citizenServiceNumber,
-          dateOfBirth: this.dateOfBirth,
-          gender: this.gender,
-          phoneNumber: this.phoneNumber,
-          email: this.email,
-          password: this.password
-        });
+// Status meldingen
+const emptyError = ref(false);
+const registerError = ref(false);
+const registerErrorMessage = ref("");
+const registerSuccess = ref("");
+const isSubmitting = ref(false);
 
-        if (response.status === 201) {
-          this.registerSuccess = "Registratie gelukt! Je wordt doorgestuurd naar de login.";
-          setTimeout(() => this.$router.push("/"), 1500);
-        }
-      } catch (error) {
-        if (error.response && error.response.data && error.response.data.message) {
-          this.registerErrorMessage = error.response.data.message;
-        } else {
-          this.registerErrorMessage = "Er is iets misgegaan bij registreren.";
-        }
-        this.registerError = true;
-      }
-    },
+// Registratie functie
+const register = async () => {
+  // Reset meldingen
+  emptyError.value = false;
+  registerError.value = false;
+  registerErrorMessage.value = "";
+  registerSuccess.value = "";
 
-    goToLogin() {
-      this.$router.push("/");
-    }
+  // Check op lege velden
+  if (!firstName.value || !lastName.value || !streetName.value || !houseNumber.value ||
+      !postalCode.value || !citizenServiceNumber.value || !dateOfBirth.value || !gender.value ||
+      !phoneNumber.value || !email.value || !password.value) {
+    emptyError.value = true;
+    return;
   }
+
+  isSubmitting.value = true; // Start loading
+
+  try {
+    const response = await axios.post("https://localhost:7240/api/register", {
+      firstName: firstName.value,
+      lastName: lastName.value,
+      streetName: streetName.value,
+      houseNumber: houseNumber.value,
+      postalCode: postalCode.value,
+      citizenServiceNumber: citizenServiceNumber.value,
+      dateOfBirth: dateOfBirth.value,
+      gender: gender.value,
+      phoneNumber: phoneNumber.value,
+      email: email.value,
+      password: password.value
+    });
+
+    if (response.status === 201 || response.status === 200) {
+      registerSuccess.value = "Registratie gelukt! Je wordt nu doorgestuurd...";
+
+      setTimeout(() => {
+        router.push("/");
+      }, 1500);
+    }
+  } catch (error) {
+    isSubmitting.value = false;
+    if (error.response?.data?.message) {
+      registerErrorMessage.value = error.response.data.message;
+    } else {
+      registerErrorMessage.value = "Er is iets misgegaan bij registreren.";
+    }
+    registerError.value = true;
+  }
+};
+
+// Navigatie naar login
+const goToLogin = () => {
+  router.push("/");
 };
 </script>

@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from '../views/LoginView.vue'
 import AdminLoginView from "../views/AdminLoginView.vue";
 import AdminDashboardView from "../views/AdminDashboardView.vue";
+import UsersView from "../views/AdminUserManagementView.vue";
 
 const routes = [
   { 
@@ -21,6 +22,12 @@ const routes = [
     name: "AdminDashboard",
     component: AdminDashboardView,
     meta: { requiresAdmin: true }, // optioneel, handig voor route guards
+  },
+  {
+    path: "/admin/users",
+    name: "AdminUsers",
+    component: UsersView,
+    meta: { requiresAdmin: true },
   }
 ]
 

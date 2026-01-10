@@ -11,14 +11,7 @@ namespace backend.Data
 
             var passwordHasher = new PasswordHasher<User>();
 
-            // 🔹 Role seeden
-            if (!context.Roles.Any(r => r.RoleName == "Patient"))
-            {
-                context.Roles.Add(new Role { RoleName = "Patient" });
-                context.SaveChanges();
-            }
-
-            var patientRole = context.Roles.First(r => r.RoleName == "Patient");
+            var patientRole = context.Roles.First(r => r.RoleName == "Patiënt");
 
             // 🔹 User seeden
             if (!context.Users.Any(u => u.Email == "gebruiker@example.com"))
@@ -32,6 +25,9 @@ namespace backend.Data
                     HouseNumber = "1",
                     PostalCode = "1234AB",
                     PhoneNumber = "0612345678",
+                    DateOfBirth = DateTime.MinValue,
+                    Gender = "Vrouw",
+                    CitizenServiceNumber = "123456789",
                     CreatedAt = DateTime.UtcNow,
                     RoleId = patientRole.Id
                 };
@@ -39,12 +35,6 @@ namespace backend.Data
                 user.PasswordHash = passwordHasher.HashPassword(user, "Wachtwoord123");
 
                 context.Users.Add(user);
-                context.SaveChanges();
-            }
-            // 🔹 Admin role seeden
-            if (!context.Roles.Any(r => r.RoleName == "Admin"))
-            {
-                context.Roles.Add(new Role { RoleName = "Admin" });
                 context.SaveChanges();
             }
 
@@ -62,6 +52,9 @@ namespace backend.Data
                     HouseNumber = "99",
                     PostalCode = "9999AA",
                     PhoneNumber = "0600000000",
+                    DateOfBirth = DateTime.Now,
+                    Gender = "Man",
+                    CitizenServiceNumber = "012345678",
                     CreatedAt = DateTime.UtcNow,
                     RoleId = adminRole.Id
                 };

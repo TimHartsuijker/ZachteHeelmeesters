@@ -142,10 +142,22 @@ admin-dashboard-page {
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.logo {
-  color: black;
-  font-size: 1.5rem;
-  font-weight: bold;
+.admin-navbar a {
+  text-decoration: none;
+  transition: color 0.3s, background 0.3s, box-shadow 0.3s;
+  & h1 {
+    color: black;
+    text-decoration: none;
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+}
+
+.admin-navbar a h1:hover {
+  color: #fff;
+  cursor: pointer;
+  background: none;
+  box-shadow: none;
 }
 
 /* Gecentreerde buttons */
@@ -203,7 +215,6 @@ admin-dashboard-page {
   border-radius: 1.5rem;
   box-shadow: 0 2px 16px 0 rgba(0,0,0,0.07);
   padding: 0 0 2.5rem 0;
-  margin-top: 112px; /* 70px min-height + 48px vertical padding + 20px gap */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -211,7 +222,7 @@ admin-dashboard-page {
 }
 /* Remove .align-under-nav margin-top, not needed with padding-top */
 .align-under-nav {
-  margin-top: 0;
+  margin-top: 100px;
 }
 .status-message {
   padding: 2rem;

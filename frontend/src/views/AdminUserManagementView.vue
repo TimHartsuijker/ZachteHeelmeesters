@@ -1,5 +1,5 @@
 <script setup>
-import NavBar from '../components/nav.vue'
+import AdminNavBar from '../components/AdminNavBar.vue'
 import Filter from '../components/Filter.vue'
 import Gebruikers from '../components/Gebruiker.vue'
 import { ref, onMounted, computed } from 'vue'
@@ -37,11 +37,11 @@ const fetchRollen = async () => {
   } catch (error) {
     console.error('Error fetching roles:', error)
     rollen.value = [
-      { rolID: 1, rolnaam: 'Patiënt' },
-      { rolID: 2, rolnaam: 'Huisarts' },
-      { rolID: 3, rolnaam: 'Specialist' },
-      { rolID: 4, rolnaam: 'Administrator' },
-      { rolID: 5, rolnaam: 'Systeembeheerder' }
+      { rolId: 1, roleName: 'Patiënt' },
+      { rolId: 2, roleName: 'Huisarts' },
+      { rolId: 3, roleName: 'Specialist' },
+      { rolId: 4, roleName: 'Administrator' },
+      { rolId: 5, roleName: 'Systeembeheerder' }
     ]
   }
 }
@@ -58,7 +58,10 @@ const filteredUsers = computed(() => {
     const fullName = `${firstName} ${lastName}`.toLowerCase();
     
     const matchesSearch = fullName.includes(searchLower) || email.toLowerCase().includes(searchLower);
-    const matchesRole = !filterOptions.value.role || user.roleName === filterOptions.value.role;
+    
+
+    const role = rollen.value.find(r => r.roleName === filterOptions.value.role);
+    const matchesRole = !filterOptions.value.role || user.roleId === role?.id;
 
     return matchesSearch && matchesRole;
   });
@@ -82,7 +85,7 @@ onMounted(() => {
 <template>
   <header>
     <div class="wrapper">
-      <NavBar/>
+      <AdminNavBar/>
     </div>
   </header>
 
@@ -118,6 +121,7 @@ header {
   left: 0;
   z-index: 1000;
 }
+
 #app {
   background-color: #ECFAE5;
 }

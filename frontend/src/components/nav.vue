@@ -2,7 +2,7 @@
   <nav class="navbar" aria-label="Hoofdnavigatie">
     <ul>
       <li>
-        <a href="/Gebruikers.html" aria-current="page">Gebruikers</a>
+        <a href="/admin/users" aria-current="user-management page">Gebruikersbeheer</a>
       </li>
     </ul>
   </nav>

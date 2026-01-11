@@ -65,6 +65,18 @@
           <input type="text" id="phone" v-model="phoneNumber" />
         </div>
 
+        <!-- Huisarts -->
+        <div v-if="loading || !doctors">Huisartsen aan het ophalen...</div>
+        <div v-else class="register-view-form-group">
+          <label for="doctor">Huisarts:</label>
+          <select id="doctor" v-model="doctor">
+            <option value="">Selecteer huisarts</option>
+            <option v-for="doctor in doctors" :key="doctor.id" :value="doctor.id">
+              Dr. {{ doctor.firstName }} {{ doctor.lastName }}
+            </option>
+          </select>
+        </div>
+
         <!-- Email -->
         <div class="register-view-form-group">
           <label for="email">Email:</label>
@@ -96,12 +108,14 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
 
 // Router initialiseren voor navigatie
 const router = useRouter();
+
+const loading = ref(true);
 
 // Formulier velden
 const firstName = ref("");
@@ -113,6 +127,7 @@ const citizenServiceNumber = ref("");
 const dateOfBirth = ref("");
 const gender = ref("");
 const phoneNumber = ref("");
+const doctor = ref("");
 const email = ref("");
 const password = ref("");
 
@@ -122,6 +137,22 @@ const registerError = ref(false);
 const registerErrorMessage = ref("");
 const registerSuccess = ref("");
 const isSubmitting = ref(false);
+
+const doctors = ref([])
+const fetchDoctors = async () => {
+  try {
+    const response = await fetch('https://localhost:7240/api/doctors')
+    if (!response.ok) throw new Error('Failed to fetch doctors')
+    doctors.value = await response.json()
+  } catch (error) {
+    console.error('Error fetching doctors:', error)
+    doctors.value = [
+      { id: null, firstName: 'Failed to fetch', lastName: 'doctors' }
+    ]
+  } finally {
+    loading.value = false
+  }
+}
 
 // Registratie functie
 const register = async () => {
@@ -134,7 +165,7 @@ const register = async () => {
   // Check op lege velden
   if (!firstName.value || !lastName.value || !streetName.value || !houseNumber.value ||
       !postalCode.value || !citizenServiceNumber.value || !dateOfBirth.value || !gender.value ||
-      !phoneNumber.value || !email.value || !password.value) {
+      !phoneNumber.value || !doctor.value || !email.value || !password.value) {
     emptyError.value = true;
     return;
   }
@@ -152,6 +183,7 @@ const register = async () => {
       dateOfBirth: dateOfBirth.value,
       gender: gender.value,
       phoneNumber: phoneNumber.value,
+      doctorId: doctor.value,
       email: email.value,
       password: password.value
     });
@@ -173,6 +205,11 @@ const register = async () => {
     registerError.value = true;
   }
 };
+
+onMounted(() => {
+  console.log('App.vue mounted')
+  fetchDoctors()
+});
 
 // Navigatie naar login
 const goToLogin = () => {

@@ -30,6 +30,7 @@ namespace backend.Controllers
                 string.IsNullOrWhiteSpace(request.HouseNumber) ||
                 string.IsNullOrWhiteSpace(request.PostalCode) ||
                 string.IsNullOrWhiteSpace(request.CitizenServiceNumber) ||
+                request.DoctorId == 0 ||
                 request.DateOfBirth == default ||
                 string.IsNullOrWhiteSpace(request.Gender))
             {
@@ -46,6 +47,13 @@ namespace backend.Controllers
             if (_context.Users.Any(u => u.CitizenServiceNumber == request.CitizenServiceNumber))
             {
                 return BadRequest(new { message = "Dit BSN nummer is al geregistreerd." });
+            }
+
+            // Controleer of huisarts bestaat
+            var doctor = _context.Users.FirstOrDefault(u => u.Id == request.DoctorId);
+            if (doctor == null)
+            {
+                return BadRequest(new { message = "De opgegeven huisarts bestaat niet." });
             }
 
             // 4️⃣ Haal Patient role op
@@ -67,6 +75,7 @@ namespace backend.Controllers
                 PhoneNumber = request.PhoneNumber,
                 CitizenServiceNumber = request.CitizenServiceNumber,
                 DateOfBirth = request.DateOfBirth,
+                DoctorId = doctor.Id,
                 Gender = request.Gender,
                 CreatedAt = DateTime.UtcNow,
                 RoleId = patientRole.Id

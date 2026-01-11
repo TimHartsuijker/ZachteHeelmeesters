@@ -79,7 +79,7 @@ onMounted(() => {
   console.log('App.vue mounted')
   fetchRollen()
   fetchUsers()
-})
+});
 </script>
 
 <template>

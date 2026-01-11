@@ -3,6 +3,7 @@ import LoginView from '../views/LoginView.vue'
 import RegisterView from '../views/RegisterView.vue' // <-- importeer de nieuwe view
 import AdminLoginView from "../views/AdminLoginView.vue";
 import AdminDashboardView from "../views/AdminDashboardView.vue";
+import UsersView from "../views/AdminUserManagementView.vue";
 
 const routes = [
   { 
@@ -24,6 +25,12 @@ const routes = [
     path: "/admin/dashboard",
     name: "AdminDashboard",
     component: AdminDashboardView,
+    meta: { requiresAdmin: true }, // optioneel, handig voor route guards
+  },
+  {
+    path: "/admin/users",
+    name: "AdminUsers",
+    component: UsersView,
     meta: { requiresAdmin: true },
   }
 ]

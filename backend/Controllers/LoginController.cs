@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 
-namespace BackendLogin.Controllers
+namespace backend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

@@ -1,19 +1,6 @@
 <template>
   <div class="admin-dashboard-page">
-    <!-- Navbar -->
-    <nav class="admin-navbar">
-      <h1 class="logo">Admin Dashboard</h1>
-      
-      <!-- Gecentreerde knoppen -->
-      <div class="nav-center-buttons">
-        <button @click="viewUsers">Gebruikersbeheer</button>
-        <button @click="openSettings">Instellingen</button>
-        <button @click="viewAuditLogs">Audit logs</button>
-      </div>
-
-      <!-- Logout rechts -->
-      <button class="logout-btn" @click="logout">Uitloggen</button>
-    </nav>
+    <AdminNavBar/>
 
     <!-- Content area -->
     <div class="admin-content">
@@ -26,25 +13,9 @@
 <script>
 export default {
   name: "AdminDashboardView",
-  data() {
-    return {
-      message: "",
-    };
-  },
-  methods: {
-    viewUsers() {
-      this.message = "Gebruikerslijst getoond (voorbeeld).";
-    },
-    openSettings() {
-      this.message = "Instellingen geopend (voorbeeld).";
-    },
-    viewAuditLogs() {
-      this.message = "Audit logs getoond (voorbeeld).";
-    },
-    logout() {
-      sessionStorage.removeItem("isAdminLoggedIn");
-      this.$router.push("/");
-    },
-  },
 };
+</script>
+
+<script setup>
+import AdminNavBar from '../components/AdminNavBar.vue';
 </script>

@@ -40,8 +40,7 @@ const fetchRollen = async () => {
       { rolId: 1, roleName: 'Patiënt' },
       { rolId: 2, roleName: 'Huisarts' },
       { rolId: 3, roleName: 'Specialist' },
-      { rolId: 4, roleName: 'Administrator' },
-      { rolId: 5, roleName: 'Systeembeheerder' }
+      { rolId: 4, roleName: 'Systeembeheerder' }
     ]
   }
 }

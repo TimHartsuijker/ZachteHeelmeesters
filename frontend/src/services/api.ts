@@ -31,7 +31,6 @@ export type PatientResponse = {
   straatnaam: string
   huisnummer: string
   postcode: string
-  plaats: string | null
   bsn: string | null
   geboortedatum: string | null
   geslacht: string | null

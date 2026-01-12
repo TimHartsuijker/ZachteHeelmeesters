@@ -40,7 +40,10 @@ namespace backend.Controllers
                 Huisartspraktijk = patient.Doctor?.PracticeName,
                 Huisartsnaam = patient.Doctor != null
                     ? $"{patient.Doctor.FirstName} {patient.Doctor.LastName}"
-                    : null
+                    : null,
+                BSN = patient.CitizenServiceNumber,
+                Geboortedatum = patient.DateOfBirth.ToString("dd-MM-yyyy"),
+                Geslacht = patient.Gender,
             });
         }
     }

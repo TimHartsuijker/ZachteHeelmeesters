@@ -49,7 +49,6 @@
             <strong>Straatnaam:</strong> {{ patient.straatnaam }} <br>
             <strong>Huisnummer:</strong> {{ patient.huisnummer }} <br>
             <strong>Postcode:</strong> {{ patient.postcode }} <br>
-            <strong>Plaats:</strong> {{ patient.plaats }}
           </p>
         </div>
       </div>

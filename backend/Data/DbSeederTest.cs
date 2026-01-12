@@ -33,7 +33,10 @@ namespace backend.Data
                     PostalCode = "1234AB",
                     PhoneNumber = "0612345678",
                     CreatedAt = DateTime.UtcNow,
-                    RoleId = patientRole.Id
+                    RoleId = patientRole.Id,
+                    //CitizenServiceNumber = "233456789",
+                    //Gender = "Ander"
+
                 };
 
                 user.PasswordHash = passwordHasher.HashPassword(user, "Wachtwoord123");
@@ -80,7 +83,9 @@ namespace backend.Data
                     PhoneNumber = "0612345678",
                     CreatedAt = DateTime.UtcNow,
                     RoleId = gpRole.Id,
-                    PracticeName = "Jansen General Practice"
+                    PracticeName = "Jansen General Practice",
+                    //CitizenServiceNumber = "123456789",
+                    //Gender = "Man"
                 };
 
                 gpUser.PasswordHash = passwordHasher.HashPassword(gpUser, "Wachtwoord123");
@@ -104,7 +109,10 @@ namespace backend.Data
                     PostalCode = "5678CD",
                     PhoneNumber = "0687654321",
                     CreatedAt = DateTime.UtcNow,
-                    RoleId = patientRole.Id
+                    RoleId = patientRole.Id,
+                    CitizenServiceNumber = "223456789",
+                    Gender = "Vrouw",
+                    DateOfBirth = new DateTime(1990, 1, 12)
                 };
 
                 patientUser.PasswordHash = passwordHasher.HashPassword(patientUser, "Wachtwoord123");

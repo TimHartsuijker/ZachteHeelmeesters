@@ -8,13 +8,26 @@
 
 /* Container: grid met links content en rechts button */
 .profiel-container {
-  margin-top: 80px; /* laptop: hetzelfde als voorheen */
+  margin-top: 80px;
   display: grid;
   grid-template-columns: 1fr 250px; /* links = data, rechts = button */
   gap: 40px;
   padding: 0 40px;
-  align-items: start; /* button bovenaan uitlijnen met kaart */
+  align-items: start; 
   box-sizing: border-box;
+}
+
+/* Titel en intro tekst boven de kaart */
+.profiel-boven {
+  grid-column: 1 / span 2;
+  margin-bottom: 20px;
+  margin-left: 32px;
+}
+
+.profiel-boven h2 {
+  margin: 0 0 6px 0;
+  font-size: 28px;
+  font-weight: 600;
 }
 
 /* Kaart met gegevens */
@@ -28,15 +41,41 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  grid-column: 1 / -1;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+/* Patient data blok (lichtgrijs) */
+.patient-data {
+  background-color: #f0f0f0;
+  padding: 20px 24px;
+  border-radius: 8px;
+  line-height: 1.8;
+  color: var(--text-color);
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  grid-column: 1 / -1;
+  box-sizing: border-box;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  margin-top: -25px;
+}
+
+.patient-data p {
+  word-break: break-word; /* lange woorden breken */
 }
 
 /* Button rechts van kaart */
 .profiel-rechts {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start; /* bovenaan uitlijnen */
+  justify-content: flex-start;
   align-items: flex-start;
-  margin-top: 0; /* geen negatieve marge meer nodig */
+  margin-top: 0;
 }
 
 /* Button styling */
@@ -53,49 +92,37 @@
   background: var(--background-color-hover);
 }
 
-/* Titel en intro tekst boven de kaart */
-.profiel-boven {
-  grid-column: 1 / span 2;
-  margin-bottom: 20px;
-  margin-left: 32px;
-}
-
-.profiel-boven h2 {
-  margin: 0 0 6px 0;
-  font-size: 28px;
-  font-weight: 600;
-}
-
-/* Patient data blok (lichtgrijs) */
-.patient-data {
-  background-color: #f0f0f0; /* lichtgrijs */
-  padding: 20px 24px;
-  border-radius: 8px;
-  line-height: 1.8;
-  color: var(--text-color);
-  margin-top: 0; /* negatieve marge weg */
-}
-
 /* RESPONSIVE: tablet & mobiel */
 @media (max-width: 1024px) {
   .profiel-container {
     display: flex;
     flex-direction: column;
-    padding: 0 20px;
-    gap: 20px; /* iets kleiner gap op tablet/mobiel */
+    padding: 0; /* zodat grijze blok tot rand loopt */
+    gap: 20px;
   }
 
-  .profiel-rechts {
-    margin-top: 20px; /* button onder de kaart */
+  .profiel-boven {
+    margin-left: 0;
+    padding: 0 16px;
   }
 
   .profiel-card,
   .patient-data {
     width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding-left: 16px;
+    padding-right: 16px;
+    box-sizing: border-box;
+    grid-column: auto;
+    margin-top: -20px;
   }
 
-  .profiel-boven {
-    margin-left: 0;
+  .profiel-rechts {
+    margin-top: -15px;
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-bottom: 40px;
   }
 }
 
@@ -113,7 +140,7 @@
   .profiel-card,
   .patient-data {
     font-size: 16px;
-    padding: 16px 20px;
+    padding: 16px 12px;   
   }
 
   .button-box {

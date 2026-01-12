@@ -16,12 +16,18 @@ namespace SeleniumTests.P_O_M
 
         private By EmailInput => By.Id("email");
         private By PasswordInput => By.Id("wachtwoord");
-        private By LoginButton => By.Id("login-btn"); 
+        private By LoginButton => By.Id("login-btn");
+        private By AdminLoginLink => By.Id("admin-login-link");
 
-     
+
         public void Navigate()
         {
             driver.Navigate().GoToUrl(Url);
+        }
+
+        public void ClickAdminLogin()
+        {
+            driver.FindElement(AdminLoginLink).Click();
         }
 
         public void EnterEmail(string email)
@@ -41,6 +47,10 @@ namespace SeleniumTests.P_O_M
         public void ClickLogin()
         {
             driver.FindElement(LoginButton).Click();
+        }
+        public bool IsAdminLoginLinkDisplayed()
+        {
+            return driver.FindElement(AdminLoginLink).Displayed;
         }
 
 

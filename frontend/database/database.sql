@@ -1,6 +1,6 @@
 USE zachteheelmeester;
+GO
 
--- Drop tables in reverse order that they are created in the script below to avoid foreign key constraint errors
 DROP TABLE IF EXISTS afspraken;
 DROP TABLE IF EXISTS afdelingen;
 DROP TABLE IF EXISTS medischdossierentry;
@@ -8,23 +8,26 @@ DROP TABLE IF EXISTS huisarts_patient;
 DROP TABLE IF EXISTS gebruikers;
 DROP TABLE IF EXISTS rollen;
 DROP TABLE IF EXISTS behandelingen;
+GO
 
-create table behandelingen (
-	zorgcode varchar(50) NOT NULL,
-    omschrijving varchar(255) NOT NULL,
-    specialisme varchar(20) NOT NULL,
+CREATE TABLE behandelingen (
+    zorgcode VARCHAR(50) NOT NULL,
+    omschrijving VARCHAR(255) NOT NULL,
+    specialisme VARCHAR(20) NOT NULL,
     tijdsduur INT NOT NULL,
     kosten FLOAT NOT NULL,
     PRIMARY KEY (zorgcode)
 );
+GO
 
-CREATE TABLE rollen(
+CREATE TABLE rollen (
     rolID INT NOT NULL,
     rolnaam VARCHAR(100) NOT NULL,
     PRIMARY KEY (rolID)
 );
+GO
 
-CREATE TABLE gebruikers(
+CREATE TABLE gebruikers (
     gebruikersID INT IDENTITY(1,1) NOT NULL,
     voornaam VARCHAR(100) NOT NULL,
     achternaam VARCHAR(100) NOT NULL,
@@ -34,39 +37,40 @@ CREATE TABLE gebruikers(
     Huisnummer VARCHAR(100) NOT NULL,
     Postcode VARCHAR(6) NOT NULL,
     Telefoonnummer VARCHAR(15) NOT NULL,
-    rol VARCHAR(50) NOT NULL,
-    systeembeheerder BIT NOT NULL,
-    FOREIGN KEY (rol) REFERENCES rollen(rolID),
-    PRIMARY KEY (gebruikersID)
+    rol INT NOT NULL,
+    systeembeheerder BIT NOT NULL DEFAULT 0,
+    PRIMARY KEY (gebruikersID),
+    FOREIGN KEY (rol) REFERENCES rollen(rolID)
 );
+GO
 
 CREATE TABLE huisarts_patient (
     huisartsID INT NOT NULL,
     patientID INT NOT NULL,
-
+    PRIMARY KEY (huisartsID, patientID),
     FOREIGN KEY (huisartsID) REFERENCES gebruikers(gebruikersID),
-    FOREIGN KEY (patientID) REFERENCES gebruikers(gebruikersID),
-
-    PRIMARY KEY (huisartsID, patientID)
+    FOREIGN KEY (patientID) REFERENCES gebruikers(gebruikersID)
 );
+GO
 
 CREATE TABLE medischdossierentry (
     entryID INT IDENTITY(1,1) NOT NULL,
     patientID INT NOT NULL,
     datumtijd DATETIME NOT NULL,
-    -- nog geen idee wat hier verder moet komen
-    FOREIGN KEY (patientID) REFERENCES gebruikers(gebruikersID),
-    PRIMARY KEY (patientID, entryID)
+    PRIMARY KEY (patientID, entryID),
+    FOREIGN KEY (patientID) REFERENCES gebruikers(gebruikersID)
 );
+GO
 
-CREATE TABLE afdelingen(
+CREATE TABLE afdelingen (
     afdelingID VARCHAR(50) NOT NULL,
     naam VARCHAR(100) NOT NULL,
     PRIMARY KEY (afdelingID)
 );
+GO
 
-CREATE TABLE afspraken(
-    datumtijd DATETIME not null,
+CREATE TABLE afspraken (
+    datumtijd DATETIME NOT NULL,
     behandeling VARCHAR(50) NOT NULL,
     afdeling VARCHAR(50) NOT NULL,
     arts INT NOT NULL,

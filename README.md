@@ -1,8 +1,16 @@
-om dit project te kunnen gebruiken moeten de volgende stappen gedaan worden:
+# ZachteHeelmeesters
+## Vereisten
 
-### Databse setup:
+- [Node.js](https://nodejs.org/) (v16 of hoger)
+- [.NET 8 SDK](https://dotnet.microsoft.com/download)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+- VS Code met extensie **SQL Server (mssql)**
 
+## Installatie
+### 1. Database Setup
 
+**Stap 1: Docker starten**
+- Start Docker Desktop op
 
 * start vs code op,
 * installeer de vs code extentie "SQL Server (mssql)",

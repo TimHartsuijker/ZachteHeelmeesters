@@ -8,14 +8,17 @@ namespace backend.Data
         {
             context.Database.EnsureCreated();
 
-            //// Rollen
-            //if (!context.Roles.Any())
-            //{
-            //    context.Roles.AddRange(
-            //        new Role { Id = 1, RoleName = "Patient" },
-            //    );
-            //}
-
+            // Rollen
+            if (!context.Roles.Any())
+            {
+                context.Roles.AddRange(
+                    new Role {RoleName = "Patiënt" },
+                    new Role {RoleName = "Admin" },
+                    new Role {RoleName = "Huisarts" },
+                    new Role {RoleName = "Specialist" }
+                );
+            }
+           
             //// Departments
             //if (!context.Departments.Any())
             //{

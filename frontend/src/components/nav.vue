@@ -1,8 +1,11 @@
 <template>
   <nav class="navbar" aria-label="Hoofdnavigatie">
     <ul>
-      <li>
-        <router-link to="/agenda" aria-current="page">Agenda</router-link>
+      <li v-if="userRole === 'Specialist' || userRole === 'Huisarts'">
+          <RouterLink to="/agenda" aria-current="page">Agenda</RouterLink>
+      </li>
+      <li v-else-if="userRole === 'Admin'">
+        <RouterLink to="/admin/users" aria-current="user-management page">Gebruikersbeheer</RouterLink>
       </li>
     </ul>
   </nav>

@@ -24,7 +24,18 @@ namespace backend.Controllers
             try
             {
                 var gebruikers = await _context.Users
-                .ToListAsync();
+                    .OrderBy(u => u.Id)
+                    .Select(u => new UserResponseDto // Map to DTO
+                    {
+                        Id = u.Id,
+                        FirstName = u.FirstName,
+                        LastName = u.LastName,
+                        Email = u.Email,
+                        RoleId = u.RoleId
+                    })
+                    .ToListAsync();
+
+                Console.WriteLine(gebruikers);
 
                 return Ok(gebruikers);
             }

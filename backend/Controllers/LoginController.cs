@@ -107,8 +107,15 @@ namespace backend.Controllers
 
             return Ok(new
             {
-                message = "Admin login ok",
-                role = "Admin"
+                message = "Login ok",
+                user = new
+                {
+                    id = user.Id,
+                    email = user.Email,
+                    firstName = user.FirstName,
+                    lastName = user.LastName,
+                    role = user.Role.RoleName
+                }
             });
         }
 

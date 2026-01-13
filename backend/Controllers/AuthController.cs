@@ -3,21 +3,22 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    public class AuthController : Controller
+    public class AuthController : ControllerBase
     {
         [HttpPost("logout")]
         public IActionResult Logout()
         {
             try
             {
-                return Ok(new { message = "Logged out" });
+                HttpContext.Session.Clear();
+
+                return Ok(new { message = "Logged out successfully" });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { error = ex.Message });
+                return StatusCode(500, new { error = ex.Message });
             }
         }
     }

@@ -27,54 +27,56 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref } from "vue";
 import axios from "axios";
+import { useRouter } from "vue-router";
 
-export default {
-  name: "AdminLoginView",
-  data() {
-    return {
-      email: "",
-      wachtwoord: "",
-      loginError: false,
-      loginErrorMessage: "",
-    };
-  },
-  methods: {
-    async loginAdmin() {
-      // Reset foutmeldingen
-      this.loginError = false;
-      this.loginErrorMessage = "";
+const router = useRouter();
 
-      // Check lege velden
-      if (!this.email || !this.wachtwoord) {
-        this.loginError = true;
-        this.loginErrorMessage = "Gegevens moeten ingevuld zijn";
-        return;
+// State (Vervangt data())
+const email = ref("");
+const wachtwoord = ref("");
+const loginError = ref(false);
+const loginErrorMessage = ref("");
+
+async function loginAdmin() {
+
+  // Check lege velden
+  if (!email.value || !wachtwoord.value) {
+    loginError.value = true;
+    loginErrorMessage.value = "Gegevens moeten ingevuld zijn";
+    return;
+  }
+
+  try {
+    const response = await axios.post(
+      "https://localhost:7240/api/login/admin",
+      {
+        email: email.value,
+        wachtwoord: wachtwoord.value,
       }
+    );
 
-      try {
-        const response = await axios.post(
-          "https://localhost:7240/api/login/admin",
-          {
-            email: this.email,
-            wachtwoord: this.wachtwoord,
-          }
-        );
+    if (response.status === 200) {
+      const userData = response.data.user;
+      console.log("Login gelukt!", response.data);
 
-        if (response.status === 200) {
-          // Opslaan sessie
-          sessionStorage.setItem("isAdminLoggedIn", "true");
+      // Opslaan sessie
+      sessionStorage.setItem("isAdminLoggedIn", "true");
+      sessionStorage.setItem("userId", userData.id);
+      sessionStorage.setItem("userEmail", userData.email);
+      sessionStorage.setItem("userName", `${userData.firstName} ${userData.lastName}`);
+      sessionStorage.setItem("userRole", userData.role);
 
-          // Redirect naar admin dashboard
-          this.$router.push("/admin/dashboard");
-        }
-      } catch (error) {
-        this.loginError = true;
-        this.loginErrorMessage =
-          (error.response && error.response.data.message) || "Admin login mislukt";
-      }
-    },
-  },
+      // Redirect naar admin dashboard
+      router.push("/admin/dashboard");
+    }
+  } catch (error) {
+    console.log(error);
+    loginError.value = true;
+    loginErrorMessage.value =
+      (error.response && error.response.data.message) || "Admin login mislukt";
+  }
 };
 </script>

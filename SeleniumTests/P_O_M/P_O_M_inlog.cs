@@ -43,6 +43,13 @@ namespace SeleniumTests.P_O_M
             driver.FindElement(LoginButton).Click();
         }
 
+        public void LoginAsPatient(string email, string password)
+        {
+            Navigate();
+            EnterEmail(email);
+            EnterPassword(password);
+            ClickLogin();
+        }
 
         public bool IsEmailFieldDisplayed()
         {

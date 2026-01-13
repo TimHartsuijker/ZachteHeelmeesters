@@ -77,9 +77,16 @@ export default {
 
           // Sessie opslaan
           sessionStorage.setItem("isLoggedIn", "true");
+          // Bewaar userId voor dossier requests
+          if (response.data?.user?.id) {
+            sessionStorage.setItem("userId", String(response.data.user.id));
+          }
+          if (response.data?.user?.role) {
+            sessionStorage.setItem("userRole", response.data.user.role);
+          }
 
-          // Redirect naar dashboard
-          window.location.href = "/dashboard";
+          // Redirect naar dossier
+          this.$router.push('/dossier');
         }
       } catch (error) {
         // Foutmelding van backend (401/400)

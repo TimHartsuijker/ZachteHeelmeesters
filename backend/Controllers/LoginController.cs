@@ -70,6 +70,60 @@ namespace BackendLogin.Controllers
                 }
             });
         }
+
+        [HttpGet("user/{userId}")]
+        public async Task<IActionResult> GetUserDetails(int userId)
+        {
+            try
+            {
+                var user = await _context.Users
+                    .Include(u => u.Role)
+                    .Include(u => u.Doctor)
+                    .FirstOrDefaultAsync(u => u.Id == userId);
+
+                if (user == null)
+                {
+                    return NotFound(new { message = "Gebruiker niet gevonden" });
+                }
+
+                // Calculate age from DateOfBirth
+                var today = DateTime.Today;
+                var age = today.Year - user.DateOfBirth.Year;
+                if (user.DateOfBirth.Date > today.AddYears(-age)) age--;
+
+                return Ok(new
+                {
+                    id = user.Id,
+                    firstName = user.FirstName,
+                    lastName = user.LastName,
+                    fullName = $"{user.FirstName} {user.LastName}",
+                    email = user.Email,
+                    dateOfBirth = user.DateOfBirth,
+                    age = age,
+                    gender = user.Gender,
+                    phoneNumber = user.PhoneNumber,
+                    address = new
+                    {
+                        street = user.StreetName,
+                        houseNumber = user.HouseNumber,
+                        postalCode = user.PostalCode
+                    },
+                    doctor = user.Doctor != null ? new
+                    {
+                        id = user.Doctor.Id,
+                        firstName = user.Doctor.FirstName,
+                        lastName = user.Doctor.LastName,
+                        fullName = $"{user.Doctor.FirstName} {user.Doctor.LastName}",
+                        practiceName = user.Doctor.PracticeName
+                    } : null,
+                    role = user.Role.RoleName
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Er is een fout opgetreden bij het ophalen van gebruikersgegevens" });
+            }
+        }
     }
 }
 

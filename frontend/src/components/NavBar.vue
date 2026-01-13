@@ -4,9 +4,6 @@
       <li>
         <router-link to="/dossier" aria-current="page">Dossier</router-link>
       </li>
-      <li>
-        <router-link to="/doctor/upload" aria-current="page">Document Uploaden</router-link>
-      </li>
     </ul>
   </nav>
 </template>

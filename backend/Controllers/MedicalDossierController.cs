@@ -20,11 +20,16 @@ namespace backend.Controllers
         }
 
         /// <summary>
-        /// AC2.12.1: Get patient's medical dossier (all files)
-        /// AC2.12.2: Complete medical history
+        /// Get patient's medical dossier (all entries with files and notes)
         /// </summary>
         [HttpGet("patient/{patientId}")]
-        public async Task<ActionResult<IEnumerable<object>>> GetPatientDossier(int patientId, [FromQuery] string? category = null, [FromQuery] DateTime? fromDate = null, [FromQuery] DateTime? toDate = null)
+        public async Task<ActionResult<IEnumerable<object>>> GetPatientDossier(
+            int patientId,
+            [FromQuery] string? category = null,
+            [FromQuery] DateTime? fromDate = null,
+            [FromQuery] DateTime? toDate = null,
+            [FromQuery] int? treatmentId = null,
+            [FromQuery] string? treatmentName = null)
         {
             try
             {
@@ -35,53 +40,78 @@ namespace backend.Controllers
                     return NotFound(new { message = "Patiënt niet gevonden" });
                 }
 
-                // Build query with filters
-                var query = _context.MedicalRecordFiles
-                    .Include(f => f.MedicalRecordEntry)
-                        .ThenInclude(e => e.CreatedBy)
-                    .Include(f => f.MedicalRecordEntry)
-                        .ThenInclude(e => e.Appointment)
-                    .Where(f => f.MedicalRecordEntry.PatientId == patientId);
+                // Build query for entries
+                var query = _context.MedicalRecordEntries
+                    .Include(e => e.CreatedBy)
+                    .Include(e => e.Appointment)
+                        .ThenInclude(a => a.Treatment)
+                    .Include(e => e.Files)
+                    .Where(e => e.PatientId == patientId);
 
-                // AC2.12.3: Filter by category
+                // Filter by category
                 if (!string.IsNullOrEmpty(category))
                 {
-                    query = query.Where(f => f.Category == category);
+                    query = query.Where(e => e.Category == category);
                 }
 
-                // AC2.12.3: Filter by date range
+                // Filter by treatment
+                if (treatmentId.HasValue)
+                {
+                    query = query.Where(e => e.Appointment != null && e.Appointment.TreatmentId == treatmentId.Value);
+                }
+                else if (!string.IsNullOrWhiteSpace(treatmentName))
+                {
+                    query = query.Where(e => e.Appointment != null && e.Appointment.Treatment.Description == treatmentName);
+                }
+
+                // Filter by date range
                 if (fromDate.HasValue)
                 {
-                    query = query.Where(f => f.UploadedAt >= fromDate.Value);
+                    query = query.Where(e => e.CreatedAt >= fromDate.Value);
                 }
 
                 if (toDate.HasValue)
                 {
-                    query = query.Where(f => f.UploadedAt <= toDate.Value);
+                    query = query.Where(e => e.CreatedAt <= toDate.Value);
                 }
 
                 // Order by date (most recent first)
-                query = query.OrderByDescending(f => f.UploadedAt);
+                query = query.OrderByDescending(e => e.CreatedAt);
 
-                var files = await query.Select(f => new
+                var entries = await query.Select(e => new
                 {
-                    f.Id,
-                    f.FileName,
-                    f.ContentType,
-                    f.FileSize,
-                    f.UploadedAt,
-                    f.Category,
-                    f.Description,
-                    UploadedBy = new
+                    e.Id,
+                    e.Title,
+                    e.Notes,
+                    e.Category,
+                    e.CreatedAt,
+                    CreatedBy = new
                     {
-                        f.MedicalRecordEntry.CreatedBy.Id,
-                        f.MedicalRecordEntry.CreatedBy.FirstName,
-                        f.MedicalRecordEntry.CreatedBy.LastName
+                        e.CreatedBy.Id,
+                        e.CreatedBy.FirstName,
+                        e.CreatedBy.LastName
                     },
-                    AppointmentDate = f.MedicalRecordEntry.Appointment.AppointmentDateTime
+                    AppointmentDate = e.Appointment != null ? (DateTime?)e.Appointment.AppointmentDateTime : null,
+                    Treatment = e.Appointment != null ? new
+                    {
+                        e.Appointment.Treatment.Id,
+                        e.Appointment.Treatment.Code,
+                        Name = e.Appointment.Treatment.Description,
+                        e.Appointment.Treatment.Specialism
+                    } : null,
+                    Files = e.Files.Select(f => new
+                    {
+                        f.Id,
+                        f.FileName,
+                        f.ContentType,
+                        f.FileSize,
+                        f.UploadedAt,
+                        f.Category,
+                        f.Description
+                    }).ToList()
                 }).ToListAsync();
 
-                return Ok(files);
+                return Ok(entries);
             }
             catch (Exception ex)
             {
@@ -91,26 +121,28 @@ namespace backend.Controllers
         }
 
         /// <summary>
-        /// Get unique categories for filtering
+        /// Get distinct treatments for patient dossier
         /// </summary>
-        [HttpGet("patient/{patientId}/categories")]
-        public async Task<ActionResult<IEnumerable<string>>> GetPatientCategories(int patientId)
+        [HttpGet("patient/{patientId}/treatments")]
+        public async Task<ActionResult<IEnumerable<object>>> GetPatientTreatments(int patientId)
         {
             try
             {
-                var categories = await _context.MedicalRecordFiles
-                    .Include(f => f.MedicalRecordEntry)
-                    .Where(f => f.MedicalRecordEntry.PatientId == patientId && f.Category != null)
-                    .Select(f => f.Category!)
+                var treatments = await _context.MedicalRecordEntries
+                    .Include(e => e.Appointment)
+                        .ThenInclude(a => a.Treatment)
+                    .Where(e => e.PatientId == patientId && e.Appointment != null)
+                    .Select(e => e.Appointment!.Treatment)
                     .Distinct()
-                    .OrderBy(c => c)
+                    .Select(t => new { t.Id, t.Code, Name = t.Description, t.Specialism })
+                    .OrderBy(t => t.Name)
                     .ToListAsync();
 
-                return Ok(categories);
+                return Ok(treatments);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting categories for patient {PatientId}", patientId);
+                _logger.LogError(ex, "Error getting treatments for patient {PatientId}", patientId);
                 return StatusCode(500, new { message = "Er is een fout opgetreden" });
             }
         }
@@ -140,10 +172,60 @@ namespace backend.Controllers
         }
 
         /// <summary>
+        /// Create a note-only entry (no file required)
+        /// </summary>
+        [HttpPost("entry")]
+        public async Task<ActionResult> CreateEntry([FromBody] CreateEntryRequest request)
+        {
+            try
+            {
+                // Validate patient exists
+                var patient = await _context.Users.FindAsync(request.PatientId);
+                if (patient == null)
+                {
+                    return NotFound(new { message = "Patiënt niet gevonden" });
+                }
+
+                // Validate doctor exists
+                var doctor = await _context.Users.FindAsync(request.DoctorId);
+                if (doctor == null)
+                {
+                    return NotFound(new { message = "Arts niet gevonden" });
+                }
+
+                // Create medical record entry
+                var medicalEntry = new MedicalRecordEntry
+                {
+                    PatientId = request.PatientId,
+                    AppointmentId = request.AppointmentId,
+                    CreatedById = request.DoctorId,
+                    CreatedAt = DateTime.UtcNow,
+                    Title = request.Title,
+                    Notes = request.Notes,
+                    Category = request.Category
+                };
+
+                _context.MedicalRecordEntries.Add(medicalEntry);
+                await _context.SaveChangesAsync();
+
+                return Ok(new
+                {
+                    message = "Notitie succesvol toegevoegd",
+                    entryId = medicalEntry.Id
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating entry for patient {PatientId}", request.PatientId);
+                return StatusCode(500, new { message = "Er is een fout opgetreden bij het toevoegen van de notitie" });
+            }
+        }
+
+        /// <summary>
         /// Upload a medical document (for doctors)
         /// </summary>
         [HttpPost("upload")]
-        public async Task<ActionResult> UploadFile([FromForm] int patientId, [FromForm] int doctorId, [FromForm] int appointmentId, [FromForm] IFormFile file, [FromForm] string? category = null, [FromForm] string? description = null)
+        public async Task<ActionResult> UploadFile([FromForm] int patientId, [FromForm] int doctorId, [FromForm] int? appointmentId, [FromForm] IFormFile file, [FromForm] string? title = null, [FromForm] string? notes = null, [FromForm] string? category = null, [FromForm] string? description = null)
         {
             try
             {
@@ -172,9 +254,14 @@ namespace backend.Controllers
                     return NotFound(new { message = "Arts niet gevonden" });
                 }
 
-                // Find or create medical record entry
-                var medicalEntry = await _context.MedicalRecordEntries
-                    .FirstOrDefaultAsync(e => e.PatientId == patientId && e.AppointmentId == appointmentId);
+                // Create or find medical record entry
+                MedicalRecordEntry? medicalEntry = null;
+                
+                if (appointmentId.HasValue)
+                {
+                    medicalEntry = await _context.MedicalRecordEntries
+                        .FirstOrDefaultAsync(e => e.PatientId == patientId && e.AppointmentId == appointmentId);
+                }
 
                 if (medicalEntry == null)
                 {
@@ -183,7 +270,10 @@ namespace backend.Controllers
                         PatientId = patientId,
                         AppointmentId = appointmentId,
                         CreatedById = doctorId,
-                        CreatedAt = DateTime.UtcNow
+                        CreatedAt = DateTime.UtcNow,
+                        Title = title,
+                        Notes = notes,
+                        Category = category
                     };
                     _context.MedicalRecordEntries.Add(medicalEntry);
                     await _context.SaveChangesAsync();
@@ -216,6 +306,7 @@ namespace backend.Controllers
                 return Ok(new
                 {
                     message = "Bestand succesvol geüpload",
+                    entryId = medicalEntry.Id,
                     fileId = medicalFile.Id,
                     fileName = medicalFile.FileName
                 });
@@ -253,5 +344,16 @@ namespace backend.Controllers
                 return StatusCode(500, new { message = "Er is een fout opgetreden bij het verwijderen van het bestand" });
             }
         }
+    }
+
+    // Request models
+    public class CreateEntryRequest
+    {
+        public int PatientId { get; set; }
+        public int DoctorId { get; set; }
+        public int? AppointmentId { get; set; }
+        public string? Title { get; set; }
+        public string? Notes { get; set; }
+        public string? Category { get; set; }
     }
 }

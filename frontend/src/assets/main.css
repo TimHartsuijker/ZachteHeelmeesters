@@ -12,8 +12,6 @@
   --color-gray-dark: #BBBBBB;
 }
 
-@import './base.css';
-
 body {
   background-color: #ECFAE5;
   margin: 0;
@@ -24,12 +22,14 @@ body {
   width: 100%;
   min-height: 100vh;
   background-color: #ECFAE5;
-/* LoginView.css of in <style scoped> */
+}
+
+/* LoginView Styling */
 .login-view-page {
   display: flex;
-  justify-content: center; /* horizontaal centreren */
-  align-items: center;     /* verticaal centreren */
-  height: 100vh;           /* hele viewport hoogte */
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
@@ -43,12 +43,6 @@ body {
   text-align: center;
 }
 
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
-}
-
 .login-view-card h2 {
   margin-bottom: 1.5rem;
   color: #333;
@@ -57,7 +51,6 @@ body {
 
 .login-view-form-group {
   display: flex;
-  
   flex-direction: column;
   margin-bottom: 1rem;
   text-align: left;
@@ -71,16 +64,22 @@ body {
 
 .login-view-form-group input {
   padding: 0.5rem 0.75rem;
-  border: 1px solid #B0DB9C23;
+  border: 1px solid #B0DB9C;
   border-radius: 6px;
   font-size: 1rem;
-  background: #B0DB9C;
+  background: #FFFFFF;
+  color: #333;
   transition: border 0.3s;
 }
 
 .login-view-form-group input:focus {
   outline: none;
   border-color: #00a676;
+  background: #FFFFFF;
+}
+
+.login-view-form-group input::placeholder {
+  color: #999;
 }
 
 button[type="submit"] {
@@ -97,16 +96,27 @@ button[type="submit"] {
 }
 
 button[type="submit"]:hover {
-  background-color: #00855f;
+  background-color: #007a0a;
 }
 
+button[type="submit"]:active {
+  background-color: #006008;
+}
 
 .error-text {
-  color: red;
+  color: #d32f2f;
   margin-top: 5px;
+  font-size: 0.9rem;
 }
 
 .success-text {
-  color: green;
+  color: #388e3c;
   margin-top: 5px;
+  font-size: 0.9rem;
+}
+
+@media (hover: hover) {
+  a:hover {
+    background-color: hsla(160, 100%, 37%, 0.2);
+  }
 }

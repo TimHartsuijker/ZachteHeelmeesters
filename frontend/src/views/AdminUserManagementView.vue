@@ -1,5 +1,4 @@
 <script setup>
-import AdminNavBar from '../components/AdminNavBar.vue'
 import Filter from '../components/Filter.vue'
 import Gebruikers from '../components/Gebruiker.vue'
 import { ref, onMounted, computed } from 'vue'
@@ -78,16 +77,10 @@ onMounted(() => {
   console.log('App.vue mounted')
   fetchRollen()
   fetchUsers()
-})
+});
 </script>
 
 <template>
-  <header>
-    <div class="wrapper">
-      <AdminNavBar/>
-    </div>
-  </header>
-
   <main class="main-users align-under-nav">
     <Filter 
       :rollen="rollen"

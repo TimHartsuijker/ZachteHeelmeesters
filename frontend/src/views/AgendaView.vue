@@ -1,33 +1,24 @@
+<template>
+  <main class="main-agenda align-under-nav">
+    <DoctorCalendar v-if="doctorId" :doctor-id="doctorId" />
+  </main>
+</template>
+
 <script setup>
 import { ref, onMounted } from 'vue'
-import NavBar from '../components/nav.vue'
 import DoctorCalendar from '../components/DoctorCalendar.vue'
+import router from '@/router/router';
 
 const doctorId = ref(null);
 
 onMounted(() => {
   console.log('AgendaView.vue mounted');
   const userId = sessionStorage.getItem('userId');
-  if (userId) {
-    doctorId.value = parseInt(userId);
-  } else {
-    // Redirect to login if not logged in
-    window.location.href = '/';
-  }
+  
+  doctorId.value = parseInt(userId);
 });
 </script>
 
-<template>
-  <header>
-    <div class="wrapper">
-      <NavBar/>
-    </div>
-  </header>
-
-  <main class="main-agenda align-under-nav">
-    <DoctorCalendar v-if="doctorId" :doctor-id="doctorId" />
-  </main>
-</template>
 
 <style scoped>
 header {

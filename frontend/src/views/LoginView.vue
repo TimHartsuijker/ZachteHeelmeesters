@@ -32,9 +32,7 @@
 
         <button type="submit" id="login-btn">Login</button>
         <div class="admin-login-link">
-          <button id="admin-login-link" @click="goToAdminLogin">
-            Inloggen als beheerder
-          </button>
+          <RouterLink class="admin-login-link" to="/admin/login" aria-current="admin-login link">Inloggen als beheerder</RouterLink>
         </div>
 
       </form>
@@ -95,10 +93,9 @@ const login = async () => {
 
       // Redirect op basis van rol
       switch (userData.role) {
-        case "Admin":
-          router.push("/admin/dashboard");
-          break;
         case "Specialist":
+          router.push("/agenda");
+          break;
         case "Huisarts":
           router.push("/agenda");
           break;
@@ -118,11 +115,6 @@ const login = async () => {
 
     loginError.value = true;
   }
-};
-
-// Navigatie naar Admin
-const goToAdminLogin = () => {
-  router.push("/admin/login");
 };
 </script>
 

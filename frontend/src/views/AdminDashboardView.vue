@@ -1,7 +1,5 @@
 <template>
   <div class="admin-dashboard-page">
-    <AdminNavBar/>
-
     <!-- Content area -->
     <div class="admin-content">
       <p v-if="message">{{ message }}</p>
@@ -10,12 +8,14 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "AdminDashboardView",
-};
-</script>
-
 <script setup>
-import AdminNavBar from '../components/AdminNavBar.vue';
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+
+const adminId = ref(null);
+const router = useRouter();
+
+onMounted(() => {
+  console.log('AdminDashboardView.vue mounted');
+});
 </script>

@@ -1,21 +1,30 @@
 <template>
   <nav class="navbar" aria-label="Hoofdnavigatie">
     <ul>
-      <li v-if="userRole === 'Specialist' || userRole === 'Huisarts'">
+      <li v-if="userRole === 'Specialist'" class="nav-center-buttons">
           <RouterLink to="/agenda" aria-current="page">Agenda</RouterLink>
       </li>
-      <li v-else-if="userRole === 'Admin'">
+      <li v-else-if="userRole === 'Patient'" class="nav-center-buttons">
+          <RouterLink to="/afspraken" aria-current="appointments page">Mijn afspraken</RouterLink>
+      </li>
+      <li v-else-if="userRole === 'Admin'" class="nav-center-buttons">
         <RouterLink to="/admin/users" aria-current="user-management page">Gebruikersbeheer</RouterLink>
       </li>
     </ul>
+      <LogoutButton />
   </nav>
 </template>
 
 <script>
+import LogoutButton from './LogoutButton.vue';
+
 export default {
   name: "NavBar",
   mounted() {
     console.log('nav.vue navbar mounted');
+  },
+  components: {
+    LogoutButton,
   },
   computed: {
     userRole() {

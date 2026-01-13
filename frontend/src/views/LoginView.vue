@@ -74,9 +74,12 @@ const login = async () => {
   }
 
   try {
-    const response = await axios.post("http://localhost:5016/api/login", {
+    const response = await axios.post("https://localhost:7240/api/login", {
       email: email.value,
       wachtwoord: wachtwoord.value,
+    }, {
+      // DIT IS DE BELANGRIJKE TOEVOEGING:
+      withCredentials: true
     });
 
     if (response.status === 200) {

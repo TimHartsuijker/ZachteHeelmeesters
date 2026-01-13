@@ -38,18 +38,23 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // MIGRATIONS + SEEDING (NA Build, VOOR Run)
-using (var scope = app.Services.CreateScope())
+try
 {
-    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
-    context.Database.Migrate(); // past migrations toe
-    
-    DbSeederStatic.Seed(context);     // seed data
-
-    if (app.Environment.IsDevelopment())
+    using (var scope = app.Services.CreateScope())
     {
-        DbSeederTest.Seed(context);    // alleen dev
+        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        context.Database.Migrate();
+        DbSeederStatic.Seed(context);
+        if (app.Environment.IsDevelopment())
+        {
+            DbSeederTest.Seed(context);
+        }
     }
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"FOUT BIJ MIGRATIE: {ex.Message}");
+    // De app start nu in ieder geval wel op, ook als de db faalt
 }
 
 // Middleware pipeline

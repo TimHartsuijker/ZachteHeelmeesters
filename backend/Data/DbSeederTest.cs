@@ -12,17 +12,12 @@ namespace backend.Data
             var passwordHasher = new PasswordHasher<User>();
 
             var patientRole = context.Roles.First(r => r.RoleName == "Patiënt");
+            var doctorRole = context.Roles.First(r => r.RoleName == "Specialist");
+            var generalPracticioner = context.Roles.First(r => r.RoleName == "Huisarts");
+            var adminRole = context.Roles.First(r => r.RoleName == "Admin");
 
-            // 🔹 User seeden
-            if (!context.Users.Any(u => u.Email == "gebruiker@example.com"))
-            {
-                doctorRole = new Role { RoleName = "Doctor" };
-                context.Roles.Add(doctorRole);
-                context.SaveChanges();
-                Console.WriteLine("[DbSeederTest] Created Doctor role");
-            }
 
-            // 🔹 Patient user seeden
+            // Patient user seeden
             var patientUser = context.Users.FirstOrDefault(u => u.Email == "gebruiker@example.com");
             if (patientUser == null)
             {
@@ -52,7 +47,7 @@ namespace backend.Data
                 Console.WriteLine($"[DbSeederTest] Patient user already exists with ID: {patientUser.Id}");
             }
 
-            // 🔹 Doctor user seeden
+            // Doctor user seeden
             var doctorUser = context.Users.FirstOrDefault(u => u.Email == "testdoctor@example.com");
             if (doctorUser == null)
             {
@@ -65,6 +60,9 @@ namespace backend.Data
                     HouseNumber = "1A",
                     PostalCode = "1234AB",
                     PhoneNumber = "0631234567",
+                    DateOfBirth = DateTime.MinValue,
+                    CitizenServiceNumber = "012948356",
+                    Gender = "Man",
                     CreatedAt = DateTime.UtcNow,
                     RoleId = doctorRole.Id
                 };
@@ -79,17 +77,7 @@ namespace backend.Data
                 Console.WriteLine($"[DbSeederTest] Doctor user already exists with ID: {doctorUser.Id}");
             }
 
-            // Verify both users exist
-            var allUsers = context.Users.ToList();
-            Console.WriteLine($"[DbSeederTest] Total users in database: {allUsers.Count}");
-            foreach (var user in allUsers)
-            {
-                Console.WriteLine($"[DbSeederTest]   - User ID {user.Id}: {user.Email}");
-            }
-
-            var adminRole = context.Roles.First(r => r.RoleName == "Admin");
-
-            // 🔹 Admin user seeden
+            // Admin user seeden
             if (!context.Users.Any(u => u.Email == "admin@example.com"))
             {
                 var admin = new User
@@ -114,6 +102,13 @@ namespace backend.Data
                 context.SaveChanges();
             }
 
+            // Verify all users exist
+            var allUsers = context.Users.ToList();
+            Console.WriteLine($"[DbSeederTest] Total users in database: {allUsers.Count}");
+            foreach (var user in allUsers)
+            {
+                Console.WriteLine($"[DbSeederTest]   - User ID {user.Id}: {user.Email}");
+            }
         }
     }
 }

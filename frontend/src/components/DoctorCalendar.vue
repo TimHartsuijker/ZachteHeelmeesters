@@ -211,7 +211,7 @@ export default {
     },
     apiBaseUrl: {
       type: String,
-      default: 'http://localhost:5016/api'
+      default: 'https://localhost:7240/api'
     }
   },
   data() {

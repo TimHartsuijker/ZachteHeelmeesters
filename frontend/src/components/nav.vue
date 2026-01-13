@@ -16,6 +16,11 @@ export default {
   name: "NavBar",
   mounted() {
     console.log('nav.vue navbar mounted');
+  },
+  computed: {
+    userRole() {
+      return sessionStorage.getItem('userRole');
+    }
   }
 }
 </script>

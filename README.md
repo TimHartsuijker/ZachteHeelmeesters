@@ -12,79 +12,34 @@
 **Stap 1: Docker starten**
 - Start Docker Desktop op
 
-**Stap 2: SQL Server container starten**
-Open een terminal en voer uit:
-```powershell
-docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=gmQ0veEXZ1uOJqG" -p 1433:1433 -d mcr.microsoft.com/mssql/server:2022-latest
-```
+* start vs code op,
+* installeer de vs code extentie "SQL Server (mssql)",
+* start docker desktop op,
+* in vs code, open het mapje "database" en open de file "DatabaseCreationScript.sql",
+* run met het groene pijltje rechts bovenin de query,
+* in hetzelfde mapje doe je hetzelfde nadat de vorige query geslaagd is in de file "database.sql"
+* ga links in vs code naar de nieuwe blok "SQL Server" (ctrl+alt+D),
+* refresh de docker image door op het ronde pijltje te drukken die bij de image staat,
+* open de image en de "databases" map daarin,
+* de database zou nu in docker moeten staan!
 
-**Stap 3: Database aanmaken**
-- Installeer de VS Code extensie **SQL Server (mssql)** als je dit nog niet hebt
-- Open het mapje `frontend/database/`
-- Open de file `DatabaseCreationScript.sql`
-- Run de query met het groene pijltje rechtsboven (of druk op `Ctrl+Shift+E`)
-- Open vervolgens `database.sql` in dezelfde map
-- Run deze query ook met het groene pijltje
+### Migration draaien (beschikbaarheidskalender)
 
-**Stap 4: Verificatie**
-- Ga in VS Code naar het **SQL Server** paneel (druk op `Ctrl+Alt+D`)
-- Refresh de Docker container door op het ronde pijltje te klikken
-- Open de container en de **Databases** map
-- De database `zachteheelmeester` zou nu zichtbaar moeten zijn!
+* Zorg dat de SQL container draait en luistert op poort 1433.
+* Run het migratiescript voor de doctor_availability tabel:
+	* `sqlcmd -S localhost,1433 -U sa -P "<SA_PASSWORD>" -d zachteheelmeester -i "frontend/database/4.20-migration.sql"`
+* (Optioneel) Seeding testdokter + weekslots staat in `frontend/database/database.sql`; rerun alleen het laatste blok indien nodig.
 
-### 2. Backend Setup (.NET)
+### Backend starten
 
-Open een terminal en navigeer naar de backend folder:
+* Ga naar `backend/`
+* Zorg dat de connection string in `appsettings.Development.json` wijst naar je Docker SQL (nu: `Server=localhost,1433;Database=zachteheelmeester;User Id=sa;Password=gmQ0veEXZ1uOJqG;TrustServerCertificate=True`)
+* Restore en start: `dotnet restore` daarna `dotnet run --urls http://localhost:5016`
+* API draait op `http://localhost:5016` (zie `launchSettings.json`)
 
-```powershell
-cd backend
-dotnet restore
-dotnet run
-```
+### Frontend starten
 
-De backend draait nu op: **http://localhost:5016**
-
-Je kunt Swagger gebruiken om de API te testen: **http://localhost:5016/swagger**
-
-### 3. Frontend Setup (Vue.js)
-
-Open een **nieuwe** terminal en navigeer naar de frontend folder:
-
-```powershell
-cd frontend
-npm install
-npm run dev
-```
-
-De frontend is nu beschikbaar op: **http://localhost:5173** (of een andere poort die getoond wordt in de terminal)
-
-## Project Draaien
-
-Elke keer als je aan het project wilt werken:
-
-1. **Start Docker Desktop**
-2. **Start de backend:**
-   ```powershell
-   cd backend
-   dotnet run
-   ```
-3. **Start de frontend** (in een aparte terminal):
-   ```powershell
-   cd frontend
-   npm run dev
-   ```
-
-## Troubleshooting
-
-### Database verbinding mislukt
-- Controleer of Docker Desktop draait
-- Controleer of de SQL Server container actief is: `docker ps`
-- Als de container niet draait, start hem opnieuw met het docker run commando hierboven
-
-### Backend kan niet starten
-- Zorg dat poort 5016 niet al in gebruik is
-- Controleer of .NET 8 SDK geïnstalleerd is: `dotnet --version`
-
-### Frontend kan niet connecten met backend
-- Zorg dat de backend draait op http://localhost:5016
-- Check de browser console voor foutmeldingen (F12)
+* Ga naar `frontend/`
+* Installeer dependencies: `npm install`
+* Start dev server: `npm run dev`
+* Frontend verwacht de API op `http://localhost:5016` (pas `apiBaseUrl` prop/setting aan indien anders).

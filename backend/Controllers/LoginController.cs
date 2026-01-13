@@ -70,6 +70,8 @@ namespace backend.Controllers
                 {
                     id = user.Id,
                     email = user.Email,
+                    firstName = user.FirstName,
+                    lastName = user.LastName,
                     role = user.Role.RoleName
                 }
             });

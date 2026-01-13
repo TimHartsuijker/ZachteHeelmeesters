@@ -1,8 +1,11 @@
 <template>
   <nav class="navbar" aria-label="Hoofdnavigatie">
     <ul>
-      <li>
-        <a href="/admin/users" aria-current="user-management page">Gebruikersbeheer</a>
+      <li v-if="userRole === 'Specialist' || userRole === 'Huisarts'">
+          <RouterLink to="/agenda" aria-current="page">Agenda</RouterLink>
+      </li>
+      <li v-else-if="userRole === 'Admin'">
+        <RouterLink to="/admin/users" aria-current="user-management page">Gebruikersbeheer</RouterLink>
       </li>
     </ul>
   </nav>
@@ -13,6 +16,11 @@ export default {
   name: "NavBar",
   mounted() {
     console.log('nav.vue navbar mounted');
+  },
+  computed: {
+    userRole() {
+      return sessionStorage.getItem('userRole');
+    }
   }
 }
 </script>
@@ -32,6 +40,7 @@ export default {
   display: flex;
   align-items: center;
   font-size: 1.5rem;
+  font-family: Arial, sans-serif;
   box-shadow: 0 2px 16px 0 rgba(0,0,0,0.07);
 }
 
@@ -52,6 +61,7 @@ export default {
   text-decoration: none;
   font-weight: bold;
   font-size: 1.1rem;
+  font-family: Arial, sans-serif;
   transition: color 0.3s ease;
   outline: none;
 }
@@ -60,6 +70,15 @@ export default {
   color: #fff;
   background: none;
   box-shadow: none;
+}
+
+.navbar :deep(a) {
+  color: #222;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 1.1rem;
+  transition: color 0.3s ease;
+  outline: none;
 }
 
 body {

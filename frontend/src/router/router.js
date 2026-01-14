@@ -3,6 +3,7 @@ import LoginView from '../views/LoginView.vue'
 import AdminLoginView from "../views/AdminLoginView.vue";
 import AdminDashboardView from "../views/AdminDashboardView.vue";
 import UsersView from "../views/AdminUserManagementView.vue";
+import CreateReferralView from "../views/CreateReferralView.vue";
 
 const routes = [
   { 
@@ -10,8 +11,6 @@ const routes = [
     name: 'login',
     component: LoginView
   },
-  
-
   {
     path: "/admin/login",
     name: "AdminLogin",
@@ -28,7 +27,12 @@ const routes = [
     name: "AdminUsers",
     component: UsersView,
     meta: { requiresAdmin: true },
-  }
+  },
+  { 
+    path: '/create-referral', 
+    name: 'doorverwijzing-aanmaken',
+    component: CreateReferralView
+  },
 ]
 
 const router = createRouter({

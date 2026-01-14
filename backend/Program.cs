@@ -9,47 +9,52 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // Add services to the container.
 builder.Services.AddControllers();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
-// CORS toevoegen zodat frontend requests werkt
-builder.Services.AddCors(options =>
-{
-    options.AddDefaultPolicy(policy =>
-    {
-        policy.WithOrigins("http://localhost:5173") // je frontend poort
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-    });
-});
-
-// Sessions inschakelen (voor login sessie tracking)
+// Add session services
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(30); // sessie timeout
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
 
-// Learn more about configuring Swagger/OpenAPI
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+// Add CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("frontend", builder =>
+    {
+        builder.WithOrigins("http://localhost:5173", "http://localhost:5174", "http://localhost:3000", "http://localhost:5016")
+               .AllowAnyMethod()
+               .AllowAnyHeader()
+               .AllowCredentials();
+    });
+});
 
 // App bouwen
 var app = builder.Build();
 
 // MIGRATIONS + SEEDING (NA Build, VOOR Run)
-using (var scope = app.Services.CreateScope())
+try
 {
-    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
-    context.Database.Migrate(); // past migrations toe
-    
-    DbSeederStatic.Seed(context);     // seed data
-
-    if (app.Environment.IsDevelopment())
+    using (var scope = app.Services.CreateScope())
     {
-        DbSeederTest.Seed(context);    // alleen dev
+        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        context.Database.Migrate();
+        DbSeederStatic.Seed(context);
+        if (app.Environment.IsDevelopment())
+        {
+            DbSeederTest.Seed(context);
+        }
     }
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"FOUT BIJ MIGRATIE: {ex.Message}");
+    // De app start nu in ieder geval wel op, ook als de db faalt
 }
 
 // Middleware pipeline
@@ -59,15 +64,16 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// Apply CORS policy FIRST before any other middleware
+app.UseCors("frontend");
 
-// CORS inschakelen
-app.UseCors();
+app.UseHttpsRedirection();
 
 // Session middleware toevoegen
 app.UseSession();
 
 app.UseAuthorization();
+app.UseAuthentication();
 
 app.MapControllers();
 

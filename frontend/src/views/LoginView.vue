@@ -32,10 +32,8 @@
 
         <button type="submit" id="login-btn">Login</button>
         <div class="admin-login-link">
-  <button id="admin-login-link" @click="goToAdminLogin">
-    Inloggen als beheerder
-  </button>
-</div>
+          <RouterLink class="admin-login-link" to="/admin/login" aria-current="admin-login link">Inloggen als beheerder</RouterLink>
+        </div>
 
       </form>
 
@@ -43,69 +41,80 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref } from "vue";
 import axios from "axios";
+import { useRouter } from "vue-router";
 
-export default {
-  data() {
-    return {
-      email: "",
-      wachtwoord: "",
-      emptyError: false,
-      loginError: false,
-      loginErrorMessage: "",
-      loginSuccess: "",
-    };
-  },
+// Router instance
+const router = useRouter();
 
-  methods: {
-    // 🔹 User login
-    async login() {
-      // Reset meldingen
-      this.emptyError = false;
-      this.loginError = false;
-      this.loginErrorMessage = "";
-      this.loginSuccess = "";
+// State (Vervangt data())
+const email = ref("");
+const wachtwoord = ref("");
+const emptyError = ref(false);
+const loginError = ref(false);
+const loginErrorMessage = ref("");
+const loginSuccess = ref("");
 
-      // Check op lege velden
-      if (!this.email || !this.wachtwoord) {
-        this.emptyError = true;
-        return;
+// User login (Vervangt methods)
+const login = async () => {
+  // Reset meldingen
+  emptyError.value = false;
+  loginError.value = false;
+  loginErrorMessage.value = "";
+  loginSuccess.value = "";
+
+  // Check op lege velden
+  if (!email.value || !wachtwoord.value) {
+    emptyError.value = true;
+    return;
+  }
+
+  try {
+    const response = await axios.post("https://localhost:7240/api/login", {
+      email: email.value,
+      wachtwoord: wachtwoord.value,
+    }, {
+      // DIT IS DE BELANGRIJKE TOEVOEGING:
+      withCredentials: true
+    });
+
+    if (response.status === 200) {
+      const userData = response.data.user;
+      console.log("Login gelukt!", response.data);
+
+      // Sessie opslaan
+      sessionStorage.setItem("isLoggedIn", "true");
+      sessionStorage.setItem("userId", userData.id);
+      sessionStorage.setItem("userEmail", userData.email);
+      sessionStorage.setItem("userName", `${userData.firstName} ${userData.lastName}`);
+      sessionStorage.setItem("userRole", userData.role);
+
+      // Redirect op basis van rol
+      switch (userData.role) {
+        case "Specialist":
+          router.push("/agenda");
+          break;
+        case "Huisarts":
+          router.push("/agenda");
+          break;
+        default:
+          router.push("/dashboard");
+          break;
       }
-
-      try {
-        const response = await axios.post("https://localhost:7240/api/login", {
-          email: this.email,
-          wachtwoord: this.wachtwoord,
-        });
-
-        if (response.status === 200) {
-          console.log("Login gelukt!", response.data);
-
-          // Sessie opslaan
-          sessionStorage.setItem("isLoggedIn", "true");
-
-          // Redirect naar user dashboard
-          this.$router.push("/dashboard");
-        }
-      } catch (error) {
-        // Foutmelding van backend (401/400)
-        if (error.response && error.response.data && error.response.data.message) {
-          this.loginErrorMessage = error.response.data.message;
-        } else {
-          this.loginErrorMessage = "Er is iets misgegaan bij het inloggen.";
-        }
-
-        this.loginError = true;
-        console.log("Fout bij inloggen:", this.loginErrorMessage);
-      }
-    },
-
-    // 🔹 Admin login knop (SPA navigatie, geen refresh)
-    goToAdminLogin() {
-      this.$router.push("/admin/login");
     }
-  },
+  } catch (error) {
+    console.error("Full error:", error);
+    
+    if (error.response?.data?.message) {
+      loginErrorMessage.value = error.response.data.message;
+    } else {
+      loginErrorMessage.value = error.message || "Er is iets misgegaan bij het inloggen.";
+    }
+
+    loginError.value = true;
+  }
 };
 </script>
 

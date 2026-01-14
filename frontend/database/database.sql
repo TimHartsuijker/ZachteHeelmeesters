@@ -79,4 +79,46 @@ CREATE TABLE afspraken (
     FOREIGN KEY (behandeling) REFERENCES behandelingen(zorgcode),
     FOREIGN KEY (afdeling) REFERENCES afdelingen(afdelingID)
 );
-GO
+
+-- Seed a test doctor and availability for week of 2026-01-07
+DECLARE @DoctorRoleId VARCHAR(50) = 'DOCTOR';
+
+IF NOT EXISTS (SELECT 1 FROM rollen WHERE rolID = @DoctorRoleId)
+BEGIN
+    INSERT INTO rollen (rolID, rolnaam)
+    VALUES (@DoctorRoleId, 'Doctor');
+END;
+
+DECLARE @DoctorId INT;
+
+SELECT @DoctorId = gebruikersID FROM gebruikers WHERE email = 'testdoctor@example.com';
+
+IF @DoctorId IS NULL
+BEGIN
+    INSERT INTO gebruikers (
+        voornaam,
+        achternaam,
+        email,
+        wachtwoord,
+        Straatnaam,
+        Huisnummer,
+        Postcode,
+        Telefoonnummer,
+        rol,
+        systeembeheerder
+    ) VALUES (
+        'Test',
+        'Doctor',
+        'testdoctor@example.com',
+        'password',
+        'Teststraat',
+        '1A',
+        '1234AB',
+        316123456,
+        @DoctorRoleId,
+        0
+    );
+
+    SET @DoctorId = SCOPE_IDENTITY();
+END;
+

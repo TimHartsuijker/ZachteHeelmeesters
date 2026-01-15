@@ -16,8 +16,6 @@ Om dit project te kunnen gebruiken moeten de volgende stappen ondernomen worden
 
 ## Setup Technical Environment
 
-
-
 ### Database setup:
 
 * 1. Start Visual Studio Code (VS Code) op
@@ -32,15 +30,67 @@ Om dit project te kunnen gebruiken moeten de volgende stappen ondernomen worden
 * 9. Open de image en de `databases` map daarin
 * 10. De database zou nu in docker moeten staan!
 
-
+**Note:** De backend past automatisch migrations toe en seed testdata bij het opstarten (in Development mode).
 
 ### Backend setup:
 
-* 1. Start Visual Studio (2022) op
-* 2. 
+* 1. Open een terminal in de `backend` map
+* 2. Run `dotnet run` (gebruikt automatisch het https profile)
+* 3. Backend draait nu op:
+    * `https://localhost:7240` (primary)
+    * `http://localhost:5016` (fallback)
 
-
+**Belangrijke opmerking:** Gebruik altijd `dotnet run` zonder extra argumenten - het https profile is nu de default en werkt direct met de frontend.
 
 ### Frontend setup:
 
-* start Visual Studio Code (VS Code) op 
+* 1. Open een terminal in de `frontend` map
+* 2. Run `npm install` (eerste keer)
+* 3. Run `npm run dev`
+* 4. Frontend draait nu op `http://localhost:5173`
+
+### Tests draaien:
+
+```powershell
+# Alle tests
+dotnet test SeleniumTests/SeleniumTests.csproj
+
+# Specifieke test suite (bijv. US 2.12)
+dotnet test SeleniumTests/SeleniumTests.csproj --filter "FullyQualifiedName~US2_12"
+```
+
+**Belangrijk:** Backend en frontend moeten beiden draaien voordat je Selenium tests uitvoert.
+
+## Test Accounts
+
+Na het seeden zijn deze accounts beschikbaar:
+
+**Patient:**
+- Email: `gebruiker@example.com`
+- Password: `Wachtwoord123`
+
+**Doctor:**
+- Email: `dokter@example.com`
+- Password: `Wachtwoord123`
+
+## Troubleshooting
+
+### CORS Errors / Network Errors
+**Probleem:** "CORS-aanvraag is niet gelukt" of "Network Error"
+
+**Oplossing:** Zorg dat de backend draait. Run `dotnet run` in de backend map (https is nu default).
+
+### Lege pagina in Selenium Tests
+**Probleem:** Vue app laadt niet, lege pagina, of "504 Outdated Optimize Dep"
+
+**Oplossing:** Herstart de frontend dev server:
+```powershell
+cd frontend
+# Stop huidige server (Ctrl+C)
+npm run dev
+```
+
+### Geen dossier entries in tests
+**Probleem:** Test faalt met "No dossier entries found"
+
+**Oplossing:** Medical data wordt automatisch geseed in Development mode. Check backend logs voor seeding bevestiging. 

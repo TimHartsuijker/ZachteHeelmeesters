@@ -92,6 +92,33 @@ namespace backend.Data
                 doctor.Patients.Add(patient);
                 context.SaveChanges();
             }
+
+            // 🔹 Empty Dossier Patient seeden (for testing empty state)
+            User? emptyPatient = context.Users.FirstOrDefault(u => u.Email == "leegdossier@example.com");
+            if (emptyPatient == null)
+            {
+                emptyPatient = new User
+                {
+                    FirstName = "Leeg",
+                    LastName = "Dossier",
+                    Email = "leegdossier@example.com",
+                    StreetName = "Lege Straat",
+                    HouseNumber = "99",
+                    PostalCode = "0000AA",
+                    CitizenServiceNumber = "999999999",
+                    DateOfBirth = new DateTime(1995, 12, 31),
+                    Gender = "Vrouw",
+                    PhoneNumber = "0699999999",
+                    CreatedAt = DateTime.UtcNow,
+                    RoleId = patientRole.Id,
+                    DoctorId = doctor.Id
+                };
+
+                emptyPatient.PasswordHash = passwordHasher.HashPassword(emptyPatient, "Wachtwoord123");
+
+                context.Users.Add(emptyPatient);
+                context.SaveChanges();
+            }
         }
     }
 }

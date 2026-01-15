@@ -106,6 +106,59 @@ namespace SeleniumTests.P_O_M
             entry.FindElement(EntryToggleBtn).Click();
         }
 
+        public void ToggleEntry(IWebElement entry)
+        {
+            entry.FindElement(EntryToggleBtn).Click();
+        }
+
+        public bool IsEntryExpanded(IWebElement entry)
+        {
+            // Check if entry has expanded content visible (files, notes, etc.)
+            try
+            {
+                var files = entry.FindElements(FileCard);
+                return files.Count > 0 && files[0].Displayed;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public IReadOnlyCollection<IWebElement> GetFilesInEntry(IWebElement entry)
+        {
+            return entry.FindElements(FileCard);
+        }
+
+        public string GetNotesFromEntry(IWebElement entry)
+        {
+            try
+            {
+                var notesElements = entry.FindElements(NotesSection);
+                if (notesElements.Count > 0)
+                {
+                    return notesElements[0].Text;
+                }
+                return string.Empty;
+            }
+            catch
+            {
+                return string.Empty;
+            }
+        }
+
+        public string GetAuthorFromEntry(IWebElement entry)
+        {
+            try
+            {
+                return entry.FindElement(AuthorLine).Text;
+            }
+            catch
+            {
+                return string.Empty;
+            }
+        }
+
         public bool EntryContainsFiles(IWebElement entry)
         {
             return entry.FindElements(FileCard).Any();

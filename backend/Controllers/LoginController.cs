@@ -1,5 +1,6 @@
 ﻿using backend.Data;
 using backend.Models;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,31 +10,38 @@ namespace BackendLogin.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [EnableCors("AllowFrontend")]
     public class LoginController : ControllerBase
     {
         private readonly AppDbContext _context;
         private readonly PasswordHasher<User> _passwordHasher;
+        private readonly ILogger<LoginController> _logger;
 
-        public LoginController(AppDbContext context)
+        public LoginController(AppDbContext context, ILogger<LoginController> logger)
         {
             _context = context;
             _passwordHasher = new PasswordHasher<User>();
+            _logger = logger;
         }
         
 
         [HttpGet]
         public IActionResult TestEndpoint()
         {
+            _logger.LogInformation("Test endpoint called");
             return Ok(new { message = "API werkt!" });
         }
 
         [HttpPost]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
+            _logger.LogInformation($"Login attempt for email: {request?.Email}");
+
             if (request == null ||
                 string.IsNullOrWhiteSpace(request.Email) ||
                 string.IsNullOrWhiteSpace(request.Wachtwoord))
             {
+                _logger.LogWarning("Login attempt with missing fields");
                 return BadRequest(new { message = "Gegevens moeten ingevuld zijn" });
             }
 
@@ -44,6 +52,7 @@ namespace BackendLogin.Controllers
 
             if (user == null)
             {
+                _logger.LogWarning($"Login attempt failed: user not found for email {request.Email}");
                 return Unauthorized(new { message = "Inloggegevens zijn incorrect" });
             }
 
@@ -56,9 +65,11 @@ namespace BackendLogin.Controllers
 
             if (result == PasswordVerificationResult.Failed)
             {
+                _logger.LogWarning($"Login attempt failed: incorrect password for {request.Email}");
                 return Unauthorized(new { message = "Inloggegevens zijn incorrect" });
             }
 
+            _logger.LogInformation($"Login successful for {request.Email}");
             return Ok(new
             {
                 message = "Login ok",

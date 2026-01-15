@@ -15,15 +15,17 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins(
+        policy
+            .WithOrigins(
                 "http://localhost:5173",
                 "https://localhost:5173",
                 "http://localhost:3000",
                 "https://localhost:3000"
             )
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials()
+            .WithExposedHeaders("Content-Type");
     });
 });
 
@@ -66,13 +68,15 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-
-// CORS inschakelen
+// CORS middleware MOET VOORDOOR AUTH/REDIRECT
 app.UseCors("AllowFrontend");
+
+app.UseHttpsRedirection();
 
 // Session middleware toevoegen
 app.UseSession();
+
+app.UseAuthorization();
 
 app.UseAuthorization();
 

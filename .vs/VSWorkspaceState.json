@@ -1,13 +1,9 @@
 {
   "ExpandedNodes": [
     "",
-    "\\.pytest_cache",
-    "\\backend",
     "\\SeleniumTests",
     "\\SeleniumTests\\Tests",
-    "\\SeleniumTests\\Tests\\US3",
-    "\\SeleniumTests\\Tests\\US3\\3.7a"
+    "\\SeleniumTests\\Tests\\US4"
   ],
-  "SelectedNode": "\\backend\\backend.sln",
   "PreviewInSolutionExplorer": false
 }

@@ -93,8 +93,8 @@ export default {
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   font-size: 1.1rem;
-  width: 100%;
-  max-width: none;
+  width: 96%;
+  max-width: 98%;
   margin: 1.5rem auto 0 auto;
 }
 .user-field {

@@ -1,5 +1,4 @@
 <script setup>
-import AdminNavBar from '../components/AdminNavBar.vue'
 import Filter from '../components/Filter.vue'
 import Gebruikers from '../components/Gebruiker.vue'
 import { ref, onMounted, computed } from 'vue'
@@ -40,8 +39,7 @@ const fetchRollen = async () => {
       { rolId: 1, roleName: 'Patiënt' },
       { rolId: 2, roleName: 'Huisarts' },
       { rolId: 3, roleName: 'Specialist' },
-      { rolId: 4, roleName: 'Administrator' },
-      { rolId: 5, roleName: 'Systeembeheerder' }
+      { rolId: 4, roleName: 'Systeembeheerder' }
     ]
   }
 }
@@ -83,12 +81,6 @@ onMounted(() => {
 </script>
 
 <template>
-  <header>
-    <div class="wrapper">
-      <AdminNavBar/>
-    </div>
-  </header>
-
   <main class="main-users align-under-nav">
     <Filter 
       :rollen="rollen"

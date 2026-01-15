@@ -132,7 +132,7 @@ admin-dashboard-page {
 }
 
 /* Navbar bovenaan */
-.admin-navbar {
+.navbar {
   display: flex;
   align-items: center;
   justify-content: space-between; /* logo links, buttons gecentreerd, logout rechts */
@@ -142,7 +142,7 @@ admin-dashboard-page {
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.admin-navbar a {
+.navbar a {
   text-decoration: none;
   transition: color 0.3s, background 0.3s, box-shadow 0.3s;
   & h1 {
@@ -153,7 +153,7 @@ admin-dashboard-page {
   }
 }
 
-.admin-navbar a h1:hover {
+.navbar a h1:hover {
   color: #fff;
   cursor: pointer;
   background: none;
@@ -197,6 +197,7 @@ admin-dashboard-page {
 }
 
 .logout-btn:hover {
+  color: white;
   background-color: #e04344;
 }
 

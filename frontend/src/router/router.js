@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from '../views/LoginView.vue'
+import RegisterView from '../views/RegisterView.vue' // <-- importeer de nieuwe view
 import DashboardView from '../views/DashboardView.vue'
 import AgendaView from '../views/AgendaView.vue'
 import AdminLoginView from "../views/AdminLoginView.vue";
@@ -12,6 +13,11 @@ const routes = [
     name: 'login',
     component: LoginView,
     meta: { hideNavbar: true }
+  },
+  { 
+    path: '/register',
+    name: 'register',
+    component: RegisterView
   },
   {
     path: "/admin/login",

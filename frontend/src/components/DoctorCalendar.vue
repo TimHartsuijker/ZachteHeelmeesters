@@ -201,6 +201,10 @@
   </div>
 </template>
 
+<script setup>
+import axios from "axios";
+</script>
+
 <script>
 export default {
   name: 'DoctorCalendar',
@@ -476,11 +480,7 @@ export default {
       console.log('[saveSlot] payload JSON', JSON.stringify(slots, null, 2));
 
       try {
-        const response = await fetch(`${this.apiBaseUrl}/doctoravailability/${this.doctorId}/bulk`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(slots)
-        });
+        const response = await axios.post(`/api/doctoravailability/${this.doctorId}/bulk`, slots);
         console.log('[saveSlot] payload', slots, 'status', response.status);
         if (!response.ok) {
           const text = await response.text();
@@ -499,9 +499,7 @@ export default {
       const key = this.slotKey(this.selectedSlot.date, this.selectedSlot.hour, this.selectedSlot.minute);
       const iso = this.toIso(this.selectedSlot.date, this.selectedSlot.hour, this.selectedSlot.minute);
       try {
-        const response = await fetch(`${this.apiBaseUrl}/doctoravailability/${this.doctorId}?dateTime=${encodeURIComponent(iso)}`, {
-          method: 'DELETE'
-        });
+        const response = await axios.delete(`/api/doctoravailability/${this.doctorId}?dateTime=${encodeURIComponent(iso)}`);
         if (!response.ok) throw new Error('Verwijderen mislukt');
         delete this.availabilities[key];
       } catch (err) {
@@ -559,11 +557,7 @@ export default {
       console.log('[UnavailablePeriod] slots to save', slots);
 
       try {
-        const response = await fetch(`${this.apiBaseUrl}/doctoravailability/${this.doctorId}/bulk`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(slots)
-        });
+        const response = await axios.post(`/api/doctoravailability/${this.doctorId}/bulk`, slots);
         console.log('[UnavailablePeriod] response status', response.status);
         if (!response.ok) {
           const text = await response.text();
@@ -603,11 +597,7 @@ export default {
       );
 
       try {
-        const response = await fetch(`${this.apiBaseUrl}/doctoravailability/${this.doctorId}/bulk`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(slots)
-        });
+        const response = await axios.post(`/api/doctoravailability/${this.doctorId}/bulk`, slots);
         if (!response.ok) throw new Error('Opslaan mislukt');
       } catch (err) {
         this.error = err.message;
@@ -633,7 +623,7 @@ export default {
       const startDate = this.toLocalIsoFromDate(monday);
       const endDate = this.toLocalIsoFromDate(endOfSunday);
 
-      fetch(`${this.apiBaseUrl}/doctoravailability/${this.doctorId}?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`)
+      axios.get(`/api/doctoravailability/${this.doctorId}?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`)
         .then(response => {
           if (!response.ok) throw new Error('Kon beschikbaarheid niet laden');
           return response.json();

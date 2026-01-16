@@ -10,12 +10,12 @@ const router = useRouter();
 
 const logout = async () => {
   try {
-    await axios.post("https://localhost:7240/api/auth/logout", {}, {
+    await axios.post("/api/auth/logout", {}, {
       withCredentials: true // ZORGT DAT DE SESSIE-COOKIE WORDT MEEGESTUURD
     });
     
     sessionStorage.clear();
-    router.push("/");
+    router.push("/login");
   } catch (error) {
     console.error("Logout failed:", error);
   }

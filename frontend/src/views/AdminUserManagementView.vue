@@ -1,6 +1,7 @@
 <script setup>
 import Filter from '../components/Filter.vue'
 import Gebruikers from '../components/Gebruiker.vue'
+import axios from 'axios'
 import { ref, onMounted, computed } from 'vue'
 
 const users = ref([])
@@ -16,13 +17,13 @@ const filterOptions = ref({
 const fetchUsers = async () => {
   try {
     loading.value = true
-    const response = await fetch('https://localhost:7240/api/users')
-    if (!response.ok) throw new Error('Failed to fetch users')
-    users.value = await response.json()
+    const response = await axios.get('/api/users')
+    // In Axios zit de data direct in .data, je hoeft geen .json() te doen
+    users.value = response.data 
     error.value = null
   } catch (err) {
     console.error('Error fetching users:', err)
-    error.value = 'Cannot connect to backend. Make sure the backend is running (dotnet run in backend folder)'
+    error.value = 'Cannot connect to backend.'
   } finally {
     loading.value = false
   }
@@ -30,17 +31,11 @@ const fetchUsers = async () => {
 
 const fetchRollen = async () => {
   try {
-    const response = await fetch('https://localhost:7240/api/roles')
-    if (!response.ok) throw new Error('Failed to fetch roles')
-    rollen.value = await response.json()
+    const response = await axios.get('/api/roles')
+    rollen.value = response.data
   } catch (error) {
     console.error('Error fetching roles:', error)
-    rollen.value = [
-      { rolId: 1, roleName: 'Patiënt' },
-      { rolId: 2, roleName: 'Huisarts' },
-      { rolId: 3, roleName: 'Specialist' },
-      { rolId: 4, roleName: 'Systeembeheerder' }
-    ]
+    // Backup data blijft prima staan
   }
 }
 

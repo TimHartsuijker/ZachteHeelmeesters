@@ -8,7 +8,7 @@ import UsersView from "../views/AdminUserManagementView.vue";
 
 const routes = [
   { 
-    path: '/', 
+    path: '/login', 
     name: 'login',
     component: LoginView,
     meta: { hideNavbar: true }
@@ -55,6 +55,10 @@ router.beforeEach((to, from, next) => {
   const userRole = sessionStorage.getItem('userRole');
   const isLoggedIn = sessionStorage.getItem('userId') !== null;
   const isAdminLoggedIn = sessionStorage.getItem('adminId') !== null;
+
+  if (to.path == '/') {
+    return next({ name: isLoggedIn || isAdminLoggedIn ? 'dashboard' : 'login' });
+  }
 
   if (to.meta.requiresAuth) {
     

@@ -5,8 +5,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import DoctorCalendar from '../components/DoctorCalendar.vue'
+import { ref, onMounted } from 'vue';
+import DoctorCalendar from '../components/DoctorCalendar.vue';
 import router from '@/router/router';
 
 const doctorId = ref(null);

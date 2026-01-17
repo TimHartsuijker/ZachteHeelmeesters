@@ -35,7 +35,12 @@ const fetchRollen = async () => {
     rollen.value = response.data
   } catch (error) {
     console.error('Error fetching roles:', error)
-    // Backup data blijft prima staan
+    rollen.value = [
+      { rolId: 1, roleName: 'Patiënt' },
+      { rolId: 2, roleName: 'Huisarts' },
+      { rolId: 3, roleName: 'Specialist' },
+      { rolId: 4, roleName: 'Systeembeheerder' }
+    ]
   }
 }
 

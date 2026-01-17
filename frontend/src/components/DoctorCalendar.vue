@@ -10,7 +10,6 @@
       </div>
     </div>
 
-    <!-- Quick actions for setting unavailable/available periods -->
     <div class="quick-actions">
       <button @click="showUnavailablePeriodModal = true" class="btn btn-primary">
         Periode onbeschikbaar maken
@@ -21,10 +20,8 @@
       <span class="user-info user-info-inline">Gebruiker: {{ userName }} ({{ userEmail }})</span>
     </div>
 
-    <!-- Week view -->
     <div class="week-view">
       <div class="time-grid">
-        <!-- Time labels -->
         <div class="time-labels">
           <div class="time-label"></div>
           <div v-for="hour in hours" :key="hour" class="time-label">
@@ -32,9 +29,7 @@
           </div>
         </div>
 
-        <!-- Days with time slots -->
         <div class="days-container">
-          <!-- Day headers -->
           <div class="day-headers">
             <div v-for="day in weekDays" :key="day.date" class="day-header">
               <div class="day-name">{{ day.name }}</div>
@@ -42,19 +37,11 @@
             </div>
           </div>
 
-          <!-- Time slots grid -->
           <div class="time-slots-grid">
-            <div
-              v-for="day in weekDays"
-              :key="day.date"
-              class="day-column"
-            >
+            <div v-for="day in weekDays" :key="day.date" class="day-column">
               <div
                 v-for="slot in getSlots(day.date)"
                 :key="`${slot.date}-${slot.hour}-${slot.minute}`"
-                :data-date="slot.date"
-                :data-hour="slot.hour"
-                :data-minute="slot.minute"
                 :class="['time-slot', { unavailable: isSlotUnavailable(slot.date, slot.hour, slot.minute), 'hour-boundary': isHourBoundary(slot.minute) }]"
                 @click="selectSlot(slot.date, slot.hour, slot.minute)"
               >
@@ -68,7 +55,6 @@
       </div>
     </div>
 
-    <!-- Unavailable Period Modal -->
     <div v-if="showUnavailablePeriodModal" class="modal">
       <div class="modal-content">
         <span class="close" @click="showUnavailablePeriodModal = false">&times;</span>
@@ -76,12 +62,7 @@
         <form @submit.prevent="setUnavailablePeriod">
           <div class="form-group">
             <label for="unavail-start">Start datum/tijd:</label>
-            <input
-              id="unavail-start"
-              v-model="unavailablePeriod.startDateTime"
-              type="datetime-local"
-              required
-            />
+            <input id="unavail-start" v-model="unavailablePeriod.startDateTime" type="datetime-local" required />
           </div>
           <div class="form-group">
             <label for="unavail-end">Tot en met:</label>
@@ -94,19 +75,13 @@
           </div>
           <div class="form-group">
             <label for="unavail-reason">Reden (optioneel):</label>
-            <input
-              id="unavail-reason"
-              v-model="unavailablePeriod.reason"
-              type="text"
-              placeholder="bijv. Vakantie, Ziekte, Pauze"
-            />
+            <input id="unavail-reason" v-model="unavailablePeriod.reason" type="text" placeholder="bijv. Vakantie, Ziekte, Pauze" />
           </div>
           <button type="submit" class="btn btn-primary">Opslaan</button>
         </form>
       </div>
     </div>
 
-    <!-- Available Period Modal -->
     <div v-if="showAvailablePeriodModal" class="modal">
       <div class="modal-content">
         <span class="close" @click="showAvailablePeriodModal = false">&times;</span>
@@ -114,28 +89,17 @@
         <form @submit.prevent="setAvailablePeriod">
           <div class="form-group">
             <label for="avail-start">Start datum/tijd:</label>
-            <input
-              id="avail-start"
-              v-model="availablePeriod.startDateTime"
-              type="datetime-local"
-              required
-            />
+            <input id="avail-start" v-model="availablePeriod.startDateTime" type="datetime-local" required />
           </div>
           <div class="form-group">
             <label for="avail-end">Eind datum/tijd:</label>
-            <input
-              id="avail-end"
-              v-model="availablePeriod.endDateTime"
-              type="datetime-local"
-              required
-            />
+            <input id="avail-end" v-model="availablePeriod.endDateTime" type="datetime-local" required />
           </div>
           <button type="submit" class="btn btn-primary">Opslaan</button>
         </form>
       </div>
     </div>
 
-    <!-- Hour Selection Modal -->
     <div v-if="showHourModal && selectedSlot" class="modal">
       <div class="modal-content">
         <span class="close" @click="showHourModal = false">&times;</span>
@@ -143,58 +107,23 @@
         <p>{{ formatSlotTime(selectedSlot.date, selectedSlot.hour, selectedSlot.minute) }}</p>
         <form @submit.prevent="saveSlot">
           <div class="form-group">
-            <label for="slot-available">
-              <input
-                id="slot-available"
-                v-model="selectedSlot.isAvailable"
-                type="checkbox"
-              />
+            <label>
+              <input v-model="selectedSlot.isAvailable" type="checkbox" />
               Dit moment beschikbaar
             </label>
           </div>
           <div class="form-group" v-if="!selectedSlot.isAvailable">
-            <label for="slot-reason">Reden (optioneel):</label>
-            <input
-              id="slot-reason"
-              v-model="selectedSlot.reason"
-              type="text"
-              placeholder="bijv. Pauze, Afspraak, Vergadering"
-            />
+            <label>Reden (optioneel):</label>
+            <input v-model="selectedSlot.reason" type="text" />
           </div>
-          <div class="form-group" v-if="!selectedSlot.isAvailable">
-            <label for="slot-end-time-unavail">Tot en met:</label>
-            <select id="slot-end-time-unavail" v-model="selectedSlot.endTime">
-              <option value="">Alleen dit moment</option>
-              <option
-                v-for="time in getUnavailableEndTimes()"
-                :key="time"
-                :value="time"
-              >
-                {{ time }}
-              </option>
-            </select>
-          </div>
-          <div class="form-group" v-if="selectedSlot.isAvailable">
-            <label for="slot-end-time">Tot en met:</label>
-            <select id="slot-end-time" v-model="selectedSlot.endTime" required>
-              <option value="">Selecteer eind tijd</option>
-              <option
-                v-for="time in getEndTimesForSlot()"
-                :key="time"
-                :value="time"
-              >
-                {{ time }}
-              </option>
+          <div class="form-group">
+            <label>Tot en met:</label>
+            <select v-model="selectedSlot.endTime">
+              <option v-for="time in getEndTimesForSlot()" :key="time" :value="time">{{ time }}</option>
             </select>
           </div>
           <button type="submit" class="btn btn-primary">Opslaan</button>
-          <button
-            type="button"
-            @click="deleteSlot"
-            class="btn btn-danger"
-          >
-            Verwijderen
-          </button>
+          <button type="button" @click="deleteSlot" class="btn btn-danger">Verwijderen</button>
         </form>
       </div>
     </div>
@@ -202,463 +131,252 @@
 </template>
 
 <script setup>
+import { ref, computed, watch, onMounted } from "vue";
 import axios from "axios";
-</script>
+import { 
+  getMondayOfWeek, 
+  toIso, 
+  getSlots, 
+  getTimesFrom, 
+  toLocalIsoFromDate,
+  formatEndTime,
+  formatSlotTime,
+  getMaxDate,
+  pad 
+} from '@/utils/dateHelpers';
 
-<script>
-export default {
-  name: 'DoctorCalendar',
-  props: {
-    doctorId: {
-      type: Number,
-      default: 1 // fallback for testing; replace with logged-in doctor ID later
-    },
-    apiBaseUrl: {
-      type: String,
-      default: 'https://localhost:7240/api'
-    }
-  },
-  data() {
-    return {
-      currentDate: new Date(),
-      hours: Array.from({ length: 24 }, (_, i) => i),
-      dayNames: ['Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag', 'Zondag'],
-      availabilities: {},
-      showUnavailablePeriodModal: false,
-      showAvailablePeriodModal: false,
-      showHourModal: false,
-      selectedSlot: null,
-      unavailablePeriod: {
-        startDateTime: '',
-        endDateTime: '',
-        reason: ''
-      },
-      availablePeriod: {
-        startDateTime: '',
-        endDateTime: ''
-      },
-      loading: false,
-      error: null,
-      userName: sessionStorage.getItem('userName') || 'Unknown',
-      userEmail: sessionStorage.getItem('userEmail') || 'unknown@example.com'
-    };
-  },
-  computed: {
-    weekRange() {
-      const monday = this.getMondayOfWeek(this.currentDate);
-      const sunday = new Date(monday);
-      sunday.setDate(sunday.getDate() + 6);
-      
-      const dateFormat = (date) => {
-        return `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
-      };
-      
-      return `${dateFormat(monday)} tot ${dateFormat(sunday)}`;
-    },
-    weekDays() {
-      const monday = this.getMondayOfWeek(this.currentDate);
-      const days = [];
-      
-      for (let i = 0; i < 7; i++) {
-        const date = new Date(monday);
-        date.setDate(date.getDate() + i);
-        const dateString = date.toISOString().split('T')[0];
-        
-        days.push({
-          date: dateString,
-          name: this.dayNames[i],
-          fullDate: date
-        });
-      }
-      
-      return days;
-    }
-  },
-  watch: {
-    'unavailablePeriod.startDateTime'(val) {
-      // Reset and prefill end time to the first available option to avoid empty required field
-      this.unavailablePeriod.endDateTime = '';
-      if (val) {
-        const options = this.getUnavailablePeriodEndTimes();
-        if (options.length > 0) {
-          this.unavailablePeriod.endDateTime = options[0];
-        }
-      }
-    }
-  },
-  methods: {
-    pad(value) {
-      return String(value).padStart(2, '0');
-    },
-    toLocalIsoFromDate(dateObj) {
-      const y = dateObj.getFullYear();
-      const m = String(dateObj.getMonth() + 1).padStart(2, '0');
-      const d = String(dateObj.getDate()).padStart(2, '0');
-      const hh = String(dateObj.getHours()).padStart(2, '0');
-      const mm = String(dateObj.getMinutes()).padStart(2, '0');
-      const ss = String(dateObj.getSeconds()).padStart(2, '0');
-      return `${y}-${m}-${d}T${hh}:${mm}:${ss}`;
-    },
-    toIso(dateString, hour, minute) {
-      // Build ISO string in UTC format (no timezone offset)
-      // This ensures consistency when sending to backend and when retrieving
-      const year = dateString.split('-')[0];
-      const month = dateString.split('-')[1];
-      const day = dateString.split('-')[2];
-      return `${year}-${month}-${day}T${this.pad(hour)}:${this.pad(minute)}:00`;
-    },
-    slotKey(dateString, hour, minute) {
-      return `${dateString}T${this.pad(hour)}:${this.pad(minute)}:00`;
-    },
-    getMondayOfWeek(date) {
-      const d = new Date(date);
-      const day = d.getDay();
-      const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Adjust to Monday
-      return new Date(d.setDate(diff));
-    },
-    previousWeek() {
-      const newDate = new Date(this.currentDate);
-      newDate.setDate(newDate.getDate() - 7);
-      this.currentDate = newDate;
-      this.loadAvailabilities();
-    },
-    nextWeek() {
-      const newDate = new Date(this.currentDate);
-      newDate.setDate(newDate.getDate() + 7);
-      this.currentDate = newDate;
-      this.loadAvailabilities();
-    },
-    goToToday() {
-      this.currentDate = new Date();
-      this.loadAvailabilities();
-    },
-    getSlots(dateString) {
-      const slots = [];
-      for (let hour = 0; hour < 24; hour++) {
-        for (let minute = 0; minute < 60; minute += 15) {
-          slots.push({
-            date: dateString,
-            hour: hour,
-            minute: minute
-          });
-        }
-      }
-      return slots;
-    },
-    isHourBoundary(minute) {
-      return minute === 0;
-    },
-    isSlotUnavailable(dateString, hour, minute) {
-      const key = `${dateString}T${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:00`;
-      return this.availabilities[key]?.isAvailable === false;
-    },
-    getSlotReason(dateString, hour, minute) {
-      const key = `${dateString}T${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:00`;
-      const reason = this.availabilities[key]?.reason || '';
-      if (reason.length > 15) {
-        return reason.substring(0, 15) + '...';
-      }
-      return reason;
-    },
-    selectSlot(dateString, hour, minute) {
-      const key = `${dateString}T${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:00`;
-      this.selectedSlot = {
-        date: dateString,
-        hour: hour,
-        minute: minute,
-        isAvailable: this.availabilities[key]?.isAvailable !== false,
-        reason: this.availabilities[key]?.reason || '',
-        endTime: ''
-      };
-      this.showHourModal = true;
-    },
-    getEndTimesForSlot() {
-      if (!this.selectedSlot || !this.selectedSlot.isAvailable) {
-        return [];
-      }
-      const times = [];
-      const startHour = this.selectedSlot.hour;
-      const startMinute = this.selectedSlot.minute;
-      
-      // Generate end times from current slot to 23:45 in 15-minute intervals
-      for (let hour = startHour; hour < 24; hour++) {
-        for (let minute = (hour === startHour ? startMinute + 15 : 0); minute < 60; minute += 15) {
-          times.push(`${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`);
-        }
-      }
-      return times;
-    },
-    getUnavailableEndTimes() {
-      if (!this.selectedSlot) {
-        return [];
-      }
-      const times = [];
-      const startHour = this.selectedSlot.hour;
-      const startMinute = this.selectedSlot.minute;
-      
-      // Generate end times from current slot to 23:45 in 15-minute intervals
-      for (let hour = startHour; hour < 24; hour++) {
-        for (let minute = (hour === startHour ? startMinute + 15 : 0); minute < 60; minute += 15) {
-          times.push(`${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`);
-        }
-      }
-      return times;
-    },
-    getUnavailablePeriodEndTimes() {
-      if (!this.unavailablePeriod.startDateTime) {
-        return [];
-      }
-      
-      const startDate = new Date(this.unavailablePeriod.startDateTime);
-      const times = [];
-      const current = new Date(startDate);
-      
-      // Generate times from start + 15 minutes to end of next day (local time)
-      while (true) {
-        const currentDateStr = `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, '0')}-${String(current.getDate()).padStart(2, '0')}`;
-        if (currentDateStr > this.getMaxDate()) break;
-        // Skip to 15 minutes after start if same hour
-        if (current.getHours() === startDate.getHours() && current.getMinutes() <= startDate.getMinutes()) {
-          current.setMinutes(startDate.getMinutes() + 15);
-        }
-        
-        if (current > startDate) {
-          times.push(this.toLocalIsoFromDate(current));
-        }
-        
-        current.setMinutes(current.getMinutes() + 15);
-      }
-      
-      return times;
-    },
-    getMaxDate() {
-      const date = new Date(this.unavailablePeriod.startDateTime);
-      date.setDate(date.getDate() + 1); // Next day
-      const y = date.getFullYear();
-      const m = String(date.getMonth() + 1).padStart(2, '0');
-      const d = String(date.getDate()).padStart(2, '0');
-      return `${y}-${m}-${d}`;
-    },
-    formatEndTime(isoString) {
-      const date = new Date(isoString);
-      const dateStr = date.toLocaleDateString('nl-NL');
-      const timeStr = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-      return `${dateStr} ${timeStr}`;
-    },
-    async saveSlot() {
-      console.log('[saveSlot] selectedSlot', this.selectedSlot, 'doctorId', this.doctorId);
-      if (!this.selectedSlot) {
-        console.warn('[saveSlot] no selectedSlot');
-        return;
-      }
-      if (this.selectedSlot.isAvailable && !this.selectedSlot.endTime) {
-        alert('Selecteer alstublieft een eind tijd');
-        return;
-      }
+// --- Gebruikersinformatie ---
+const doctorId = ref(sessionStorage.getItem('userId') || '');
+const userName = ref(sessionStorage.getItem('userName') || 'Onbekend');
+const userEmail = ref(sessionStorage.getItem('userEmail') || 'onbekend@example.com');
 
-      const startIso = this.toIso(this.selectedSlot.date, this.selectedSlot.hour, this.selectedSlot.minute);
-      let endIso = startIso;
+// --- Kalender State ---
+const currentDate = ref(new Date());
+const hours = ref(Array.from({ length: 24 }, (_, i) => i));
+const dayNames = ref(['Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag', 'Zondag']);
+const availabilities = ref({}); // Reactief object voor snelle lookup
+const loading = ref(false);
+const error = ref(null);
 
-      if (this.selectedSlot.isAvailable) {
-        const [endHour, endMinute] = this.selectedSlot.endTime.split(':').map(Number);
-        endIso = this.toIso(this.selectedSlot.date, endHour, endMinute);
-      } else if (this.selectedSlot.endTime) {
-        const [endHour, endMinute] = this.selectedSlot.endTime.split(':').map(Number);
-        endIso = this.toIso(this.selectedSlot.date, endHour, endMinute);
-      } else {
-        const temp = new Date(startIso);
-        temp.setMinutes(temp.getMinutes() + 15);
-        endIso = this.toLocalIsoFromDate(temp);
-      }
+// --- Modal & Selectie State ---
+const showUnavailablePeriodModal = ref(false);
+const showAvailablePeriodModal = ref(false);
+const showHourModal = ref(false);
+const selectedSlot = ref(null);
 
-      const slots = this.buildSlots(
-        startIso,
-        endIso,
-        this.selectedSlot.isAvailable,
-        this.selectedSlot.reason
-      );
-      console.log('[saveSlot] payload JSON', JSON.stringify(slots, null, 2));
+// --- Formulier Data ---
+const unavailablePeriod = ref({ startDateTime: '', endDateTime: '', reason: '' });
+const availablePeriod = ref({ startDateTime: '', endDateTime: '' });
 
-      try {
-        const response = await axios.post(`/api/doctoravailability/${this.doctorId}/bulk`, slots);
-        console.log('[saveSlot] payload', slots, 'status', response.status);
-        if (!response.ok) {
-          const text = await response.text();
-          console.error('[saveSlot] error response', text);
-          throw new Error(`Opslaan mislukt: ${text}`);
-        }
-      } catch (err) {
-        console.error('[saveSlot] error', err);
-        this.error = err.message;
-      }
-
-      this.showHourModal = false;
-      this.loadAvailabilities();
-    },
-    async deleteSlot() {
-      const key = this.slotKey(this.selectedSlot.date, this.selectedSlot.hour, this.selectedSlot.minute);
-      const iso = this.toIso(this.selectedSlot.date, this.selectedSlot.hour, this.selectedSlot.minute);
-      try {
-        const response = await axios.delete(`/api/doctoravailability/${this.doctorId}?dateTime=${encodeURIComponent(iso)}`);
-        if (!response.ok) throw new Error('Verwijderen mislukt');
-        delete this.availabilities[key];
-      } catch (err) {
-        this.error = err.message;
-      }
-      this.showHourModal = false;
-    },
-    formatSlotTime(dateString, hour, minute) {
-      const date = new Date(dateString + 'T00:00:00');
-      return `${date.toLocaleDateString('nl-NL', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })} van ${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
-    },
-    buildSlots(startIso, endIso, isAvailable, reason = '') {
-      const slots = [];
-      let current = new Date(startIso);
-      const end = new Date(endIso);
-      
-      // Round current to nearest 15-minute boundary
-      const minutes = current.getMinutes();
-      const roundedMinutes = Math.round(minutes / 15) * 15;
-      if (roundedMinutes !== minutes) {
-        current.setMinutes(roundedMinutes);
-      }
-      current.setSeconds(0);
-      current.setMilliseconds(0);
-      
-      while (current < end) {
-        const year = current.getFullYear();
-        const month = String(current.getMonth() + 1).padStart(2, '0');
-        const day = String(current.getDate()).padStart(2, '0');
-        const hour = current.getHours();
-        const minute = current.getMinutes();
-        const slotIso = this.toIso(`${year}-${month}-${day}`, hour, minute);
-        slots.push({
-          doctorId: this.doctorId,
-          dateTime: slotIso,
-          isAvailable,
-          reason: isAvailable ? '' : reason
-        });
-        current.setMinutes(current.getMinutes() + 15);
-      }
-      return slots;
-    },
-    async setUnavailablePeriod() {
-      console.log('[UnavailablePeriod] submit', this.unavailablePeriod);
-      if (!this.unavailablePeriod.startDateTime || !this.unavailablePeriod.endDateTime) {
-        console.warn('[UnavailablePeriod] missing required fields', this.unavailablePeriod);
-        return;
-      }
-      const slots = this.buildSlots(
-        this.unavailablePeriod.startDateTime,
-        this.unavailablePeriod.endDateTime,
-        false,
-        this.unavailablePeriod.reason
-      );
-      console.log('[UnavailablePeriod] slots to save', slots);
-
-      try {
-        const response = await axios.post(`/api/doctoravailability/${this.doctorId}/bulk`, slots);
-        console.log('[UnavailablePeriod] response status', response.status);
-        if (!response.ok) {
-          const text = await response.text();
-          console.error('[UnavailablePeriod] error response', text);
-          throw new Error(`Opslaan mislukt: ${text}`);
-        }
-        const saved = await response.json();
-        console.log('[UnavailablePeriod] saved slots', saved);
-        saved.forEach(slot => {
-          const dt = new Date(slot.dateTime);
-          const year = dt.getFullYear();
-          const month = String(dt.getMonth() + 1).padStart(2, '0');
-          const day = String(dt.getDate()).padStart(2, '0');
-          const dateString = `${year}-${month}-${day}`;
-          const key = this.slotKey(dateString, dt.getHours(), dt.getMinutes());
-          this.availabilities[key] = slot;
-        });
-      } catch (err) {
-        console.error('[UnavailablePeriod] error', err);
-        this.error = err.message;
-      }
-
-      this.unavailablePeriod = {
-        startDateTime: '',
-        endDateTime: '',
-        reason: ''
-      };
-      this.showUnavailablePeriodModal = false;
-      this.loadAvailabilities();
-    },
-    async setAvailablePeriod() {
-      if (!this.availablePeriod.startDateTime || !this.availablePeriod.endDateTime) return;
-      const slots = this.buildSlots(
-        this.availablePeriod.startDateTime,
-        this.availablePeriod.endDateTime,
-        true
-      );
-
-      try {
-        const response = await axios.post(`/api/doctoravailability/${this.doctorId}/bulk`, slots);
-        if (!response.ok) throw new Error('Opslaan mislukt');
-      } catch (err) {
-        this.error = err.message;
-      }
-
-      this.availablePeriod = {
-        startDateTime: '',
-        endDateTime: ''
-      };
-      this.showAvailablePeriodModal = false;
-      this.loadAvailabilities();
-    },
-    loadAvailabilities() {
-      this.loading = true;
-      const monday = this.getMondayOfWeek(this.currentDate);
-      monday.setHours(0, 0, 0, 0);
-      const sunday = new Date(monday);
-      sunday.setDate(sunday.getDate() + 6);
-      const endOfSunday = new Date(sunday);
-      endOfSunday.setHours(23, 59, 59, 999);
-
-      // Use local ISO without timezone to align with stored values
-      const startDate = this.toLocalIsoFromDate(monday);
-      const endDate = this.toLocalIsoFromDate(endOfSunday);
-
-      axios.get(`/api/doctoravailability/${this.doctorId}?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`)
-        .then(response => {
-          if (!response.ok) throw new Error('Kon beschikbaarheid niet laden');
-          return response.json();
-        })
-        .then(data => {
-          this.availabilities = {};
-          data.forEach(slot => {
-            const dt = new Date(slot.dateTime);
-            const year = dt.getFullYear();
-            const month = String(dt.getMonth() + 1).padStart(2, '0');
-            const day = String(dt.getDate()).padStart(2, '0');
-            const dateString = `${year}-${month}-${day}`;
-            const hour = dt.getHours();
-            const minute = dt.getMinutes();
-            const key = this.slotKey(dateString, hour, minute);
-            this.availabilities[key] = {
-              ...slot,
-              reason: slot.reason || '',
-              isAvailable: slot.isAvailable
-            };
-          });
-          console.log('[loadAvailabilities] loaded', Object.keys(this.availabilities).length, 'slots', this.availabilities);
-          this.loading = false;
-        })
-        .catch(error => {
-          this.error = error.message;
-          this.loading = false;
-        });
-    }
-  },
-  mounted() {
-    console.log('DoctorCalendar mounted with doctorId:', this.doctorId);
-    this.loadAvailabilities();
+// --- Computed Properties ---
+const weekDays = computed(() => {
+  const monday = getMondayOfWeek(currentDate.value);
+  const days = [];
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(monday);
+    date.setDate(date.getDate() + i);
+    days.push({
+      date: date.toISOString().split('T')[0],
+      name: dayNames.value[i], // .value gebruiken
+      fullDate: date
+    });
   }
+  return days;
+});
+
+const weekRange = computed(() => {
+  const monday = getMondayOfWeek(currentDate.value);
+  const sunday = new Date(monday);
+  sunday.setDate(sunday.getDate() + 6);
+  const fmt = (d) => `${pad(d.getDate())}-${pad(d.getMonth() + 1)}-${d.getFullYear()}`;
+  return `${fmt(monday)} tot ${fmt(sunday)}`;
+});
+
+// --- Helper Functies ---
+const isHourBoundary = (minute) => minute === 0;
+const slotKey = (dateString, hour, minute) => `${dateString}T${pad(hour)}:${pad(minute)}:00`;
+
+// Genereert slots voor de database
+const buildSlots = (startIso, endIso, isAvailable, reason = '') => {
+  const slots = [];
+  let current = new Date(startIso);
+  const end = new Date(endIso);
+  
+  // Afronden op 15 min
+  const mins = current.getMinutes();
+  const rounded = Math.round(mins / 15) * 15;
+  if (rounded !== mins) current.setMinutes(rounded);
+  current.setSeconds(0);
+  current.setMilliseconds(0);
+  
+  while (current < end) {
+    const y = current.getFullYear();
+    const m = pad(current.getMonth() + 1);
+    const d = pad(current.getDate());
+    const h = current.getHours();
+    const min = current.getMinutes();
+    const iso = toIso(`${y}-${m}-${d}`, h, min);
+    
+    slots.push({
+      doctorId: doctorId.value, // .value gebruiken
+      dateTime: iso,
+      isAvailable,
+      reason: isAvailable ? '' : reason
+    });
+    current.setMinutes(current.getMinutes() + 15);
+  }
+  return slots;
 };
+
+// --- Watcher voor formulieren ---
+watch(() => unavailablePeriod.value.startDateTime, (val) => {
+  if (val) {
+    const options = getUnavailablePeriodEndTimes();
+    if (options.length > 0) unavailablePeriod.value.endDateTime = options[0];
+  }
+});
+
+// --- Navigatie Methodes ---
+const previousWeek = () => {
+  const d = new Date(currentDate.value);
+  d.setDate(d.getDate() - 7);
+  currentDate.value = d;
+  loadAvailabilities();
+};
+
+const nextWeek = () => {
+  const d = new Date(currentDate.value);
+  d.setDate(d.getDate() + 7);
+  currentDate.value = d;
+  loadAvailabilities();
+};
+
+const goToToday = () => {
+  currentDate.value = new Date();
+  loadAvailabilities();
+};
+
+// --- Kalender Lookup Methodes ---
+const isSlotUnavailable = (date, hour, min) => availabilities.value[slotKey(date, hour, min)]?.isAvailable === false;
+
+const getSlotReason = (date, hour, min) => {
+  const res = availabilities.value[slotKey(date, hour, min)]?.reason || '';
+  return res.length > 15 ? res.substring(0, 15) + '...' : res;
+};
+
+const selectSlot = (date, hour, min) => {
+  const key = slotKey(date, hour, min);
+  selectedSlot.value = {
+    date, hour, minute: min,
+    isAvailable: availabilities.value[key]?.isAvailable !== false,
+    reason: availabilities.value[key]?.reason || '',
+    endTime: ''
+  };
+  showHourModal.value = true;
+};
+
+// --- Tijd opties voor modals ---
+const getEndTimesForSlot = () => selectedSlot.value ? getTimesFrom(selectedSlot.value.hour, selectedSlot.value.minute) : [];
+const getUnavailableEndTimes = () => getEndTimesForSlot();
+
+const getUnavailablePeriodEndTimes = () => {
+  if (!unavailablePeriod.value.startDateTime) return [];
+  const start = new Date(unavailablePeriod.value.startDateTime);
+  const times = [];
+  let current = new Date(start);
+  const limit = getMaxDate(unavailablePeriod.value.startDateTime);
+  
+  while (true) {
+    current.setMinutes(current.getMinutes() + 15);
+    const dateStr = current.toISOString().split('T')[0];
+    if (dateStr > limit) break;
+    times.push(toLocalIsoFromDate(current));
+  }
+  return times;
+};
+
+// --- API Interactie ---
+const loadAvailabilities = async () => {
+  loading.value = true;
+  const monday = getMondayOfWeek(currentDate.value);
+  const sunday = new Date(monday);
+  sunday.setDate(sunday.getDate() + 7);
+
+  try {
+    const { data } = await axios.get(`/api/doctoravailability/${doctorId.value}`, {
+      params: { startDate: toLocalIsoFromDate(monday), endDate: toLocalIsoFromDate(sunday) }
+    });
+    const map = {};
+    data.forEach(s => { map[s.dateTime] = { ...s, reason: s.reason || '' }; });
+    availabilities.value = map;
+  } catch (err) { error.value = err.message; }
+  finally { loading.value = false; }
+};
+
+const saveSlot = async () => {
+  if (!selectedSlot.value) return;
+  const startIso = toIso(selectedSlot.value.date, selectedSlot.value.hour, selectedSlot.value.minute);
+  let endIso;
+
+  if (selectedSlot.value.endTime) {
+    const [h, m] = selectedSlot.value.endTime.split(':').map(Number);
+    endIso = toIso(selectedSlot.value.date, h, m);
+  } else {
+    const t = new Date(startIso);
+    t.setMinutes(t.getMinutes() + 15);
+    endIso = toLocalIsoFromDate(t);
+  }
+
+  const slots = buildSlots(startIso, endIso, selectedSlot.value.isAvailable, selectedSlot.value.reason);
+  try {
+    await axios.post(`/api/doctoravailability/${doctorId.value}/bulk`, slots);
+    showHourModal.value = false;
+    loadAvailabilities();
+  } catch (err) { alert("Fout bij opslaan: " + err.message); }
+};
+
+const deleteSlot = async () => {
+  if (!selectedSlot.value) return;
+  const iso = toIso(selectedSlot.value.date, selectedSlot.value.hour, selectedSlot.value.minute);
+  try {
+    await axios.delete(`/api/doctoravailability/${doctorId.value}`, { params: { dateTime: iso } });
+    showHourModal.value = false;
+    loadAvailabilities();
+  } catch (err) { alert("Verwijderen mislukt"); }
+};
+
+const setUnavailablePeriod = async () => {
+  try {
+    if (!unavailablePeriod.value.startDateTime || !unavailablePeriod.value.endDateTime) return;
+    const slots = buildSlots(unavailablePeriod.value.startDateTime, unavailablePeriod.value.endDateTime, false, unavailablePeriod.value.reason);
+    
+    console.log('Onbeschikbare slots:', slots);
+
+    const response = await axios.post(`/api/doctoravailability/${doctorId.value}/bulk`, slots);
+    console.log('Server antwoord:', response.data);
+    showUnavailablePeriodModal.value = false;
+    unavailablePeriod.value = { startDateTime: '', endDateTime: '', reason: '' };
+    loadAvailabilities();
+  } catch (err) { alert(err.message); }
+};
+
+const setAvailablePeriod = async () => {
+  try {
+    if (!availablePeriod.value.startDateTime || !availablePeriod.value.endDateTime) return;
+    const slots = buildSlots(availablePeriod.value.startDateTime, availablePeriod.value.endDateTime, true);
+    
+    console.log('Beschikbare slots:', slots);
+  
+    const response = await axios.post(`/api/doctoravailability/${doctorId.value}/bulk`, slots);
+    console.log('Server antwoord:', response.data);
+    showAvailablePeriodModal.value = false;
+    availablePeriod.value = { startDateTime: '', endDateTime: '' };
+    loadAvailabilities();
+  } catch (err) { alert(err.message); }
+};
+
+// --- Lifecycle ---
+onMounted(loadAvailabilities);
 </script>
 
 <style scoped>

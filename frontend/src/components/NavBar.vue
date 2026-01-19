@@ -4,7 +4,13 @@
       <li v-if="userRole === 'Specialist'" class="nav-center-buttons">
           <RouterLink to="/agenda" aria-current="page">Agenda</RouterLink>
       </li>
-      <li v-else-if="userRole === 'Patient'" class="nav-center-buttons">
+      <li v-if="userRole === 'Specialist'" class="nav-center-buttons">
+          <RouterLink to="/patienten" aria-current="page">Patiënten</RouterLink>
+      </li>
+      <li v-else-if="userRole === 'Huisarts'" class="nav-center-buttons">
+          <RouterLink to="/patienten" aria-current="page">Patiënten</RouterLink>
+      </li>
+      <li v-else-if="userRole === 'Patiënt'" class="nav-center-buttons">
           <RouterLink to="/afspraken" aria-current="appointments page">Mijn afspraken</RouterLink>
       </li>
       <li v-else-if="userRole === 'Admin'" class="nav-center-buttons">

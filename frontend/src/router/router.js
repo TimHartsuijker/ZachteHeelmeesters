@@ -5,6 +5,7 @@ import AgendaView from '../views/AgendaView.vue'
 import AdminLoginView from "../views/AdminLoginView.vue";
 import AdminDashboardView from "../views/AdminDashboardView.vue";
 import UsersView from "../views/AdminUserManagementView.vue";
+import DoctorPatientsView from "../views/DoctorPatientsView.vue";
 
 const routes = [
   { 
@@ -42,6 +43,12 @@ const routes = [
     name: "AdminUsers",
     component: UsersView,
     meta: { requiresAuth: true, allowedRoles: ['Admin'] },
+  },
+  {
+    path: "/patienten",
+    name: "DoctorPatients",
+    component: DoctorPatientsView,
+    meta: { requiresAuth: true, allowedRoles: ['Huisarts', 'Specialist'] },
   }
 ]
 

@@ -22,6 +22,8 @@ services:
       dockerfile: Dockerfile
     environment:
       - ConnectionStrings__MyConnection=${ConnectionStrings__MyConnection}
+    networks:
+      - my-project-network
     # Do not publish backend directly; proxy will route /api to this service
   client:
     build:

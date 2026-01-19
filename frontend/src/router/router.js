@@ -17,7 +17,8 @@ const routes = [
   { 
     path: '/register',
     name: 'register',
-    component: RegisterView
+    component: RegisterView,
+    meta: { hideNavbar: true }
   },
   {
     path: "/admin/login",

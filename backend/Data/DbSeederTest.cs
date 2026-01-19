@@ -118,7 +118,7 @@ namespace backend.Data
                     Gender = "Man",
                     CitizenServiceNumber = "987654321",
                     CreatedAt = DateTime.UtcNow,
-                    RoleId = doctorRole.Id
+                    RoleId = generalPracticioner.Id
                 };
 
                 doctor.PasswordHash = passwordHasher.HashPassword(doctor, "Huisarts123");
@@ -143,7 +143,7 @@ namespace backend.Data
                     Gender = "Man",
                     CitizenServiceNumber = "987654322",
                     CreatedAt = DateTime.UtcNow,
-                    RoleId = doctorRole.Id
+                    RoleId = generalPracticioner.Id
                 };
 
                 doctor.PasswordHash = passwordHasher.HashPassword(doctor, "Huisarts123");

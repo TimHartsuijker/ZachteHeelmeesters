@@ -57,7 +57,7 @@ namespace backend.Controllers
             }
 
             // 4️⃣ Haal Patient role op
-            var patientRole = _context.Roles.FirstOrDefault(r => r.RoleName == "Patient");
+            var patientRole = _context.Roles.FirstOrDefault(r => r.RoleName == "Patiënt");
             if (patientRole == null)
             {
                 return BadRequest(new { message = "Rol Patiënt niet gevonden, seed de database." });

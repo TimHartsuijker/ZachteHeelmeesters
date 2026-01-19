@@ -95,7 +95,7 @@ public class _4_20_2
             // ===== LOGOUT AND SECOND USER LOGIN =====
 
             // Step 8: Logout by navigating back to login page
-            driver.Navigate().GoToUrl("http://localhost:5173/");
+            driver.Navigate().GoToUrl("http://localhost/login");
             Console.WriteLine("LOG [Step 8] Logged out (navigated back to login page).");
 
             // Step 9: Login as second user (Doctor)

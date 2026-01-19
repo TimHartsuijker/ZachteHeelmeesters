@@ -9,37 +9,46 @@
         <!-- Voornaam -->
         <div class="register-view-form-group">
           <label for="firstname">Voornaam:</label>
-          <input type="text" id="firstname" v-model="firstName" />
+          <input type="text" id="firstname" v-model="firstName" placeholder="Pink" />
         </div>
 
         <!-- Achternaam -->
         <div class="register-view-form-group">
           <label for="lastname">Achternaam:</label>
-          <input type="text" id="lastname" v-model="lastName" />
+          <input type="text" id="lastname" v-model="lastName" placeholder="Eltje" />
         </div>
 
         <!-- Straatnaam -->
         <div class="register-view-form-group">
           <label for="street">Straatnaam:</label>
-          <input type="text" id="street" v-model="streetName" />
+          <input type="text" id="street" v-model="streetName" placeholder="Dicklaanstraat" />
         </div>
 
         <!-- Huisnummer -->
         <div class="register-view-form-group">
           <label for="houseNumber">Huisnummer:</label>
-          <input type="text" id="houseNumber" v-model="houseNumber" />
+          <input type="text" id="houseNumber" v-model="houseNumber" placeholder="73A" />
         </div>
 
         <!-- Postcode -->
         <div class="register-view-form-group">
           <label for="postalCode">Postcode:</label>
-          <input type="text" id="postalCode" v-model="postalCode" />
+          <input type="text" minlength="6" maxlength="6" id="postalCode" v-model="postalCode" placeholder="1939AD"  />
         </div>
 
         <!-- BSN -->
         <div class="register-view-form-group">
           <label for="csn">Burgerservicenummer:</label>
-          <input type="text" id="csn" v-model="citizenServiceNumber" />
+          <input 
+            type="text"
+            inputmode="numeric"
+            minlength="9"
+            maxlength="9"
+            placeholder="018941218" 
+            id="csn" 
+            v-model="citizenServiceNumber" 
+            @input="citizenServiceNumber = citizenServiceNumber.replace(/\D/g, '')"
+          />
         </div>
 
         <!-- Geboortedatum -->
@@ -62,7 +71,14 @@
         <!-- Telefoon -->
         <div class="register-view-form-group">
           <label for="phone">Telefoonnummer:</label>
-          <input type="text" id="phone" v-model="phoneNumber" />
+          <input type="text" 
+            minlength="10" 
+            maxlength="10" 
+            id="phone" 
+            v-model="phoneNumber" 
+            placeholder="0630569461" 
+            @input="phoneNumber = phoneNumber.replace(/\D/g, '')"
+          />
         </div>
 
         <!-- Huisarts -->
@@ -80,7 +96,7 @@
         <!-- Email -->
         <div class="register-view-form-group">
           <label for="email">Email:</label>
-          <input type="text" id="email" v-model="email" />
+          <input type="email" id="email" v-model="email" placeholder="pink.eltje@gmail.com"/>
         </div>
 
         <!-- Wachtwoord -->
@@ -141,16 +157,22 @@ const isSubmitting = ref(false);
 const doctors = ref([])
 const fetchDoctors = async () => {
   try {
-    const response = await fetch('https://localhost:7240/api/doctors')
-    if (!response.ok) throw new Error('Failed to fetch doctors')
-    doctors.value = await response.json()
+    // Axios haalt de data op en parseert deze automatisch naar JSON
+    const response = await axios.get('/api/doctors');
+    
+    // Bij Axios gebruik je response.data in plaats van response.json()
+    doctors.value = response.data;
+    
+    console.log('Doctors fetched:', doctors.value);
   } catch (error) {
-    console.error('Error fetching doctors:', error)
+    console.error('Error fetching doctors:', error);
+    
+    // Foutafhandeling
     doctors.value = [
       { id: null, firstName: 'Failed to fetch', lastName: 'doctors' }
-    ]
+    ];
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
@@ -170,10 +192,12 @@ const register = async () => {
     return;
   }
 
-  isSubmitting.value = true; // Start loading
+  isSubmitting.value = true;
 
   try {
-    const response = await axios.post("https://localhost:7240/api/register", {
+    // GEBRUIK HIER EEN RELATIEVE URL:
+    // Dus GEEN https://localhost:7240. De browser stuurt dit nu naar de Nginx proxy (poort 80)
+    const response = await axios.post("/api/register", {
       firstName: firstName.value,
       lastName: lastName.value,
       streetName: streetName.value,
@@ -197,6 +221,9 @@ const register = async () => {
     }
   } catch (error) {
     isSubmitting.value = false;
+    // Verbeterde error logging voor debugging
+    console.error("Registratie fout:", error.response || error);
+    
     if (error.response?.data?.message) {
       registerErrorMessage.value = error.response.data.message;
     } else {

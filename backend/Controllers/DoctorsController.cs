@@ -24,8 +24,13 @@ namespace backend.Controllers
         {
             try
             {
+                var doctorRoleId = await _context.Roles
+                    .Where(r => r.RoleName == "Huisarts")
+                    .Select(r => r.Id)
+                    .FirstOrDefaultAsync();
+
                 var doctors = await _context.Users
-                    .Where(u => u.RoleId == 3) 
+                    .Where(u => u.RoleId == doctorRoleId) 
                     .Select(u => new DoctorResponseDto
                     {
                         Id = u.Id,

@@ -11,7 +11,7 @@ namespace SeleniumTests.P_O_M
             this.driver = driver;
         }
 
-        public static string Url => "http://localhost:5173/register";
+        public static string Url => "http://localhost/register";
 
         private static By FirstNameInput => By.Id("firstname");
         private static By LastNameInput => By.Id("lastname");

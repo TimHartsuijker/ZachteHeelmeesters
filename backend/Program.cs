@@ -27,7 +27,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("frontend", builder =>
     {
-        builder.WithOrigins("http://localhost:5173", "http://localhost:5174", "http://localhost:3000", "http://localhost:5016")
+        builder.WithOrigins("http://localhost")
                .AllowAnyMethod()
                .AllowAnyHeader()
                .AllowCredentials();
@@ -54,22 +54,16 @@ try
 catch (Exception ex)
 {
     Console.WriteLine($"FOUT BIJ MIGRATIE: {ex.Message}");
-    // De app start nu in ieder geval wel op, ook als de db faalt
 }
 
-// Middleware pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// Apply CORS policy FIRST before any other middleware
 app.UseCors("frontend");
 
-app.UseHttpsRedirection();
-
-// Session middleware toevoegen
 app.UseSession();
 
 app.UseAuthorization();
@@ -77,5 +71,4 @@ app.UseAuthentication();
 
 app.MapControllers();
 
-// 5️⃣ App starten
 app.Run();

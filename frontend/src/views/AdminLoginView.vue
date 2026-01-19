@@ -54,7 +54,7 @@ async function loginAdmin() {
 
   try {
     const response = await axios.post(
-      "https://localhost:7240/api/login/admin",
+      "/api/login/admin",
       {
         email: email.value,
         wachtwoord: wachtwoord.value,

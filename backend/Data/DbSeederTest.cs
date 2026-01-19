@@ -29,12 +29,16 @@ namespace backend.Data
                     StreetName = "Teststraat",
                     HouseNumber = "1",
                     PostalCode = "1234AB",
+                    CitizenServiceNumber = "123456789",
+                    DateOfBirth = new DateTime(2000, 1, 1),
+                    Gender = "Man",
                     PhoneNumber = "0612345678",
                     DateOfBirth = DateTime.MinValue,
                     Gender = "Vrouw",
                     CitizenServiceNumber = "123456789",
                     CreatedAt = DateTime.UtcNow,
-                    RoleId = patientRole.Id
+                    RoleId = patientRole.Id,
+                    DoctorId = doctor.Id
                 };
 
                 patientUser.PasswordHash = passwordHasher.HashPassword(patientUser, "Wachtwoord123");

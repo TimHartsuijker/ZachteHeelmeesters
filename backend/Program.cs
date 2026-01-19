@@ -70,7 +70,8 @@ app.UseCors("frontend");
 app.UseSession();
 
 app.UseAuthorization();
-app.UseAuthentication();
+
+app.UseAuthorization();
 
 app.MapControllers();
 

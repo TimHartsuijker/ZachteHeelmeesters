@@ -5,6 +5,7 @@ namespace SeleniumTests.Pages;
 
 public class CalendarTestPage
 {
+    private readonly string baseUrl = "http://localhost/agenda";
     private readonly IWebDriver _driver;
     private readonly WebDriverWait _wait;
 
@@ -29,7 +30,7 @@ public class CalendarTestPage
     // Navigation
     public void Navigate()
     {
-        _driver.Navigate().GoToUrl("http://localhost:5173/agenda");
+        _driver.Navigate().GoToUrl(baseUrl);
     }
 
     // Wait for page to load

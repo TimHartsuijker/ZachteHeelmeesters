@@ -51,6 +51,7 @@ try
         if (app.Environment.IsDevelopment())
         {
             DbSeederTest.Seed(context);
+            DbSeederMedicalFiles.Seed(context);
         }
     }
 }

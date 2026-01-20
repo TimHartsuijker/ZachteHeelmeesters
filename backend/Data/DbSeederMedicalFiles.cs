@@ -17,7 +17,7 @@ namespace backend.Data
 
                 // Get test patient and doctor
                 var patient = context.Users.FirstOrDefault(u => u.Email == "gebruiker@example.com");
-                var doctor = context.Users.FirstOrDefault(u => u.Email == "dokter@example.com");
+                var doctor = context.Users.FirstOrDefault(u => u.Email == "testdoctor@example.com");
 
                 if (patient == null || doctor == null)
                 {

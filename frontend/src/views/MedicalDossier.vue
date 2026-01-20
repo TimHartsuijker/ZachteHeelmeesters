@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { reactive, ref, computed, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import NavBar from '@/components/NavBar.vue';
+
+const route = useRoute();
+const router = useRouter();
 
 interface Patient {
   name: string;
@@ -42,12 +46,13 @@ interface MedicalEntry {
 }
 
 // API Configuration
-const API_BASE_URL = 'https://localhost:7240/api'; // Backend URL from launchSettings.json
+const API_BASE_URL = '/api'; // Use relative URL with Vite proxy
 
 // Patient context
 const patient = reactive<Patient>({ name: '', age: 0, doctor: '' });
-const patientId = ref<string | null>(sessionStorage.getItem('userId'));
+const patientId = ref<string | null>(null);
 const userRole = ref<string | null>(sessionStorage.getItem('userRole'));
+const isViewingOtherPatient = ref(false);
 
 // Medical entries
 const allEntries = ref<MedicalEntry[]>([]);
@@ -124,8 +129,13 @@ const groupedEntries = computed(() => {
 
 // Check if user is a doctor
 const isDoctor = computed(() => {
-  return userRole.value === 'Doctor';
+  return userRole.value === 'Huisarts' || userRole.value === 'Specialist';
 });
+
+// Go back to patients list (only for doctors)
+const goBack = () => {
+  router.push('/patienten');
+};
 
 // Fetch patient details
 async function fetchPatientDetails() {
@@ -134,7 +144,14 @@ async function fetchPatientDetails() {
       throw new Error('Geen patientId gevonden in sessie');
     }
 
-    const response = await fetch(`${API_BASE_URL}/Login/user/${patientId.value}`);
+    // Use the medical record endpoint to get patient info
+    const response = await fetch(`/api/users/${patientId.value}/medical-record`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include'
+    });
     
     if (!response.ok) {
       throw new Error('Failed to fetch patient details');
@@ -143,11 +160,16 @@ async function fetchPatientDetails() {
     const userData = await response.json();
     
     // Update patient object with real data
-    patient.name = userData.fullName;
-    patient.age = userData.age;
-    patient.doctor = userData.doctor ? `${userData.doctor.fullName}` : 'Geen huisarts toegewezen';
+    const age = userData.dateOfBirth ? Math.floor((new Date() - new Date(userData.dateOfBirth)) / (365.25 * 24 * 60 * 60 * 1000)) : 0;
+    patient.name = `${userData.firstName} ${userData.lastName}`;
+    patient.age = age;
+    patient.doctor = 'Huisarts';
   } catch (err) {
     console.error('Error fetching patient details:', err);
+    // Set defaults if fetch fails
+    patient.name = 'Patiënt';
+    patient.age = 0;
+    patient.doctor = 'Onbekend';
   }
 }
 
@@ -161,7 +183,9 @@ async function fetchDossierEntries() {
       throw new Error('Geen patientId gevonden in sessie');
     }
 
-    const response = await fetch(`${API_BASE_URL}/MedicalDossier/patient/${patientId.value}`);
+    const response = await fetch(`/api/MedicalDossier/patient/${patientId.value}`, {
+      credentials: 'include'
+    });
     
     if (!response.ok) {
       throw new Error('Failed to fetch dossier entries');
@@ -183,7 +207,9 @@ async function fetchTreatments() {
       throw new Error('Geen patientId gevonden in sessie');
     }
 
-    const response = await fetch(`${API_BASE_URL}/MedicalDossier/patient/${patientId.value}/treatments`);
+    const response = await fetch(`/api/MedicalDossier/patient/${patientId.value}/treatments`, {
+      credentials: 'include'
+    });
     
     if (response.ok) {
       treatments.value = await response.json();
@@ -196,7 +222,9 @@ async function fetchTreatments() {
 // Download file
 async function downloadFile(fileId: number, fileName: string) {
   try {
-    const response = await fetch(`${API_BASE_URL}/MedicalDossier/file/${fileId}`);
+    const response = await fetch(`/api/MedicalDossier/file/${fileId}`, {
+      credentials: 'include'
+    });
     
     if (!response.ok) {
       throw new Error('Failed to download file');
@@ -266,6 +294,16 @@ function getFileColor(contentType: string): string {
 
 // Load data on mount
 onMounted(() => {
+  // Check if viewing another patient's dossier (doctor view)
+  if (route.params.patientId) {
+    patientId.value = String(route.params.patientId);
+    isViewingOtherPatient.value = true;
+  } else {
+    // View own dossier (patient view)
+    patientId.value = sessionStorage.getItem('userId');
+    isViewingOtherPatient.value = false;
+  }
+  
   fetchPatientDetails();
   fetchTreatments();
   fetchDossierEntries();
@@ -281,6 +319,13 @@ onMounted(() => {
     <div class="flex-1 flex flex-col items-center">
       <!-- Content wrapper with 70% width -->
       <div class="content-wrapper">
+        <!-- Back Button (only for doctors) -->
+        <div v-if="isDoctor && isViewingOtherPatient" class="mb-4">
+          <button @click="goBack" class="back-button">
+            ← Terug naar patiënten
+          </button>
+        </div>
+
         <!-- Header and Filter Container -->
         <div class="info-container">
           <!-- Header Card -->
@@ -670,6 +715,24 @@ onMounted(() => {
   .file-card {
     font-size: 1.05rem;
   }
+}
+
+.back-button {
+  background-color: #B0DB9C;
+  color: #222;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background-color 0.3s ease;
+  margin-bottom: 1rem;
+  margin-top: 1rem;
+}
+
+.back-button:hover {
+  background-color: #9ecb8c;
 }
 </style>
 

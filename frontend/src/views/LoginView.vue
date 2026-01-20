@@ -84,37 +84,46 @@ const login = async () => {
       const userData = response.data.user;
       console.log("Login gelukt!", response.data);
 
-          // Sessie opslaan
-          sessionStorage.setItem("isLoggedIn", "true");
-          // Bewaar userId voor dossier requests
-          if (response.data?.user?.id) {
-            sessionStorage.setItem("userId", String(response.data.user.id));
-          }
-          if (response.data?.user?.role) {
-            sessionStorage.setItem("userRole", response.data.user.role);
-          }
+      // Sessie opslaan
+      sessionStorage.setItem("isLoggedIn", "true");
+      if (userData?.id) {
+        sessionStorage.setItem("userId", String(userData.id));
+      }
+      if (userData?.role) {
+        sessionStorage.setItem("userRole", userData.role);
+      }
 
-          // Redirect naar dossier
-          this.$router.push('/dossier');
-        }
-      } catch (error) {
-        // Detailed error logging
-        console.error("Login error details:", {
-          message: error.message,
-          status: error.response?.status,
-          data: error.response?.data,
-          headers: error.response?.headers,
-          config: error.config
-        });
+      // Redirect op basis van rol
+      switch (userData?.role) {
+        case "Specialist":
+        case "Huisarts":
+          router.push("/patienten");
+          break;
+        case "Admin":
+          router.push("/admin/dashboard");
+          break;
+        default:
+          router.push("/dashboard");
+          break;
+      }
+    }
+  } catch (error) {
+    // Detailed error logging
+    console.error("Login error details:", {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data,
+      headers: error.response?.headers,
+      config: error.config
+    });
 
-        // Foutmelding van backend (401/400)
-        if (error.response && error.response.data && error.response.data.message) {
-          this.loginErrorMessage = error.response.data.message;
-        } else if (error.code === 'ERR_NETWORK') {
-          this.loginErrorMessage = "Verbindingsfout met server. Zorg dat de backend draait op https://localhost:7240";
-        } else {
-          this.loginErrorMessage = "Er is iets misgegaan bij het inloggen.";
-        }
+    if (error.response?.data?.message) {
+      loginErrorMessage.value = error.response.data.message;
+    } else if (error.code === 'ERR_NETWORK') {
+      loginErrorMessage.value = "Verbindingsfout met server. Zorg dat de backend draait";
+    } else {
+      loginErrorMessage.value = "Er is iets misgegaan bij het inloggen.";
+    }
 
     loginError.value = true;
   }

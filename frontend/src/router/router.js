@@ -13,7 +13,8 @@ const routes = [
   { 
     path: '/login', 
     name: 'login',
-    component: LoginView
+    component: LoginView,
+    meta: { hideNavbar: true }
   },
   {
     path: '/dossier',
@@ -21,11 +22,16 @@ const routes = [
     component: MedicalDossier
   },
   {
+    path: '/dossier/:patientId',
+    name: 'dossier-patient',
+    component: MedicalDossier,
+    meta: { requiresAuth: true, allowedRoles: ['Huisarts', 'Specialist'] }
+  },
+  {
     path: '/doctor/upload',
     name: 'doctor-upload',
-    component: DoctorUpload
-    component: LoginView,
-    meta: { hideNavbar: true }
+    component: DoctorUpload,
+    meta: { requiresAuth: true, allowedRoles: ['Huisarts', 'Specialist'] }
   },
   {
     path: "/admin/login",

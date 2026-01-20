@@ -20,9 +20,9 @@
               <span v-if="patient.phoneNumber" class="detail-item">{{ patient.phoneNumber }}</span>
             </div>
           </div>
-          <button @click="openMedicalRecord(patient.id)" class="btn-view-record">
+          <RouterLink :to="`/dossier/${patient.id}`" class="btn-view-record" role="button">
             Dossier Openen →
-          </button>
+          </RouterLink>
         </div>
       </div>
     </div>

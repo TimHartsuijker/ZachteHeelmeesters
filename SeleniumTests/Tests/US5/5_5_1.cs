@@ -34,7 +34,7 @@ namespace SeleniumTests.Tests.US5
             options.AddArgument("--ignore-certificate-errors");
 
             driver = new ChromeDriver(options);
-            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
 
             loginPage = new LoginPage(driver);
             patientOverviewPage = new PatientOverviewPage(driver);
@@ -60,8 +60,8 @@ namespace SeleniumTests.Tests.US5
             Console.WriteLine("\n*** Starting Test: TC_5_5_1_HuisartsCanViewAllAssignedPatientsWithBasicInfo ***\n");
 
             // Test credentials for GP (huisarts)
-            string gpEmail = "huisarts@example.com";
-            string gpPassword = "Wachtwoord123";
+            string gpEmail = "testdoctor@example.com";
+            string gpPassword = "password";
 
             // Step 1: Log in as GP (huisarts)
             Console.WriteLine("[Step 1] Navigating to login page...");

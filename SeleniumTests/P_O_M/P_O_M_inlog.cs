@@ -20,6 +20,7 @@ namespace SeleniumTests.P_O_M
         private By EmailInput => By.Id("email");
         private By PasswordInput => By.Id("wachtwoord");
         private By LoginButton => By.Id("login-btn"); 
+        private By AdminLoginLink => By.CssSelector(".admin-login-link");
 
 
         public void Navigate()
@@ -51,6 +52,36 @@ namespace SeleniumTests.P_O_M
         {
             var button = wait.Until(d => d.FindElement(LoginButton));
             button.Click();
+        }
+
+        public bool IsLoginPageDisplayed()
+        {
+            try
+            {
+                return driver.FindElement(EmailInput).Displayed && driver.FindElement(PasswordInput).Displayed;
+            }
+            catch (NoSuchElementException)
+            {
+                return false;
+            }
+        }
+
+        public bool IsAdminLoginLinkDisplayed()
+        {
+            try
+            {
+                return driver.FindElement(AdminLoginLink).Displayed;
+            }
+            catch (NoSuchElementException)
+            {
+                return false;
+            }
+        }
+
+        public void ClickAdminLogin()
+        {
+            var link = wait.Until(d => d.FindElement(AdminLoginLink));
+            link.Click();
         }
 
         public void LoginAsPatient(string email, string password)

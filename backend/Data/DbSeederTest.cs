@@ -78,6 +78,37 @@ namespace backend.Data
                 Console.WriteLine($"[DbSeederTest] Patient user already exists with ID: {patientUser.Id}");
             }
 
+            // Tweede testpatiënt voor US5.5 (mag leeg dossier hebben)
+            var patientUserB = context.Users.FirstOrDefault(u => u.Email == "patient2@example.com");
+            if (patientUserB == null)
+            {
+                patientUserB = new User
+                {
+                    FirstName = "Test",
+                    LastName = "PatiëntB",
+                    Email = "patient2@example.com",
+                    StreetName = "Teststraat",
+                    HouseNumber = "2",
+                    PostalCode = "1234AB",
+                    CitizenServiceNumber = "987654321",
+                    DateOfBirth = new DateTime(2001, 2, 2),
+                    Gender = "Vrouw",
+                    PhoneNumber = "0612345679",
+                    CreatedAt = DateTime.UtcNow,
+                    RoleId = patientRole.Id,
+                    DoctorId = doctorUser?.Id
+                };
+
+                patientUserB.PasswordHash = passwordHasher.HashPassword(patientUserB, "Wachtwoord123");
+                context.Users.Add(patientUserB);
+                context.SaveChanges();
+                Console.WriteLine($"[DbSeederTest] Created second Patient user with ID: {patientUserB.Id}");
+            }
+            else
+            {
+                Console.WriteLine($"[DbSeederTest] Second Patient user already exists with ID: {patientUserB.Id}");
+            }
+
             // Admin user seeden
             if (!context.Users.Any(u => u.Email == "admin@example.com"))
             {

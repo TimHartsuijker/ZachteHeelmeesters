@@ -1,5 +1,7 @@
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace SeleniumTests.P_O_M
 {
@@ -11,11 +13,11 @@ namespace SeleniumTests.P_O_M
         public static string Url => "http://localhost:5173/patienten";
 
         // Locators
-        private static By PageHeader => By.XPath("//h1[contains(text(), 'Patiëntenoverzicht') or contains(text(), 'Patiënten')]");
-        private static By PatientList => By.ClassName("patient-list");
-        private static By PatientCards => By.ClassName("patient-card");
+        private static By PageHeader => By.XPath("//h1[contains(text(), 'Mijn patiënten') or contains(text(), 'Patiënten')]");
+        private static By PatientList => By.ClassName("patients-list");
+        private static By PatientCards => By.ClassName("patient-row");
         private static By PatientName => By.ClassName("patient-name");
-        private static By PatientDateOfBirth => By.ClassName("patient-dob");
+        private static By PatientDetails => By.ClassName("patient-details");
         private static By LoadingIndicator => By.ClassName("loading");
         private static By ErrorMessage => By.CssSelector(".error, .error-message");
 
@@ -117,8 +119,10 @@ namespace SeleniumTests.P_O_M
                 var patientCards = driver.FindElements(PatientCards);
                 foreach (var card in patientCards)
                 {
-                    var dob = card.FindElement(PatientDateOfBirth);
-                    if (string.IsNullOrWhiteSpace(dob.Text))
+                    // first detail span is date
+                    var details = card.FindElement(PatientDetails);
+                    var spans = details.FindElements(By.TagName("span"));
+                    if (spans.Count == 0 || string.IsNullOrWhiteSpace(spans[0].Text))
                     {
                         return false;
                     }
@@ -156,9 +160,9 @@ namespace SeleniumTests.P_O_M
             }
         }
 
-        public IReadOnlyCollection<IWebElement> GetAllPatientCards()
+        public List<IWebElement> GetAllPatientCards()
         {
-            return driver.FindElements(PatientCards);
+            return driver.FindElements(PatientCards).ToList();
         }
     }
 }

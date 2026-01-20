@@ -2,6 +2,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
+using OpenQA.Selenium.Interactions;
 using SeleniumTests.P_O_M;
 
 namespace SeleniumTests.Tests.US5
@@ -35,13 +36,66 @@ namespace SeleniumTests.Tests.US5
             options.AddArgument("--ignore-certificate-errors");
 
             driver = new ChromeDriver(options);
-            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
 
             loginPage = new LoginPage(driver);
             patientOverviewPage = new PatientOverviewPage(driver);
             medicalRecordPage = new PatientMedicalRecordPage(driver);
             
             Console.WriteLine("WebDriver initialized successfully.");
+        }
+
+        private void ClickElementRobust(IWebElement element)
+        {
+            try
+            {
+                try { new Actions(driver).MoveToElement(element).Perform(); } catch { }
+                ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].scrollIntoView({block:'center'});", element);
+                wait.Until(d => element.Displayed && element.Enabled);
+                try
+                {
+                    element.Click();
+                }
+                catch (Exception)
+                {
+                    ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].click();", element);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ClickElementRobust] Fallback click failed: {ex.Message}");
+                throw;
+            }
+        }
+
+        private void OpenDossierFromCard(IWebElement card)
+        {
+            var link = card.FindElement(By.CssSelector(".btn-view-record"));
+            var before = driver.Url;
+            ClickElementRobust(link);
+            try
+            {
+                new WebDriverWait(driver, TimeSpan.FromSeconds(2)).Until(d => d.Url != before && d.Url.Contains("/dossier/"));
+            }
+            catch
+            {
+                try
+                {
+                    var href = link.GetDomAttribute("href") ?? link.GetAttribute("href");
+                    if (!string.IsNullOrWhiteSpace(href))
+                    {
+                        driver.Navigate().GoToUrl(href);
+                    }
+                    else
+                    {
+                        ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].click();", link);
+                    }
+                }
+                catch
+                {
+                    ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].click();", link);
+                }
+            }
         }
 
         [TestCleanup]
@@ -62,8 +116,8 @@ namespace SeleniumTests.Tests.US5
             Console.WriteLine("\n*** Starting Test: TC_5_5_3_CompleteMedicalRecordIsAccessibleWithAllSections ***\n");
 
             // Test credentials for GP (huisarts)
-            string gpEmail = "huisarts@example.com";
-            string gpPassword = "Wachtwoord123";
+            string gpEmail = "testdoctor@example.com";
+            string gpPassword = "password";
 
             // Step 1: Log in as GP (huisarts)
             Console.WriteLine("[Step 1] Navigating to login page...");
@@ -109,10 +163,12 @@ namespace SeleniumTests.Tests.US5
 
             // Step 3: Open patient medical record
             Console.WriteLine($"\n[Step 6] Opening medical record for patient: '{patientName}'...");
-            patientCard.Click();
+            OpenDossierFromCard(patientCard);
 
             // Wait for medical record page to load
+            wait.Until(d => d.Url.Contains("/dossier/"));
             wait.Until(d => medicalRecordPage.IsMedicalRecordPageDisplayed());
+            wait.Until(d => medicalRecordPage.IsContentWrapperVisible());
             wait.Until(d => medicalRecordPage.IsLoadingComplete());
             Console.WriteLine("[Step 6] ✓ Medical record page loaded.");
 

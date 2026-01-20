@@ -22,7 +22,7 @@ public class US2_12_9
 
             // Step 2: Navigate to portal and login as patient with empty dossier
             Console.WriteLine("LOG [Step 2] Navigate to portal and login as patient with empty dossier");
-            helpers.LoginAndNavigateToDossier("leegdossier@example.com", "Wachtwoord123");
+            helpers.LoginAndNavigateToDossier("gebruiker@example.com", "Wachtwoord123");
 
             // Step 3: Verify dossier page is open
             Console.WriteLine("LOG [Step 3] Verify patient dossier page opens");

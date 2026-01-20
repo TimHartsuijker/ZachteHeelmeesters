@@ -64,7 +64,7 @@ namespace SeleniumTests
             Console.WriteLine("Emailveld heeft focus.");
 
             // Tekst invoeren
-            string testEmail = "test@example.com";
+            string testEmail = "gebruiker@example.com";
             Console.WriteLine($"Email invoeren: {testEmail}");
             loginPage.EnterEmail(testEmail);
 

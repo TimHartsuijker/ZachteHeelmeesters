@@ -1,5 +1,6 @@
 ﻿using backend.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend.Data
 {
@@ -11,11 +12,29 @@ namespace backend.Data
 
             var passwordHasher = new PasswordHasher<User>();
 
-            var patientRole = context.Roles.First(r => r.RoleName == "Patiënt");
-            var doctorRole = context.Roles.First(r => r.RoleName == "Specialist");
-            var generalPracticioner = context.Roles.First(r => r.RoleName == "Huisarts");
-            var adminRole = context.Roles.First(r => r.RoleName == "Admin");
+            // Veilige manier om rollen op te halen of aan te maken
+            Role GetOrCreateRole(string name)
+            {
+                var role = context.Roles.FirstOrDefault(r => r.RoleName == name);
+                if (role == null)
+                {
+                    role = new Role { RoleName = name };
+                    context.Roles.Add(role);
+                    context.SaveChanges();
+                }
+                return role;
+            }
 
+            var patientRole = GetOrCreateRole("Patiënt");
+            var specialistRole = GetOrCreateRole("Specialist");
+            var gpRole = GetOrCreateRole("Huisarts");
+            var adminRole = GetOrCreateRole("Admin");
+
+            if (patientRole == null || specialistRole == null || gpRole == null || adminRole == null)
+            {
+                Console.WriteLine("[DbSeederTest] FOUT: Een of meer rollen ontbreken. Seeder afgebroken.");
+                return;
+            }
 
             // Patient user seeden
             var patientUser = context.Users.FirstOrDefault(u => u.Email == "gebruiker@example.com");
@@ -67,7 +86,7 @@ namespace backend.Data
                     CitizenServiceNumber = "012948356",
                     Gender = "Man",
                     CreatedAt = DateTime.UtcNow,
-                    RoleId = doctorRole.Id
+                    RoleId = specialistRole.Id
                 };
 
                 doctorUser.PasswordHash = passwordHasher.HashPassword(doctorUser, "password");
@@ -121,7 +140,7 @@ namespace backend.Data
                     Gender = "Man",
                     CitizenServiceNumber = "987654321",
                     CreatedAt = DateTime.UtcNow,
-                    RoleId = generalPracticioner.Id
+                    RoleId = gpRole.Id
                 };
 
                 doctor.PasswordHash = passwordHasher.HashPassword(doctor, "Huisarts123");
@@ -146,7 +165,7 @@ namespace backend.Data
                     Gender = "Man",
                     CitizenServiceNumber = "987654322",
                     CreatedAt = DateTime.UtcNow,
-                    RoleId = generalPracticioner.Id
+                    RoleId = gpRole.Id
                 };
 
                 doctor.PasswordHash = passwordHasher.HashPassword(doctor, "Huisarts123");
@@ -163,31 +182,6 @@ namespace backend.Data
                 }
             }
 
-
-            // =====================
-            // Additional SQL-based seed (converted to EF Core)
-            // =====================
-
-            // ---------------------
-            // Seed Roles
-            // ---------------------
-            if (!context.Roles.Any(r => r.RoleName == "GeneralPractitioner"))
-            {
-                context.Roles.Add(new Role { RoleName = "GeneralPractitioner" });
-            }
-
-            if (!context.Roles.Any(r => r.RoleName == "Doctor"))
-            {
-                context.Roles.Add(new Role { RoleName = "Doctor" });
-            }
-
-            context.SaveChanges();
-
-            var gpRole = context.Roles.First(r => r.RoleName == "GeneralPractitioner");
-
-            // ---------------------
-            // Seed General Practitioner user
-            // ---------------------
             if (!context.Users.Any(u => u.Email == "gp.jansen@example.nl"))
             {
                 var gpUser = new User
@@ -201,9 +195,10 @@ namespace backend.Data
                     PhoneNumber = "0612345678",
                     CreatedAt = DateTime.UtcNow,
                     RoleId = gpRole.Id,
+                    DateOfBirth = new DateTime(1975, 5, 20),
                     PracticeName = "Jansen General Practice",
-                    //CitizenServiceNumber = "123456789",
-                    //Gender = "Man"
+                    CitizenServiceNumber = "123456789",
+                    Gender = "Man"
                 };
 
                 gpUser.PasswordHash = passwordHasher.HashPassword(gpUser, "Wachtwoord123");
@@ -217,7 +212,7 @@ namespace backend.Data
             // ---------------------
             if (!context.Users.Any(u => u.Email == "devries@example.com"))
             {
-                var patientUser = new User
+                var patientUser2 = new User
                 {
                     FirstName = "Emma",
                     LastName = "de Vries",
@@ -233,9 +228,9 @@ namespace backend.Data
                     DateOfBirth = new DateTime(1990, 1, 12)
                 };
 
-                patientUser.PasswordHash = passwordHasher.HashPassword(patientUser, "Wachtwoord123");
+                patientUser2.PasswordHash = passwordHasher.HashPassword(patientUser2, "Wachtwoord123");
 
-                context.Users.Add(patientUser);
+                context.Users.Add(patientUser2);
                 context.SaveChanges();
             }
 

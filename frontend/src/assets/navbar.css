@@ -54,6 +54,7 @@ header {
   color: var(--navbar-link-color);
   background-color: var(--navbar-bg-hover-color);
 }
+
 /* Hamburger standaard verbergen (desktop) */
 .hamburger {
   display: none;
@@ -66,13 +67,13 @@ header {
 
 /* Hamburger / dropdown voor alle schermen ≤1024px */
 @media (max-width: 1024px) {
-  .navbar {
+  .navbar-phone {
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
 
-  .hamburger {
+  .navbar-phone .hamburger {
     display: block; /* hamburger zichtbaar */
   }
 

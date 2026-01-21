@@ -35,7 +35,7 @@ namespace backend.Models
         [Required]
         public DateTime DateOfBirth { get; set; }
 
-        [AllowedValues("Man", "Vrouw", "Ander", "Zeg ik liever niet")]
+        [AllowedValues("Man", "Vrouw", "Anders")]
         public string Gender { get; set; } = null!;
 
         [MaxLength(15)]

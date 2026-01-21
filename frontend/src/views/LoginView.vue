@@ -32,8 +32,12 @@
 
         <button type="submit" id="login-btn">Login</button>
         <div class="admin-login-link">
-          <RouterLink class="admin-login-link" to="/admin/login" aria-current="admin-login link">Inloggen als beheerder</RouterLink>
+            <RouterLink class="admin-login-link" to="/admin/login" aria-current="admin-login link">Inloggen als beheerder</RouterLink>
         </div>
+
+        <div class="register-link">
+          <RouterLink id="go-to-register" to="/register">Nog geen account? Registreer hier</RouterLink>
+        </div>  
 
       </form>
 

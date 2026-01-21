@@ -134,12 +134,62 @@ namespace backend.Data
                 context.SaveChanges();
             }
 
-            // Verify all users exist
-            var allUsers = context.Users.ToList();
-            Console.WriteLine($"[DbSeederTest] Total users in database: {allUsers.Count}");
-            foreach (var user in allUsers)
+            // 🔹 Doctor users seeden
+            if (!context.Users.Any(u => u.Email == "doctor1@example.com"))
             {
-                Console.WriteLine($"[DbSeederTest]   - User ID {user.Id}: {user.Email}");
+                var doctor = new User
+                {
+                    FirstName = "Huisarts",
+                    LastName = "Een",
+                    Email = "doctor1@example.com",
+                    StreetName = "Doctorstraat",
+                    HouseNumber = "1",
+                    PostalCode = "1234AB",
+                    PhoneNumber = "0612345678",
+                    DateOfBirth = DateTime.Now,
+                    Gender = "Man",
+                    CitizenServiceNumber = "987654321",
+                    CreatedAt = DateTime.UtcNow,
+                    RoleId = generalPracticioner.Id
+                };
+
+                doctor.PasswordHash = passwordHasher.HashPassword(doctor, "Huisarts123");
+
+                context.Users.Add(doctor);
+                context.SaveChanges();
+            }
+
+            // 🔹 Doctor users seeden
+            if (!context.Users.Any(u => u.Email == "doctor2@example.com"))
+            {
+                var doctor = new User
+                {
+                    FirstName = "Huisarts",
+                    LastName = "Twee",
+                    Email = "doctor2@example.com",
+                    StreetName = "Doctorstraat",
+                    HouseNumber = "1",
+                    PostalCode = "1234AB",
+                    PhoneNumber = "0612345678",
+                    DateOfBirth = DateTime.Now,
+                    Gender = "Man",
+                    CitizenServiceNumber = "987654322",
+                    CreatedAt = DateTime.UtcNow,
+                    RoleId = generalPracticioner.Id
+                };
+
+                doctor.PasswordHash = passwordHasher.HashPassword(doctor, "Huisarts123");
+
+                context.Users.Add(doctor);
+                context.SaveChanges();
+
+                // Verify all users exist
+                var allUsers = context.Users.ToList();
+                Console.WriteLine($"[DbSeederTest] Total users in database: {allUsers.Count}");
+                foreach (var user in allUsers)
+                {
+                    Console.WriteLine($"[DbSeederTest]   - User ID {user.Id}: {user.Email}");
+                }
             }
         }
     }

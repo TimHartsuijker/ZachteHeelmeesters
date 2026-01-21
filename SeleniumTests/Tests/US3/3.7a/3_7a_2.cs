@@ -18,7 +18,7 @@ public class _3_7a_2
             driver = new ChromeDriver();
 
             // Step 2: Navigate directly to Gebruikers page
-            driver.Navigate().GoToUrl("http://localhost:5173/Gebruikers.html");
+            driver.Navigate().GoToUrl("http://localhost/admin/users");
             Console.WriteLine("LOG [Step 2] Navigated to Gebruikers page.");
 
             // Wait for page to load

@@ -39,7 +39,7 @@ const routes = [
     name: 'doctor-upload',
     component: DoctorUpload,
     meta: { requiresAuth: true, allowedRoles: ['Huisarts', 'Specialist'] }
-  },
+  },  
   {
     path: "/admin/login",
     name: "AdminLogin",

@@ -2,6 +2,9 @@
 import { reactive, ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import NavBar from '@/components/NavBar.vue';
+import axios from 'axios';
+
+axios.defaults.withCredentials = true;
 
 const route = useRoute();
 const router = useRouter();
@@ -137,108 +140,81 @@ const goBack = () => {
   router.push('/patienten');
 };
 
-// Fetch patient details
+
+
 async function fetchPatientDetails() {
   try {
     if (!patientId.value) {
       throw new Error('Geen patientId gevonden in sessie');
     }
 
-    // Use the medical record endpoint to get patient info
-    const response = await fetch(`/api/users/${patientId.value}/medical-record`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      credentials: 'include'
-    });
+    const { data: userData } = await axios.get(`/api/users/${patientId.value}/medical-record`);
+
+    // Update patient object met data
+    const dob = new Date(userData.dateOfBirth);
+    const age = userData.dateOfBirth ? Math.floor((new Date().getTime() - dob.getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : 0;
     
-    if (!response.ok) {
-      throw new Error('Failed to fetch patient details');
-    }
-    
-    const userData = await response.json();
-    
-    // Update patient object with real data
-    const age = userData.dateOfBirth ? Math.floor((new Date() - new Date(userData.dateOfBirth)) / (365.25 * 24 * 60 * 60 * 1000)) : 0;
     patient.name = `${userData.firstName} ${userData.lastName}`;
     patient.age = age;
     patient.doctor = 'Huisarts';
   } catch (err) {
     console.error('Error fetching patient details:', err);
-    // Set defaults if fetch fails
     patient.name = 'Patiënt';
     patient.age = 0;
     patient.doctor = 'Onbekend';
   }
 }
 
-// Fetch patient dossier entries
 async function fetchDossierEntries() {
   isLoading.value = true;
   error.value = null;
-  
+
   try {
     if (!patientId.value) {
       throw new Error('Geen patientId gevonden in sessie');
     }
 
-    const response = await fetch(`/api/MedicalDossier/patient/${patientId.value}`, {
-      credentials: 'include'
-    });
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch dossier entries');
-    }
-    
-    allEntries.value = await response.json();
+    const response = await axios.get(`/api/MedicalDossier/patient/${patientId.value}`);
+
+    allEntries.value = response.data;
   } catch (err) {
-    error.value = err instanceof Error ? err.message : 'An error occurred';
+    error.value = err.response?.data?.message || err.message || 'An error occurred';
     console.error('Error fetching dossier:', err);
   } finally {
     isLoading.value = false;
   }
 }
 
-// Fetch available treatments
 async function fetchTreatments() {
   try {
     if (!patientId.value) {
       throw new Error('Geen patientId gevonden in sessie');
     }
 
-    const response = await fetch(`/api/MedicalDossier/patient/${patientId.value}/treatments`, {
-      credentials: 'include'
-    });
-    
-    if (response.ok) {
-      treatments.value = await response.json();
-    }
+    const response = await axios.get(`/api/MedicalDossier/patient/${patientId.value}/treatments`);
+
+    treatments.value = response.data;
   } catch (err) {
     console.error('Error fetching treatments:', err);
   }
 }
 
-// Download file
-async function downloadFile(fileId: number, fileName: string) {
+async function downloadFile(fileId, fileName) {
   try {
-    const response = await fetch(`/api/MedicalDossier/file/${fileId}`, {
-      credentials: 'include'
+    const response = await axios.get(`/api/MedicalDossier/file/${fileId}`, {
+      responseType: 'blob'
     });
+
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', fileName);
+    document.body.appendChild(link);
+    link.click();
     
-    if (!response.ok) {
-      throw new Error('Failed to download file');
-    }
-    
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = fileName;
-    document.body.appendChild(a);
-    a.click();
+    // Cleanup
+    link.remove();
     window.URL.revokeObjectURL(url);
-    document.body.removeChild(a);
   } catch (err) {
     console.error('Error downloading file:', err);
     alert('Fout bij downloaden van bestand');

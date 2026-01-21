@@ -1,5 +1,7 @@
 using backend.Data;
 using backend.Models;
+using System;
+using System.Linq;
 
 namespace backend.Data
 {
@@ -7,269 +9,145 @@ namespace backend.Data
     {
         public static void Seed(AppDbContext context)
         {
+            Console.WriteLine("[DbSeederMedicalFiles] Start: Controleren medische testdata...");
+
             try
             {
-                // Check if we already have some test entries
+                // 1. Check of de tabel al gevuld is
                 if (context.MedicalRecordEntries.Any())
                 {
-                    return; // Database already seeded
+                    Console.WriteLine("[DbSeederMedicalFiles] Overslaan: Tabel MedicalRecordEntries bevat al data.");
+                    return;
                 }
 
-                // Get test patient and doctor
+                // 2. Vereiste gebruikers ophalen
                 var patient = context.Users.FirstOrDefault(u => u.Email == "gebruiker@example.com");
                 var doctor = context.Users.FirstOrDefault(u => u.Email == "testdoctor@example.com");
 
                 if (patient == null || doctor == null)
                 {
-                    return; // Can't seed without patient and doctor
+                    Console.WriteLine("[DbSeederMedicalFiles] Fout: Kan niet seeden. Gebruikers niet gevonden.");
+                    Console.WriteLine($"[DbSeederMedicalFiles] Status - Patient: {(patient == null ? "Niet gevonden" : "OK")}");
+                    Console.WriteLine($"[DbSeederMedicalFiles] Status - Doctor: {(doctor == null ? "Niet gevonden" : "OK")}");
+                    return;
                 }
 
-                // Seed specialisms if not exist
-                var cardiologie = context.Specialisms.FirstOrDefault(s => s.Name == "Cardiologie");
-                if (cardiologie == null)
+                // 3. Specialismen aanmaken/ophalen
+                string[] specNames = { "Cardiologie", "Dermatologie", "Longgeneeskunde" };
+                foreach (var name in specNames)
                 {
-                    cardiologie = new Specialism { Name = "Cardiologie" };
-                    context.Specialisms.Add(cardiologie);
+                    if (!context.Specialisms.Any(s => s.Name == name))
+                    {
+                        context.Specialisms.Add(new Specialism { Name = name });
+                        Console.WriteLine($"[DbSeederMedicalFiles] Specialisme toegevoegd: {name}");
+                    }
                 }
-
-                var dermatologie = context.Specialisms.FirstOrDefault(s => s.Name == "Dermatologie");
-                if (dermatologie == null)
-                {
-                    dermatologie = new Specialism { Name = "Dermatologie" };
-                    context.Specialisms.Add(dermatologie);
-                }
-
-                var longgeneeskunde = context.Specialisms.FirstOrDefault(s => s.Name == "Longgeneeskunde");
-                if (longgeneeskunde == null)
-                {
-                    longgeneeskunde = new Specialism { Name = "Longgeneeskunde" };
-                    context.Specialisms.Add(longgeneeskunde);
-                }
-
                 context.SaveChanges();
 
-                // Seed treatments if not exist
-                var consultHart = context.Treatments.FirstOrDefault(t => t.Code == "Z0001");
-                if (consultHart == null)
-                {
-                    consultHart = new Treatment
-                    {
-                        Code = "Z0001",
-                        Description = "Consult hart",
-                        SpecialismId = cardiologie.Id,
-                        DurationInQuarters = 3,
-                        Cost = 144
-                    };
-                    context.Treatments.Add(consultHart);
-                }
+                var cardiologie = context.Specialisms.First(s => s.Name == "Cardiologie");
+                var dermatologie = context.Specialisms.First(s => s.Name == "Dermatologie");
+                var longgeneeskunde = context.Specialisms.First(s => s.Name == "Longgeneeskunde");
 
-                var consultHuid = context.Treatments.FirstOrDefault(t => t.Code == "Z0002");
-                if (consultHuid == null)
+                // 4. Behandelingen aanmaken
+                if (!context.Treatments.Any(t => t.Code == "Z0001"))
                 {
-                    consultHuid = new Treatment
-                    {
-                        Code = "Z0002",
-                        Description = "Consult huid",
-                        SpecialismId = dermatologie.Id,
-                        DurationInQuarters = 3,
-                        Cost = 51
-                    };
-                    context.Treatments.Add(consultHuid);
+                    context.Treatments.Add(new Treatment { Code = "Z0001", Description = "Consult hart", SpecialismId = cardiologie.Id, DurationInQuarters = 3, Cost = 144 });
                 }
-
-                var consultLongen = context.Treatments.FirstOrDefault(t => t.Code == "Z0003");
-                if (consultLongen == null)
+                if (!context.Treatments.Any(t => t.Code == "Z0002"))
                 {
-                    consultLongen = new Treatment
-                    {
-                        Code = "Z0003",
-                        Description = "Consult longen",
-                        SpecialismId = longgeneeskunde.Id,
-                        DurationInQuarters = 2,
-                        Cost = 117
-                    };
-                    context.Treatments.Add(consultLongen);
+                    context.Treatments.Add(new Treatment { Code = "Z0002", Description = "Consult huid", SpecialismId = dermatologie.Id, DurationInQuarters = 3, Cost = 51 });
                 }
-
+                if (!context.Treatments.Any(t => t.Code == "Z0003"))
+                {
+                    context.Treatments.Add(new Treatment { Code = "Z0003", Description = "Consult longen", SpecialismId = longgeneeskunde.Id, DurationInQuarters = 2, Cost = 117 });
+                }
                 context.SaveChanges();
+                Console.WriteLine("[DbSeederMedicalFiles] Behandelingen verwerkt.");
 
-                // Seed department if not exist
+                // 5. Afdeling
                 var department = context.Departments.FirstOrDefault();
                 if (department == null)
                 {
                     department = new Department { Name = "Algemeen" };
                     context.Departments.Add(department);
                     context.SaveChanges();
+                    Console.WriteLine("[DbSeederMedicalFiles] Afdeling 'Algemeen' aangemaakt.");
                 }
 
-                // Create referrals for appointments (required by Appointment model)
-                var referral1 = context.Referrals.FirstOrDefault(r => r.Code == "REF001");
-                if (referral1 == null)
+                // 6. Verwijzingen (Referrals)
+                var consultHart = context.Treatments.First(t => t.Code == "Z0001");
+                var consultHuid = context.Treatments.First(t => t.Code == "Z0002");
+                var consultLongen = context.Treatments.First(t => t.Code == "Z0003");
+
+                if (!context.Referrals.Any(r => r.Code == "REF001"))
                 {
-                    referral1 = new Referral
-                    {
-                        Code = "REF001",
-                        TreatmentId = consultHart.Id,
-                        PatientId = patient.Id,
-                        DoctorId = doctor.Id,
-                        CreatedAt = DateTime.UtcNow.AddDays(-30)
-                    };
-                    context.Referrals.Add(referral1);
+                    context.Referrals.Add(new Referral { Code = "REF001", TreatmentId = consultHart.Id, PatientId = patient.Id, DoctorId = doctor.Id, CreatedAt = DateTime.UtcNow.AddDays(-30) });
+                    context.Referrals.Add(new Referral { Code = "REF002", TreatmentId = consultHuid.Id, PatientId = patient.Id, DoctorId = doctor.Id, CreatedAt = DateTime.UtcNow.AddDays(-20) });
+                    context.Referrals.Add(new Referral { Code = "REF003", TreatmentId = consultLongen.Id, PatientId = patient.Id, DoctorId = doctor.Id, CreatedAt = DateTime.UtcNow.AddDays(-10) });
+                    context.SaveChanges();
+                    Console.WriteLine("[DbSeederMedicalFiles] Verwijzingen aangemaakt.");
                 }
 
-                var referral2 = context.Referrals.FirstOrDefault(r => r.Code == "REF002");
-                if (referral2 == null)
-                {
-                    referral2 = new Referral
-                    {
-                        Code = "REF002",
-                        TreatmentId = consultHuid.Id,
-                        PatientId = patient.Id,
-                        DoctorId = doctor.Id,
-                        CreatedAt = DateTime.UtcNow.AddDays(-20)
-                    };
-                    context.Referrals.Add(referral2);
-                }
+                var ref1 = context.Referrals.First(r => r.Code == "REF001");
+                var ref2 = context.Referrals.First(r => r.Code == "REF002");
+                var ref3 = context.Referrals.First(r => r.Code == "REF003");
 
-                var referral3 = context.Referrals.FirstOrDefault(r => r.Code == "REF003");
-                if (referral3 == null)
-                {
-                    referral3 = new Referral
-                    {
-                        Code = "REF003",
-                        TreatmentId = consultLongen.Id,
-                        PatientId = patient.Id,
-                        DoctorId = doctor.Id,
-                        CreatedAt = DateTime.UtcNow.AddDays(-10)
-                    };
-                    context.Referrals.Add(referral3);
-                }
-
+                // 7. Afspraken, Dossierregels en Bestanden
+                // Dossier 1: Cardiologie
+                var app1 = new Appointment { PatientId = patient.Id, SpecialistId = doctor.Id, TreatmentId = consultHart.Id, DepartmentId = department.Id, ReferralId = ref1.Id, AppointmentDateTime = DateTime.UtcNow.AddDays(-25) };
+                context.Appointments.Add(app1);
                 context.SaveChanges();
 
-                // Create appointments
-                var appointment1 = new Appointment
-                {
-                    PatientId = patient.Id,
-                    SpecialistId = doctor.Id,
-                    TreatmentId = consultHart.Id,
-                    DepartmentId = department.Id,
-                    ReferralId = referral1.Id,
-                    AppointmentDateTime = DateTime.UtcNow.AddDays(-25)
+                var entry1 = new MedicalRecordEntry { 
+                    PatientId = patient.Id, 
+                    AppointmentId = app1.Id, 
+                    CreatedById = doctor.Id, 
+                    CreatedAt = app1.AppointmentDateTime, 
+                    Title = "ECG Resultaten", 
+                    Notes = "ECG uitgevoerd, geen afwijkingen gevonden.", 
+                    Category = "Cardiologie" 
                 };
-                context.Appointments.Add(appointment1);
-
-                var appointment2 = new Appointment
-                {
-                    PatientId = patient.Id,
-                    SpecialistId = doctor.Id,
-                    TreatmentId = consultHuid.Id,
-                    DepartmentId = department.Id,
-                    ReferralId = referral2.Id,
-                    AppointmentDateTime = DateTime.UtcNow.AddDays(-15)
-                };
-                context.Appointments.Add(appointment2);
-
-                var appointment3 = new Appointment
-                {
-                    PatientId = patient.Id,
-                    SpecialistId = doctor.Id,
-                    TreatmentId = consultLongen.Id,
-                    DepartmentId = department.Id,
-                    ReferralId = referral3.Id,
-                    AppointmentDateTime = DateTime.UtcNow.AddDays(-5)
-                };
-                context.Appointments.Add(appointment3);
+                context.MedicalRecordEntries.Add(entry1);
                 context.SaveChanges();
 
-                // 1. Entry with file for Consult hart (Cardiologie)
-                var hartEntry = new MedicalRecordEntry
-                {
-                    PatientId = patient.Id,
-                    AppointmentId = appointment1.Id,
-                    CreatedById = doctor.Id,
-                    CreatedAt = appointment1.AppointmentDateTime,
-                    Title = "Consult hart - Cardiologie",
-                    Notes = "Patient gecontroleerd voor hartklachten. ECG normaal.",
-                    Category = "Cardiologie"
-                };
-                context.MedicalRecordEntries.Add(hartEntry);
-                context.SaveChanges();
-
-                var hartFile = new MedicalRecordFile
-                {
-                    MedicalRecordEntryId = hartEntry.Id,
-                    FileName = "ECG_Onderzoek_Cardiologie.pdf",
-                    FileContent = System.Text.Encoding.UTF8.GetBytes(@"ECG RAPPORT - Cardiologie"),
+                context.MedicalRecordFiles.Add(new MedicalRecordFile {
+                    MedicalRecordEntryId = entry1.Id,
+                    FileName = "ECG_Rapport.pdf",
+                    FileContent = System.Text.Encoding.UTF8.GetBytes("DATA: ECG_NORMAL"),
                     ContentType = "application/pdf",
-                    FileSize = 2500,
-                    UploadedAt = appointment1.AppointmentDateTime,
-                    Category = "Cardiologie",
-                    Description = "ECG onderzoek resultaten"
-                };
-                context.MedicalRecordFiles.Add(hartFile);
+                    FileSize = 1024,
+                    UploadedAt = DateTime.UtcNow,
+                    Category = "Onderzoek",
+                    Description = "Scan van ECG"
+                });
 
-                // 2. Entry with file for Consult huid (Dermatologie)
-                var huidEntry = new MedicalRecordEntry
-                {
-                    PatientId = patient.Id,
-                    AppointmentId = appointment2.Id,
-                    CreatedById = doctor.Id,
-                    CreatedAt = appointment2.AppointmentDateTime,
-                    Title = "Consult huid - Dermatologie",
-                    Notes = "Patient gezien voor huidafwijking. Eczema gediagnostiseerd.",
-                    Category = "Dermatologie"
-                };
-                context.MedicalRecordEntries.Add(huidEntry);
+                // Dossier 2: Dermatologie
+                var app2 = new Appointment { PatientId = patient.Id, SpecialistId = doctor.Id, TreatmentId = consultHuid.Id, DepartmentId = department.Id, ReferralId = ref2.Id, AppointmentDateTime = DateTime.UtcNow.AddDays(-15) };
+                context.Appointments.Add(app2);
                 context.SaveChanges();
 
-                var huidFile = new MedicalRecordFile
-                {
-                    MedicalRecordEntryId = huidEntry.Id,
-                    FileName = "Huidfoto_Dermatologie.jpg",
-                    FileContent = System.Text.Encoding.UTF8.GetBytes(@"DERMATOLOGIE FOTODOCUMENTATIE"),
-                    ContentType = "image/jpeg",
-                    FileSize = 3200,
-                    UploadedAt = appointment2.AppointmentDateTime,
-                    Category = "Dermatologie",
-                    Description = "Fotodocumentatie huidafwijking"
+                var entry2 = new MedicalRecordEntry { 
+                    PatientId = patient.Id, 
+                    AppointmentId = app2.Id, 
+                    CreatedById = doctor.Id, 
+                    CreatedAt = app2.AppointmentDateTime, 
+                    Title = "Huidonderzoek", 
+                    Notes = "Lichte uitslag op de linkerarm.", 
+                    Category = "Dermatologie" 
                 };
-                context.MedicalRecordFiles.Add(huidFile);
-
-                // 3. Entry with file for Consult longen (Longgeneeskunde)
-                var longenEntry = new MedicalRecordEntry
-                {
-                    PatientId = patient.Id,
-                    AppointmentId = appointment3.Id,
-                    CreatedById = doctor.Id,
-                    CreatedAt = appointment3.AppointmentDateTime,
-                    Title = "Consult longen - Longgeneeskunde",
-                    Notes = "Patient gezien voor hoest. Spirometrie normaal.",
-                    Category = "Longgeneeskunde"
-                };
-                context.MedicalRecordEntries.Add(longenEntry);
+                context.MedicalRecordEntries.Add(entry2);
                 context.SaveChanges();
 
-                var longenFile = new MedicalRecordFile
-                {
-                    MedicalRecordEntryId = longenEntry.Id,
-                    FileName = "Rontgen_Thorax_Longgeneeskunde.pdf",
-                    FileContent = System.Text.Encoding.UTF8.GetBytes(@"RÖNTGEN THORAX RAPPORT"),
-                    ContentType = "application/pdf",
-                    FileSize = 3800,
-                    UploadedAt = appointment3.AppointmentDateTime,
-                    Category = "Longgeneeskunde",
-                    Description = "Röntgen thorax PA en lateraal"
-                };
-                context.MedicalRecordFiles.Add(longenFile);
-
                 context.SaveChanges();
-
-                Console.WriteLine($"✓ Seeded medical entries for {patient.FirstName} {patient.LastName}");
+                Console.WriteLine($"[DbSeederMedicalFiles] Succes: Medische dossiers en bestanden gesproeid voor {patient.Email}.");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"⚠ Medical files seeding already done or error: {ex.Message}");
+                Console.WriteLine($"[DbSeederMedicalFiles] Fout tijdens seeden: {ex.Message}");
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"[DbSeederMedicalFiles] Inner Exception: {ex.InnerException.Message}");
+                }
             }
         }
     }

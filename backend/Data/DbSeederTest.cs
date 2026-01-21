@@ -148,7 +148,7 @@ namespace backend.Data
                     PhoneNumber = "0612345678",
                     DateOfBirth = DateTime.Now,
                     Gender = "Man",
-                    CitizenServiceNumber = "987654321",
+                    CitizenServiceNumber = "987654322",
                     CreatedAt = DateTime.UtcNow,
                     RoleId = generalPracticioner.Id
                 };
@@ -173,7 +173,7 @@ namespace backend.Data
                     PhoneNumber = "0612345678",
                     DateOfBirth = DateTime.Now,
                     Gender = "Man",
-                    CitizenServiceNumber = "987654322",
+                    CitizenServiceNumber = "987654323",
                     CreatedAt = DateTime.UtcNow,
                     RoleId = generalPracticioner.Id
                 };

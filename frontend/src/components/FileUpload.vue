@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import axios from 'axios';
 
 const API_BASE_URL = 'https://localhost:7240/api'; // Backend URL from launchSettings.json
 
@@ -75,7 +76,6 @@ function formatFileSize(bytes: number): string {
   return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
 }
 
-// Upload file
 async function uploadFile() {
   if (!selectedFile.value) {
     alert('Selecteer eerst een bestand');
@@ -96,21 +96,22 @@ async function uploadFile() {
     formData.append('doctorId', props.doctorId.toString());
     formData.append('appointmentId', props.appointmentId.toString());
     formData.append('category', category.value);
+    
     if (description.value) {
       formData.append('description', description.value);
     }
 
-    const response = await fetch(`${API_BASE_URL}/MedicalDossier/upload`, {
-      method: 'POST',
-      body: formData,
+    // Axios POST request
+    const response = await axios.post(`${API_BASE_URL}/MedicalDossier/upload`, formData, {
+      withCredentials: true,
+      // Optioneel: voeg een upload voortgangsbalk toe
+      onUploadProgress: (progressEvent) => {
+        const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+        console.log(`Upload voortgang: ${percentCompleted}%`);
+      }
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Upload mislukt');
-    }
-
-    // Reset form
+    // Reset form (Axios succes is altijd status 2xx)
     selectedFile.value = null;
     category.value = '';
     description.value = '';
@@ -118,7 +119,9 @@ async function uploadFile() {
     emit('upload-success');
     alert('Bestand succesvol geüpload');
   } catch (err) {
-    const errorMessage = err instanceof Error ? err.message : 'Er is een fout opgetreden';
+    // Axios error handling: check of de server een specifieke error message stuurde
+    const errorMessage = err.response?.data?.message || err.message || 'Er is een fout opgetreden';
+    
     emit('upload-error', errorMessage);
     alert('Fout bij uploaden: ' + errorMessage);
   } finally {

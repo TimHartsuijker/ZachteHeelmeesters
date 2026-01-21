@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import FileUpload from '@/components/FileUpload.vue';
 import NavBar from '@/components/NavBar.vue';
 

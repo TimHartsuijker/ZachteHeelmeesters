@@ -1,11 +1,14 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import LoginView from '../views/LoginView.vue'
-import RegisterView from '../views/RegisterView.vue' // <-- importeer de nieuwe view
-import DashboardView from '../views/DashboardView.vue'
-import AgendaView from '../views/AgendaView.vue'
+import { createRouter, createWebHistory } from 'vue-router';
+import LoginView from '../views/LoginView.vue';
+import MedicalDossier from '../views/MedicalDossier.vue';
+import DoctorUpload from '../views/DoctorUpload.vue';
+import RegisterView from '../views/RegisterView.vue';
+import DashboardView from '../views/DashboardView.vue';
+import AgendaView from '../views/AgendaView.vue';
 import AdminLoginView from "../views/AdminLoginView.vue";
 import AdminDashboardView from "../views/AdminDashboardView.vue";
 import UsersView from "../views/AdminUserManagementView.vue";
+import DoctorPatientsView from "../views/DoctorPatientsView.vue";
 
 const routes = [
   { 
@@ -20,6 +23,23 @@ const routes = [
     component: RegisterView,
     meta: { hideNavbar: true }
   },
+  {
+    path: '/dossier',
+    name: 'dossier',
+    component: MedicalDossier
+  },
+  {
+    path: '/dossier/:patientId',
+    name: 'dossier-patient',
+    component: MedicalDossier,
+    meta: { requiresAuth: true, allowedRoles: ['Huisarts', 'Specialist'] }
+  },
+  {
+    path: '/doctor/upload',
+    name: 'doctor-upload',
+    component: DoctorUpload,
+    meta: { requiresAuth: true, allowedRoles: ['Huisarts', 'Specialist'] }
+  },  
   {
     path: "/admin/login",
     name: "AdminLogin",
@@ -49,6 +69,12 @@ const routes = [
     name: "AdminUsers",
     component: UsersView,
     meta: { requiresAuth: true, allowedRoles: ['Admin'] },
+  },
+  {
+    path: "/patienten",
+    name: "DoctorPatients",
+    component: DoctorPatientsView,
+    meta: { requiresAuth: true, allowedRoles: ['Huisarts', 'Specialist'] },
   }
 ]
 

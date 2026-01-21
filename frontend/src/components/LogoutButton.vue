@@ -15,6 +15,7 @@ const logout = async () => {
     });
     
     sessionStorage.clear();
+    window.dispatchEvent(new Event('session-updated'));
     router.push("/login");
   } catch (error) {
     console.error("Logout failed:", error);

@@ -25,7 +25,7 @@ namespace backend.Controllers
                    .ToListAsync();
                 return Ok(rollen);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return StatusCode(500, new { message = "Error fetching roles" });
             }

@@ -1,52 +1,96 @@
 <template>
-  <!-- Voor laptop -->
-  <header>
-    <nav class="navbar">
-      <ul class="nav-menu nav-left">
-        <li><RouterLink to="/">Dashboard</RouterLink></li>
-        <li><RouterLink to="/afspraken">Afspraken</RouterLink></li>
-        <li><RouterLink to="/medischdossier">Medisch Dossier</RouterLink></li>
-      </ul>
-      <ul class="nav-menu nav-right">
-        <li><RouterLink to="/Patiëntprofiel">Mijn Profiel</RouterLink></li>
-      </ul>
-    </nav>
-  </header>
-
-  <!-- Voor tablet en telefoon -->
-  <header>
-    <nav class="navbar">
-      <button class="hamburger" @click="toggleMenu">
-        ☰
-      </button>
-
-      <ul class="nav-menu" :class="{ open: menuOpen }">
-        <li @click="menuOpen = false">
-          <RouterLink to="/">Dashboard</RouterLink>
-        </li>
-        <li @click="menuOpen = false">
-          <RouterLink to="/afspraken">Afspraken</RouterLink>
-        </li>
-        <li @click="menuOpen = false">
-          <RouterLink to="/afspraken">Medisch Dossier</RouterLink>
-        </li>
-        <li @click="menuOpen = false">
-          <RouterLink to="/Patiëntprofiel">Mijn Profiel</RouterLink>
-        </li>
-      </ul>
-    </nav>
-  </header>
+  <nav class="navbar" aria-label="Hoofdnavigatie">
+    <ul>
+      <li v-if="userRole === 'Specialist'" class="nav-center-buttons">
+          <RouterLink to="/agenda" aria-current="page">Agenda</RouterLink>
+      </li>
+      <li v-else-if="userRole === 'Patient'" class="nav-center-buttons">
+          <RouterLink to="/afspraken" aria-current="appointments page">Mijn afspraken</RouterLink>
+      </li>
+      <li v-else-if="userRole === 'Admin'" class="nav-center-buttons">
+        <RouterLink to="/admin/users" aria-current="user-management page">Gebruikersbeheer</RouterLink>
+      </li>
+    </ul>
+      <LogoutButton />
+  </nav>
 </template>
 
+<script>
+import LogoutButton from './LogoutButton.vue';
 
-<script setup lang="ts">
-import { ref } from 'vue'
-import { RouterLink } from 'vue-router'
-import '../assets/navbar.css'
-
-const menuOpen = ref(false)
-
-const toggleMenu = () => {
-  menuOpen.value = !menuOpen.value
+export default {
+  name: "NavBar",
+  mounted() {
+    console.log('nav.vue navbar mounted');
+  },
+  components: {
+    LogoutButton,
+  },
+  computed: {
+    userRole() {
+      return sessionStorage.getItem('userRole');
+    }
+  }
 }
 </script>
+
+<style scoped>
+.navbar {
+  background-color: #B0DB9C;
+  width: 100vw;
+  min-width: 100%;
+  min-height: 70px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  padding: 1.5rem 3rem;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  font-size: 1.5rem;
+  font-family: Arial, sans-serif;
+  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.07);
+}
+
+.navbar ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 2rem;
+}
+
+.navbar li {
+  margin-right: 0;
+}
+
+.navbar a {
+  color: #222;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 1.1rem;
+  font-family: Arial, sans-serif;
+  transition: color 0.3s ease;
+  outline: none;
+}
+
+.navbar a:hover {
+  color: #fff;
+  background: none;
+  box-shadow: none;
+}
+
+.navbar :deep(a) {
+  color: #222;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 1.1rem;
+  transition: color 0.3s ease;
+  outline: none;
+}
+
+body {
+  padding-top: 3.5rem;
+}
+</style>

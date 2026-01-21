@@ -5,56 +5,65 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Controllers
 builder.Services.AddControllers();
-
-// Database
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-// CORS
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowFrontend", policy =>
-    {
-        policy
-            .WithOrigins("http://localhost:5173")
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
-});
-
-// Swagger
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Add session services
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+// Add CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("frontend", builder =>
+    {
+        builder.WithOrigins("http://localhost")
+               .AllowAnyMethod()
+               .AllowAnyHeader()
+               .AllowCredentials();
+    });
+});
+
 var app = builder.Build();
 
-// MIGRATIONS + SEEDING
-using (var scope = app.Services.CreateScope())
+// MIGRATIONS + SEEDING (NA Build, VOOR Run)
+try
 {
-    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    context.Database.Migrate();
-
-    DbSeederStatic.Seed(context);
-
-    if (app.Environment.IsDevelopment())
+    using (var scope = app.Services.CreateScope())
     {
-        DbSeederTest.Seed(context);
+        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        context.Database.Migrate();
+        DbSeederStatic.Seed(context);
+        if (app.Environment.IsDevelopment())
+        {
+            DbSeederTest.Seed(context);
+        }
     }
 }
+catch (Exception ex)
+{
+    Console.WriteLine($"FOUT BIJ MIGRATIE: {ex.Message}");
+}
 
-// Swagger
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-app.UseCors("AllowFrontend");
+app.UseCors("frontend");
 
-// ❌ Verwijder authentication/authorization
-// app.UseAuthentication();
-// app.UseAuthorization();
+app.UseSession();
+
+app.UseAuthorization();
+app.UseAuthentication();
 
 app.MapControllers();
+
 app.Run();

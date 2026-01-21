@@ -77,3 +77,363 @@ button[type="submit"]:hover {
   color: green;
   margin-top: 5px;
 }
+.admin-login-link {
+    margin-top: 16px;       /* ruimte boven de knop */
+    text-align: center;     /* knop gecentreerd */
+}
+
+/* De admin login knop */
+#admin-login-link {
+    width: 50%;             /* helft van de card breedte */
+    padding: 0.75rem;       /* verticale padding */
+    background-color: #00960c; /* mooie groene admin-accent */
+    color: white;           /* witte tekst */
+    border: none;           /* geen rand */
+    border-radius: 8px;     /* afgeronde hoeken */
+    font-size: 1rem;        /* leesbare tekst */
+    font-weight: 500;       /* iets dikker */
+    cursor: pointer;        /* pointer bij hover */
+    transition: background-color 0.3s, transform 0.2s; /* subtiele animatie */
+}
+
+/* Hover effect */
+#admin-login-link:hover {
+    background-color: #007a09; /* iets donkerder groen */
+    transform: scale(1.03);    /* lichte vergroting */
+}
+
+/* Focus effect (toegankelijkheid) */
+#admin-login-link:focus {
+    outline: 2px solid #005a05; /* duidelijke focus */
+    outline-offset: 2px;
+}
+.admin-login-page h2 {
+    color: #000000; /* subtiel admin-accent */
+}
+#admin-login-btn{
+  
+  width: 50%;
+  padding: 0.75rem;
+  background-color: #00960c;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 15px;
+  transition: background-color 0.3s;
+}
+admin-dashboard-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  font-family: Arial, sans-serif;
+}
+
+/* Navbar bovenaan */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* logo links, buttons gecentreerd, logout rechts */
+  background-color: #DDF6D2;
+  padding: 1rem 2rem;
+  color: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.navbar a {
+  text-decoration: none;
+  transition: color 0.3s, background 0.3s, box-shadow 0.3s;
+  & h1 {
+    color: black;
+    text-decoration: none;
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+}
+
+.navbar a h1:hover {
+  color: #fff;
+  cursor: pointer;
+  background: none;
+  box-shadow: none;
+}
+
+/* Gecentreerde buttons */
+.nav-center-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex: 1; /* zorgt dat het middengedeelte de vrije ruimte inneemt */
+}
+
+.nav-center-buttons button {
+  padding: 0.5rem 1rem;
+  background-color: #B0DB9C;
+  color: black;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.nav-center-buttons button:hover {
+  background-color: #f0f0f0;
+}
+
+/* Logout knop rechts */
+.logout-btn {
+  background-color: #B0DB9C;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+  color: black;
+}
+
+.logout-btn:hover {
+  color: white;
+  background-color: #e04344;
+}
+
+/* Content area */
+.admin-content {
+  flex: 1;
+  padding: 2rem;
+  background-color: #f9f9f9;
+}
+.register-view-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #DDF6D2;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Card container */
+.register-view-card {
+    background-color: #ffffff;
+    padding: 2rem 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    width: 500px;
+    max-width: 95%;
+}
+
+/* Titel */
+.register-view-card h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #333333;
+}
+
+/* Flex container voor twee velden naast elkaar */
+.form-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.form-row .register-view-form-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Enkelvoudige velden (full width) */
+.register-view-form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+}
+
+.register-view-form-group label {
+    margin-bottom: 0.3rem;
+    font-weight: 500;
+    color: #555555;
+}
+
+.register-view-form-group input,
+.register-view-form-group select {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #B0DB9C;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    transition: border-color 0.2s ease;
+}
+
+.register-view-form-group input:focus,
+.register-view-form-group select:focus {
+    border-color: #4a90e2;
+    outline: none;
+}
+
+/* Knoppen */
+
+
+
+/* Login link */
+.login-link {
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.login-link button {
+    background: none;
+    color: #4a90e2;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.login-link button:hover {
+    text-decoration: underline;
+}
+
+/* Foutmeldingen */
+.error-text {
+    color: #d9534f;
+    font-size: 0.85rem;
+    margin-top: 0.3rem;
+}
+
+/* Succesmelding */
+.success-text {
+    color: #5cb85c;
+    font-size: 0.9rem;
+    margin-top: 0.3rem;
+}
+.register-link {
+    text-align: center;       /* knop in het midden */
+    margin-top: 1.5rem;       /* ruimte boven de link */
+}
+
+#go-to-register {
+    background-color: #B0DB9C; /* zacht groen, consistent met login */
+    color: #000;               /* zwarte tekst */
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 1.2rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+#go-to-register:hover {
+    background-color: #9ac48c; /* iets donkerder groen */
+    transform: scale(1.03);    /* lichte vergroting bij hover */
+}
+
+#go-to-register:focus {
+    outline: 2px solid #007a09; /* focus voor toegankelijkheid */
+    outline-offset: 2px;
+}
+
+.main-users {
+  width: 80vw;
+  max-width: 80vw;
+  /* Remove margin-top, use padding-top to offset fixed header */
+  margin: 2rem auto;
+  background: #CAE8BD;
+  border-radius: 1.5rem;
+  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.07);
+  padding: 0 0 2.5rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 0;
+}
+/* Remove .align-under-nav margin-top, not needed with padding-top */
+.align-under-nav {
+  margin-top: 100px;
+}
+.status-message {
+  padding: 2rem;
+  text-align: center;
+  font-size: 1.1rem;
+  color: #666;
+}
+.status-message.error {
+  color: #d32f2f;
+}
+
+/* color palette from <https://github.com/vuejs/theme> */
+:root {
+  --vt-c-white: #ffffff;
+  --vt-c-white-soft: #f8f8f8;
+  --vt-c-white-mute: #f2f2f2;
+
+  --vt-c-black: #181818;
+  --vt-c-black-soft: #222222;
+  --vt-c-black-mute: #282828;
+
+  --vt-c-indigo: #2c3e50;
+
+  --vt-c-divider-light-1: rgba(60, 60, 60, 0.29);
+  --vt-c-divider-light-2: rgba(60, 60, 60, 0.12);
+  --vt-c-divider-dark-1: rgba(84, 84, 84, 0.65);
+  --vt-c-divider-dark-2: rgba(84, 84, 84, 0.48);
+
+  --vt-c-text-light-1: var(--vt-c-indigo);
+  --vt-c-text-light-2: rgba(60, 60, 60, 0.66);
+  --vt-c-text-dark-1: var(--vt-c-white);
+  --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
+}
+
+/* semantic color variables for this project */
+:root {
+  --color-background: #ECFAE5;
+  --color-background-soft: #ECFAE5;
+  --color-background-mute: #ECFAE5;
+
+  --color-border: var(--vt-c-divider-light-2);
+  --color-border-hover: var(--vt-c-divider-light-1);
+
+  --color-heading: var(--vt-c-text-light-1);
+  --color-text: var(--vt-c-text-light-1);
+
+  --section-gap: 160px;
+}
+
+/* Removed dark mode override to force background color #ECFAE5 */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  font-weight: normal;
+}
+
+body {
+  min-height: 100vh;
+  color: var(--color-text);
+  background: var(--color-background);
+  transition:
+    color 0.5s,
+    background-color 0.5s;
+  line-height: 1.6;
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif;
+  font-size: 15px;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

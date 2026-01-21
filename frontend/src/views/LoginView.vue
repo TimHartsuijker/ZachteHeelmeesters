@@ -31,66 +31,94 @@
         </p>
 
         <button type="submit" id="login-btn">Login</button>
+        <div class="admin-login-link">
+            <RouterLink class="admin-login-link" to="/admin/login" aria-current="admin-login link">Inloggen als beheerder</RouterLink>
+        </div>
+
+        <div class="register-link">
+          <RouterLink id="go-to-register" to="/register">Nog geen account? Registreer hier</RouterLink>
+        </div>  
+
       </form>
 
     </div>
   </div>
 </template>
 
-
-<style scoped>
-@import '../assets/main.css';
-</style>
-
-
-<script>
+<script setup>
+import { ref } from "vue";
 import axios from "axios";
+import { useRouter } from "vue-router";
 
-axios.defaults.baseURL = "https://localhost:7240"; // centralize if you have many calls
+// Router instance
+const router = useRouter();
 
-export default {
-  data() {
-    return {
-      email: "",
-      wachtwoord: "",
-      emptyError: false,
-      loginError: false,
-      loginErrorMessage: "",
-      loginSuccess: "",
-    };
-  },
+// State (Vervangt data())
+const email = ref("");
+const wachtwoord = ref("");
+const emptyError = ref(false);
+const loginError = ref(false);
+const loginErrorMessage = ref("");
+const loginSuccess = ref("");
 
-  methods: {
-    async login() {
-      this.emptyError = false;
-      this.loginError = false;
-      this.loginErrorMessage = "";
-      this.loginSuccess = "";
+// User login (Vervangt methods)
+const login = async () => {
+  // Reset meldingen
+  emptyError.value = false;
+  loginError.value = false;
+  loginErrorMessage.value = "";
+  loginSuccess.value = "";
 
-      if (!this.email || !this.wachtwoord) {
-        this.emptyError = true;
-        return;
+  // Check op lege velden
+  if (!email.value || !wachtwoord.value) {
+    emptyError.value = true;
+    return;
+  }
+
+  try {
+    const response = await axios.post("/api/login", {
+      email: email.value,
+      wachtwoord: wachtwoord.value,
+    }, {
+      // DIT IS DE BELANGRIJKE TOEVOEGING:
+      withCredentials: true
+    });
+
+    if (response.status === 200) {
+      const userData = response.data.user;
+      console.log("Login gelukt!", response.data);
+
+      // Sessie opslaan
+      sessionStorage.setItem("isLoggedIn", "true");
+      sessionStorage.setItem("userId", userData.id);
+      sessionStorage.setItem("userEmail", userData.email);
+      sessionStorage.setItem("userName", `${userData.firstName} ${userData.lastName}`);
+      sessionStorage.setItem("userRole", userData.role);
+
+      // Redirect op basis van rol
+      switch (userData.role) {
+        case "Specialist":
+          router.push("/agenda");
+          break;
+        case "Huisarts":
+          router.push("/agenda");
+          break;
+        default:
+          router.push("/dashboard");
+          break;
       }
+    }
+  } catch (error) {
+    console.error("Full error:", error);
+    
+    if (error.response?.data?.message) {
+      loginErrorMessage.value = error.response.data.message;
+    } else {
+      loginErrorMessage.value = error.message || "Er is iets misgegaan bij het inloggen.";
+    }
 
-      try {
-        const response = await axios.post("/api/login", {
-          email: this.email,
-          wachtwoord: this.wachtwoord,
-        });
-
-        // Sla user ID op in sessionStorage
-        sessionStorage.setItem("userId", response.data.user.id);
-
-        // Navigeer naar dashboard
-        window.location.href = "/dashboard";
-
-      } catch (err) {
-        const data = err?.response?.data;
-        this.loginErrorMessage = data?.message ?? "Er is iets misgegaan bij het inloggen.";
-        this.loginError = true;
-        console.log("Login error:", this.loginErrorMessage, err);
-      }
-    },
-  },
+    loginError.value = true;
+  }
 };
 </script>
+

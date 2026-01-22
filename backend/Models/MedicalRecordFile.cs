@@ -14,7 +14,7 @@ namespace backend.Models
         public string FileName { get; set; } = null!;
 
         [Required]
-        public string FilePath { get; set; } = null!;
+        public byte[] FileContent { get; set; } = null!;
 
         [Required]
         public string ContentType { get; set; } = null!;
@@ -22,5 +22,9 @@ namespace backend.Models
         public long FileSize { get; set; }
 
         public DateTime UploadedAt { get; set; } = DateTime.UtcNow;
+
+        public string? Category { get; set; }
+
+        public string? Description { get; set; }
     }
 }

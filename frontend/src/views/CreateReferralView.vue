@@ -84,7 +84,7 @@ const submitReferral = async () => {
     }
 
     const response = await axios.post('/api/referral', {
-      code: referral.value.treatmentCode,
+      code: `${referral.value.treatmentCode}${parseInt(referral.value.patientId)}${parseInt(doctorId)}`,
       treatmentId: selectedTreatment.id,
       patientId: parseInt(referral.value.patientId),
       doctorId: parseInt(doctorId),

@@ -90,18 +90,21 @@ const login = async () => {
 
       // Sessie opslaan
       sessionStorage.setItem("isLoggedIn", "true");
-      sessionStorage.setItem("userId", userData.id);
-      sessionStorage.setItem("userEmail", userData.email);
-      sessionStorage.setItem("userName", `${userData.firstName} ${userData.lastName}`);
-      sessionStorage.setItem("userRole", userData.role);
+      if (userData?.id) {
+        sessionStorage.setItem("userId", String(userData.id));
+      }
+      if (userData?.role) {
+        sessionStorage.setItem("userRole", userData.role);
+      }
 
       // Redirect op basis van rol
-      switch (userData.role) {
+      switch (userData?.role) {
         case "Specialist":
-          router.push("/agenda");
-          break;
         case "Huisarts":
           router.push("/doorverwijzing-aanmaken");
+          break;
+        case "Admin":
+          router.push("/admin/dashboard");
           break;
         default:
           router.push("/dashboard");
@@ -109,12 +112,21 @@ const login = async () => {
       }
     }
   } catch (error) {
-    console.error("Full error:", error);
-    
+    // Detailed error logging
+    console.error("Login error details:", {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data,
+      headers: error.response?.headers,
+      config: error.config
+    });
+
     if (error.response?.data?.message) {
       loginErrorMessage.value = error.response.data.message;
+    } else if (error.code === 'ERR_NETWORK') {
+      loginErrorMessage.value = "Verbindingsfout met server. Zorg dat de backend draait";
     } else {
-      loginErrorMessage.value = error.message || "Er is iets misgegaan bij het inloggen.";
+      loginErrorMessage.value = "Er is iets misgegaan bij het inloggen.";
     }
 
     loginError.value = true;

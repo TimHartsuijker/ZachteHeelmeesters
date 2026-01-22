@@ -17,37 +17,7 @@ namespace backend.Data
             var adminRole = context.Roles.First(r => r.RoleName == "Admin");
 
 
-            // Patient user seeden
-            var patientUser = context.Users.FirstOrDefault(u => u.Email == "gebruiker@example.com");
-            if (patientUser == null)
-            {
-                patientUser = new User
-                {
-                    FirstName = "Test",
-                    LastName = "Gebruiker",
-                    Email = "gebruiker@example.com",
-                    StreetName = "Teststraat",
-                    HouseNumber = "1",
-                    PostalCode = "1234AB",
-                    PhoneNumber = "0612345678",
-                    DateOfBirth = DateTime.MinValue,
-                    Gender = "Vrouw",
-                    CitizenServiceNumber = "123456789",
-                    CreatedAt = DateTime.UtcNow,
-                    RoleId = patientRole.Id
-                };
-
-                patientUser.PasswordHash = passwordHasher.HashPassword(patientUser, "Wachtwoord123");
-                context.Users.Add(patientUser);
-                context.SaveChanges();
-                Console.WriteLine($"[DbSeederTest] Created Patient user with ID: {patientUser.Id}");
-            }
-            else
-            {
-                Console.WriteLine($"[DbSeederTest] Patient user already exists with ID: {patientUser.Id}");
-            }
-
-            // Doctor user seeden
+            // Doctor user seeden (eerst zodat patient koppeling kan krijgen)
             var doctorUser = context.Users.FirstOrDefault(u => u.Email == "testdoctor@example.com");
             if (doctorUser == null)
             {
@@ -60,7 +30,7 @@ namespace backend.Data
                     HouseNumber = "1A",
                     PostalCode = "1234AB",
                     PhoneNumber = "0631234567",
-                    DateOfBirth = DateTime.MinValue,
+                    DateOfBirth = new DateTime(1990, 1, 1),
                     CitizenServiceNumber = "012948356",
                     Gender = "Man",
                     CreatedAt = DateTime.UtcNow,
@@ -75,6 +45,68 @@ namespace backend.Data
             else
             {
                 Console.WriteLine($"[DbSeederTest] Doctor user already exists with ID: {doctorUser.Id}");
+            }
+
+            // Patient user seeden
+            var patientUser = context.Users.FirstOrDefault(u => u.Email == "gebruiker@example.com");
+            if (patientUser == null)
+            {
+                patientUser = new User
+                {
+                    FirstName = "Test",
+                    LastName = "Gebruiker",
+                    Email = "gebruiker@example.com",
+                    StreetName = "Teststraat",
+                    HouseNumber = "1",
+                    PostalCode = "1234AB",
+                    CitizenServiceNumber = "123456789",
+                    DateOfBirth = new DateTime(2000, 1, 1),
+                    Gender = "Vrouw",
+                    PhoneNumber = "0612345678",
+                    CreatedAt = DateTime.UtcNow,
+                    RoleId = patientRole.Id,
+                    DoctorId = doctorUser?.Id
+                };
+
+                patientUser.PasswordHash = passwordHasher.HashPassword(patientUser, "Wachtwoord123");
+                context.Users.Add(patientUser);
+                context.SaveChanges();
+                Console.WriteLine($"[DbSeederTest] Created Patient user with ID: {patientUser.Id}");
+            }
+            else
+            {
+                Console.WriteLine($"[DbSeederTest] Patient user already exists with ID: {patientUser.Id}");
+            }
+
+            // Tweede testpatiënt voor US5.5 (mag leeg dossier hebben)
+            var patientUserB = context.Users.FirstOrDefault(u => u.Email == "patient2@example.com");
+            if (patientUserB == null)
+            {
+                patientUserB = new User
+                {
+                    FirstName = "Test",
+                    LastName = "PatiëntB",
+                    Email = "patient2@example.com",
+                    StreetName = "Teststraat",
+                    HouseNumber = "2",
+                    PostalCode = "1234AB",
+                    CitizenServiceNumber = "987654321",
+                    DateOfBirth = new DateTime(2001, 2, 2),
+                    Gender = "Vrouw",
+                    PhoneNumber = "0612345679",
+                    CreatedAt = DateTime.UtcNow,
+                    RoleId = patientRole.Id,
+                    DoctorId = doctorUser?.Id
+                };
+
+                patientUserB.PasswordHash = passwordHasher.HashPassword(patientUserB, "Wachtwoord123");
+                context.Users.Add(patientUserB);
+                context.SaveChanges();
+                Console.WriteLine($"[DbSeederTest] Created second Patient user with ID: {patientUserB.Id}");
+            }
+            else
+            {
+                Console.WriteLine($"[DbSeederTest] Second Patient user already exists with ID: {patientUserB.Id}");
             }
 
             // Admin user seeden
@@ -116,7 +148,7 @@ namespace backend.Data
                     PhoneNumber = "0612345678",
                     DateOfBirth = DateTime.Now,
                     Gender = "Man",
-                    CitizenServiceNumber = "987654321",
+                    CitizenServiceNumber = "987654322",
                     CreatedAt = DateTime.UtcNow,
                     RoleId = generalPracticioner.Id
                 };
@@ -141,7 +173,7 @@ namespace backend.Data
                     PhoneNumber = "0612345678",
                     DateOfBirth = DateTime.Now,
                     Gender = "Man",
-                    CitizenServiceNumber = "987654322",
+                    CitizenServiceNumber = "987654323",
                     CreatedAt = DateTime.UtcNow,
                     RoleId = generalPracticioner.Id
                 };

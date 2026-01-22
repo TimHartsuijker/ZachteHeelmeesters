@@ -88,6 +88,7 @@ const submitReferral = async () => {
       treatmentId: selectedTreatment.id,
       patientId: parseInt(referral.value.patientId),
       doctorId: parseInt(doctorId),
+      note: referral.value.note,
       createdAt: new Date().toISOString()
     });
 

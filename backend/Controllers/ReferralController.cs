@@ -21,7 +21,7 @@ namespace backend.Controllers
         public IActionResult CreateReferral([FromBody] CreateReferralDto request)
         {
             // Log received data for debugging
-            Console.WriteLine($"Received: Code={request.Code}, TreatmentId={request.TreatmentId}, PatientId={request.PatientId}, DoctorId={request.DoctorId}");
+            Console.WriteLine($"Received: Code={request.Code}, TreatmentId={request.TreatmentId}, PatientId={request.PatientId}, DoctorId={request.DoctorId}, Note={request.Note}");
 
             // 1️ Controleer of alle verplichte velden zijn ingevuld
             if (string.IsNullOrWhiteSpace(request.Code) ||
@@ -46,6 +46,7 @@ namespace backend.Controllers
                 TreatmentId = request.TreatmentId,
                 PatientId = request.PatientId,
                 DoctorId = request.DoctorId,
+                Note = request.Note,
                 CreatedAt = DateTime.UtcNow
             };
 

@@ -16,6 +16,8 @@ namespace backend.DTOs
         [Required]
         public int DoctorId { get; set; }
 
+        public string Note { get; set; } = null!;
+
         [Required]
         public DateTime CreatedAt { get; set; }
     }

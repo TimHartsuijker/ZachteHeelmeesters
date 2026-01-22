@@ -22,6 +22,9 @@ namespace backend.Models
         public int DoctorId { get; set; }
         public User Doctor { get; set; } = null!;
 
+        [StringLength(1000)]
+        public string Note { get; set; } = null!;
+
         [Required]
         public DateTime CreatedAt { get; set; }
 

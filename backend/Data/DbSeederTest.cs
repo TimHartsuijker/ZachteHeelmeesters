@@ -249,7 +249,7 @@ namespace backend.Data
             // ------------------------
             var treatmentsToEnsure = new[]
             {
-                new Treatment { Code = "Z0001", Description = "Consult hart", SpecialismId = Cardiologie.Id, DurationInQuarters = 3, Cost = 144 },
+new Treatment { Code = "Z0001", Description = "Consult hart", SpecialismId = Cardiologie.Id, DurationInQuarters = 3, Cost = 144 },
 new Treatment { Code = "Z0002", Description = "Consult huid", SpecialismId = Dermatologie.Id, DurationInQuarters = 3, Cost = 51 },
 new Treatment { Code = "Z0003", Description = "Consult longen", SpecialismId = Longgeneeskunde.Id, DurationInQuarters = 2, Cost = 117 },
 new Treatment { Code = "Z0004", Description = "Consult ogen", SpecialismId = Oogheelkunde.Id, DurationInQuarters = 3, Cost = 114 },

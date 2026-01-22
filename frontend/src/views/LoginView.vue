@@ -101,7 +101,7 @@ const login = async () => {
           router.push("/agenda");
           break;
         case "Huisarts":
-          router.push("/agenda");
+          router.push("/doorverwijzing-aanmaken");
           break;
         default:
           router.push("/dashboard");

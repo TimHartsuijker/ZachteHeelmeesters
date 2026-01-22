@@ -31,7 +31,8 @@ namespace backend.Controllers
                         FirstName = u.FirstName,
                         LastName = u.LastName,
                         Email = u.Email,
-                        RoleId = u.RoleId
+                        RoleId = u.RoleId,
+                        DoctorId = u.DoctorId
                     })
                     .ToListAsync();
 

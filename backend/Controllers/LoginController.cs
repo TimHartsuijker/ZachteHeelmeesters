@@ -46,7 +46,7 @@ namespace backend.Controllers
                 return Unauthorized(new { message = "Inloggegevens zijn incorrect" });
             }
 
-            // 🔒 ADMIN MAG HIER NIET INLOGGEN
+            // ADMIN MAG HIER NIET INLOGGEN
             if (user.Role.RoleName == "Admin")
             {
                 return Unauthorized(new { message = "Gebruik de admin login pagina" });

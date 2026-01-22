@@ -6,6 +6,7 @@ import AgendaView from '../views/AgendaView.vue'
 import AdminLoginView from "../views/AdminLoginView.vue";
 import AdminDashboardView from "../views/AdminDashboardView.vue";
 import UsersView from "../views/AdminUserManagementView.vue";
+import CreateReferralView from '../views/CreateReferralView.vue' 
 
 const routes = [
   { 
@@ -37,6 +38,12 @@ const routes = [
     name: 'agenda',
     component: AgendaView,
     meta: { requiresAuth: true, allowedRoles: ['Specialist'] }
+  },
+  {
+    path: "/doorverwijzing-aanmaken",
+    name: "CreateReferral",
+    component: CreateReferralView,
+    meta: { requiresAuth: true, allowedRoles: ['Huisarts'] },
   },
   {
     path: "/admin/dashboard",

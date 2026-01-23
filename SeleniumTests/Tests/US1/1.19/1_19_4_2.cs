@@ -1,58 +1,35 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Support.UI;
-using System;
+using SeleniumTests.Base;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace SeleniumTests
+namespace US1._19
 {
     [TestClass]
-    public class _1_19_4_2
+    public class _1_19_4_2 : BaseTest
     {
-        private IWebDriver driver;
-        private WebDriverWait wait;
-        private string baseUrl = "http://localhost";
-
-        [TestInitialize]
-        public void Setup()
-        {
-            var options = new ChromeOptions();
-            options.AddArgument("--start-maximized");
-            options.AddArgument("--ignore-certificate-errors");
-
-            driver = new ChromeDriver(options);
-            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-        }
-
-        [TestCleanup]
-        public void TearDown()
-        {
-            driver.Quit();
-            driver.Dispose();
-        }
-
         [TestMethod]
         public void TC_1_19_4_NoLogin_AccessDashboard()
         {
-            Console.WriteLine("Test gestart: TC_1_19_4_NoLogin_AccessDashboard");
+            // Stap 1: Navigatie naar beveiligde pagina
+            LogStep(1, "Navigating to /dashboard without being logged in...");
+            dashboardPage.Navigate();
+            LogSuccess(1, "Navigation attempt to protected route completed.");
 
-            
-            Console.WriteLine("Navigeren naar /dashboard zonder in te loggen...");
-            driver.Navigate().GoToUrl($"{baseUrl}/dashboard");
+            // Stap 2: Wachten op automatische redirect
+            LogStep(2, "Waiting for login page elements (redirect check)...");
+            wait.Until(d => loginPage.IsPasswordInputDisplayed());
+            LogInfo($"Current URL: {driver.Url}");
+            LogSuccess(2, "Redirection to login page detected.");
 
-            
-            Console.WriteLine("Wachten op emailveld (loginpagina)...");
-            var loginField = wait.Until(d => d.FindElement(By.Id("email")));
+            // Stap 3: Verificatie blokkade
+            LogStep(3, "Verifying if dashboard access is blocked...");
+            Assert.IsTrue(loginPage.IsPasswordInputDisplayed(), "Gebruiker kan dashboard openen zonder inloggen!");
+            LogSuccess(3, "Access to dashboard without login is blocked as expected.");
 
-            Console.WriteLine("Emailveld gevonden ? gebruiker is teruggestuurd naar loginpagina.");
-
-            
-            Assert.IsTrue(loginField.Displayed,
-                "Gebruiker kan dashboard openen zonder inloggen!");
-
-            Console.WriteLine("? Toegang tot dashboard zonder login is geblokkeerd zoals verwacht.");
-            Console.WriteLine("Test succesvol afgerond.");
+            // Stap 4: Controle van de huidige staat
+            LogStep(4, "Final verification of login page presence...");
+            LogInfo("Login page is visible, dashboard content is not accessible.");
+            LogSuccess(4, "Unauthorized access protection verified successfully.");
         }
-
     }
 }

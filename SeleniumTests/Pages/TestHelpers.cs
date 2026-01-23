@@ -1,23 +1,16 @@
 using OpenQA.Selenium;
 using System.Threading;
 
-namespace SeleniumTests.P_O_M
+namespace SeleniumTests.Pages
 {
     /// <summary>
     /// Helper class for common test operations
     /// </summary>
-    public class TestHelpers
+    public class TestHelpers(IWebDriver driver, LoginPage loginPage, DossierPage dossierPage)
     {
-        private readonly IWebDriver driver;
-        private readonly LoginPage loginPage;
-        private readonly DossierPage dossierPage;
-
-        public TestHelpers(IWebDriver driver, LoginPage loginPage, DossierPage dossierPage)
-        {
-            this.driver = driver;
-            this.loginPage = loginPage;
-            this.dossierPage = dossierPage;
-        }
+        private readonly IWebDriver driver = driver;
+        private readonly LoginPage loginPage = loginPage;
+        private readonly DossierPage dossierPage = dossierPage;
 
         /// <summary>
         /// Complete patient login flow: Navigate -> Login -> Go to Dossier
@@ -28,9 +21,7 @@ namespace SeleniumTests.P_O_M
             loginPage.Navigate();
 
             // Login
-            loginPage.EnterEmail(email);
-            loginPage.EnterPassword(password);
-            loginPage.ClickLogin();
+            loginPage.PerformLogin(email, password);
 
             // Wait for redirect after login
             Thread.Sleep(1000);

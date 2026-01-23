@@ -4,19 +4,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SeleniumTests.P_O_M
+namespace SeleniumTests.Pages
 {
-    public class DossierPage
+    public class DossierPage(IWebDriver driver): BasePage(driver)
     {
-        private readonly IWebDriver driver;
-
-        public DossierPage(IWebDriver driver)
-        {
-            this.driver = driver;
-        }
-
-        // URL van de dossierpagina
-        public string Url => "http://localhost:5173/dossier";
+        // URL
+        public string Path => "/dossier";
 
         // ---------- FILTERS ----------
         private By TreatmentDropdown => By.CssSelector("select.filter-select");
@@ -47,13 +40,13 @@ namespace SeleniumTests.P_O_M
 
         public void Navigate()
         {
-            driver.Navigate().GoToUrl(Url);
+            driver.Navigate().GoToUrl(BaseUrl + Path);
         }
 
         public void SelectTreatment(string treatmentName)
         {
             var dropdown = driver.FindElement(TreatmentDropdown);
-            var selectElement = new OpenQA.Selenium.Support.UI.SelectElement(dropdown);
+            var selectElement = new SelectElement(dropdown);
             selectElement.SelectByText(treatmentName);
         }
 

@@ -1,5 +1,5 @@
 <template>
-  <button class="logout-btn" @click.prevent="logout">Uitloggen</button>
+  <button id="logout-btn" class="logout-btn" @click.prevent="logout">Uitloggen</button>
 </template>
 
 <script setup>

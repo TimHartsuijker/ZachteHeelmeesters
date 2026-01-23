@@ -1,72 +1,44 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Support.UI;
-using SeleniumTests.P_O_M;
-using System;
+using SeleniumTests.Base;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace SeleniumTests
+namespace US1._19
 {
     [TestClass]
-    public class _1_19_3
+    public class _1_19_3 : BaseTest
     {
-        private IWebDriver driver;
-        private WebDriverWait wait;
-        private string baseUrl = "http://localhost";
-        private LoginPage loginPage;
-
-        [TestInitialize]
-        public void Setup()
-        {
-            var options = new ChromeOptions();
-            options.AddArgument("--start-maximized");
-            options.AddArgument("--ignore-certificate-errors");
-
-            driver = new ChromeDriver(options);
-            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-
-            loginPage = new LoginPage(driver);
-        }
-
-        [TestCleanup]
-        public void TearDown()
-        {
-            driver.Quit();
-            driver.Dispose();
-        }
-
         [TestMethod]
         public void TC_1_19_3_ValidatieCorrecteInlog()
         {
-            Console.WriteLine("Test gestart: TC_1_19_3_ValidatieCorrecteInlog");
+            const string EMAIL = "gebruiker@example.com";
+            const string PASSWORD = "Wachtwoord123";
 
-            
-            Console.WriteLine("Navigeren naar loginpagina...");
-            driver.Navigate().GoToUrl($"{baseUrl}/");
-            Console.WriteLine("Loginpagina geladen.");
+            // Stap 1: Navigatie
+            LogStep(1, "Navigating to login page...");
+            loginPage.Navigate();
+            wait.Until(d => loginPage.IsPasswordInputDisplayed());
+            LogSuccess(1, "Login page loaded successfully.");
 
-           
-            Console.WriteLine("E-mailadres invoeren: gebruiker@example.com");
-            loginPage.EnterEmail("gebruiker@example.com");
+            // Stap 2: Inloggen
+            LogStep(2, $"Attempting login with email: {EMAIL}");
+            loginPage.PerformLogin(EMAIL, PASSWORD);
+            LogSuccess(2, "Login credentials submitted.");
 
-            Console.WriteLine("Wachtwoord invoeren: Wachtwoord123");
-            loginPage.EnterPassword("Wachtwoord123");
+            // Stap 3: Redirect controle
+            LogStep(3, "Waiting for dashboard redirect...");
+            wait.Until(d => dashboardPage.IsLogoutButtonDisplayed() || !d.Url.EndsWith("/login"));
+            LogInfo($"Current URL after redirect: {driver.Url}");
+            LogSuccess(3, "Redirect detected successfully.");
 
-            Console.WriteLine("Op inlogknop klikken...");
-            loginPage.ClickLogin();
+            // Stap 4: Verificatie
+            LogStep(4, "Verifying user is no longer on the login page...");
+            Assert.IsFalse(driver.Url.Contains("login"), "Gebruiker bleef op loginpagina na correcte inlog.");
+            LogSuccess(4, "User successfully redirected. Login validation passed.");
 
-            
-            Console.WriteLine("Wachten op redirect naar dashboard...");
-            wait.Until(d => d.Url.Contains("/dashboard") || !d.Url.EndsWith("/login"));
-            Console.WriteLine("Redirect gedetecteerd!");
-
-            
-            Console.WriteLine("Controleren of gebruiker NIET op loginpagina is gebleven...");
-            Assert.IsFalse(driver.Url.Contains("login"),
-                "Gebruiker bleef op loginpagina na correcte inlog.");
-
-            Console.WriteLine("? Succesvolle loginvalidatie uitgevoerd. Gebruiker is doorgestuurd.");
-            Console.WriteLine("Test succesvol afgerond.");
+            // Stap 5: Finale controle dashboard
+            LogStep(5, "Verifying dashboard elements...");
+            Assert.IsTrue(dashboardPage.IsLogoutButtonDisplayed(), "Logout knop niet gevonden op dashboard.");
+            LogSuccess(5, "Dashboard is fully loaded and functional.");
         }
     }
 }

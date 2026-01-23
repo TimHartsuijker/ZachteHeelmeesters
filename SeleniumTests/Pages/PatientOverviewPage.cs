@@ -3,14 +3,12 @@ using OpenQA.Selenium.Support.UI;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace SeleniumTests.P_O_M
+namespace SeleniumTests.Pages
 {
-    public class PatientOverviewPage(IWebDriver driver)
+    public class PatientOverviewPage(IWebDriver driver): BasePage(driver)
     {
-        private readonly IWebDriver driver = driver;
-
         // URL
-        public static string Url => "http://localhost:5173/patienten";
+        public static string Path => "/patienten";
 
         // Locators
         private static By PageHeader => By.XPath("//h1[contains(text(), 'Mijn patiënten') or contains(text(), 'Patiënten')]");
@@ -24,7 +22,7 @@ namespace SeleniumTests.P_O_M
         // Actions
         public void Navigate()
         {
-            driver.Navigate().GoToUrl(Url);
+            driver.Navigate().GoToUrl(BaseUrl + Path);
         }
 
         // Verifications

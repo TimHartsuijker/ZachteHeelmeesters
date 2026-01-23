@@ -1,78 +1,46 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Support.UI;
-using SeleniumTests.P_O_M;
-using System;
+using SeleniumTests.Base;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace SeleniumTests
+namespace US1._19
 {
     [TestClass]
-    public class _1_19_2
+    public class _1_19_2 : BaseTest
     {
-        private IWebDriver driver;
-        private WebDriverWait wait;
-        private string baseUrl = "http://localhost";
-
-        private LoginPage loginPage;
-
-        [TestInitialize]
-        public void Setup()
-        {
-            var options = new ChromeOptions();
-            options.AddArgument("--start-maximized");
-            options.AddArgument("--ignore-certificate-errors");
-
-            driver = new ChromeDriver(options);
-            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-
-            loginPage = new LoginPage(driver);
-        }
-
-        [TestCleanup]
-        public void Cleanup()
-        {
-            driver.Quit();
-            driver.Dispose();
-        }
-
         [TestMethod]
         public void TC_1_19_2_PasswordInputIsPresentAndAcceptsInput()
         {
-            Console.WriteLine("Test gestart: TC_1_19_2_PasswordInputIsPresentAndAcceptsInput");
+            const string TEST_PASSWORD = "Test123!";
 
-            Console.WriteLine("Navigeren naar loginpagina...");
-            driver.Navigate().GoToUrl($"{baseUrl}/");
-            Console.WriteLine("Loginpagina geladen.");
+            // Stap 1: Navigatie
+            LogStep(1, "Navigating to login page...");
+            loginPage.Navigate();
+            LogSuccess(1, "Login page loaded successfully.");
 
-            
-            Console.WriteLine("Controleren of wachtwoordveld zichtbaar is...");
-            Assert.IsTrue(loginPage.IsPasswordFieldDisplayed(),
-                "Het wachtwoordveld is niet zichtbaar.");
-            Console.WriteLine("Wachtwoordveld is zichtbaar!");
+            // Stap 2: Zichtbaarheid controleren
+            LogStep(2, "Verifying if password input field is visible...");
+            wait.Until(d => loginPage.IsPasswordInputDisplayed());
+            Assert.IsTrue(loginPage.IsPasswordInputDisplayed(), "Het wachtwoordveld is niet zichtbaar.");
+            LogSuccess(2, "Password input field is visible.");
 
-            
-            Console.WriteLine("Wachtwoordveld selecteren...");
-            var passwordField = driver.FindElement(By.Id("wachtwoord"));
-            passwordField.Click();
-            Console.WriteLine("Wachtwoordveld aangeklikt.");
+            // Stap 3: Focus/Klikken
+            LogStep(3, "Selecting password input field...");
+            loginPage.ClickPasswordInput();
 
-            Assert.IsTrue(passwordField.Equals(driver.SwitchTo().ActiveElement()),
-                "Het wachtwoordveld kan geen focus krijgen.");
-            Console.WriteLine("Wachtwoordveld heeft focus.");
+            Assert.IsTrue(loginPage.IsPasswordInputFocused(), "Het wachtwoordveld kan geen focus krijgen.");
+            LogSuccess(3, "Password input field clicked and focused.");
 
-           
-            string testPassword = "Test123!";
-            Console.WriteLine($"Wachtwoord invoeren: {testPassword}");
-            loginPage.EnterPassword(testPassword);
+            // Stap 4: Tekst invoer
+            LogStep(4, $"Entering password: {TEST_PASSWORD}");
+            loginPage.EnterPassword(TEST_PASSWORD);
 
-            
-            Assert.AreEqual(testPassword, passwordField.GetAttribute("value"),
-                "Het wachtwoordveld accepteert geen tekst.");
-            Console.WriteLine("Wachtwoord correct ingevoerd!");
+            Assert.AreEqual(TEST_PASSWORD, loginPage.GetPasswordInputValue(), "Het wachtwoordveld accepteert geen tekst.");
+            LogSuccess(4, "Password correctly entered and verified.");
 
-            Console.WriteLine("Test succesvol afgerond.");
+            // Stap 5: Finale controle
+            LogStep(5, "Verifying input field state...");
+            LogInfo("Input field value matches the test password.");
+            LogSuccess(5, "Password input verification complete.");
         }
-
     }
 }

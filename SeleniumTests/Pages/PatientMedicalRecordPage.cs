@@ -1,18 +1,11 @@
 using OpenQA.Selenium;
 
-namespace SeleniumTests.P_O_M
+namespace SeleniumTests.Pages
 {
-    public class PatientMedicalRecordPage
+    public class PatientMedicalRecordPage(IWebDriver driver): BasePage(driver)
     {
-        private readonly IWebDriver driver;
-
-        public PatientMedicalRecordPage(IWebDriver driver)
-        {
-            this.driver = driver;
-        }
-
         // Current route is /dossier/{patientId}
-        public static string GetUrl(string patientId) => $"http://localhost:5173/dossier/{patientId}";
+        public static string GetPath(string patientId) => $"/dossier/{patientId}";
 
         // Locators aligned with MedicalDossier.vue
         private static By ContentWrapper => By.CssSelector(".content-wrapper");
@@ -27,7 +20,7 @@ namespace SeleniumTests.P_O_M
         // Actions
         public void Navigate(string patientId)
         {
-            driver.Navigate().GoToUrl(GetUrl(patientId));
+            driver.Navigate().GoToUrl(BaseUrl + GetPath(patientId));
         }
 
         public void ClickBackButton()
@@ -74,7 +67,7 @@ namespace SeleniumTests.P_O_M
             try
             {
                 var entries = driver.FindElements(MedicalRecordEntries);
-                return (entries.Count > 0) || driver.FindElement(ContentWrapper).Displayed;
+                return entries.Count > 0 || driver.FindElement(ContentWrapper).Displayed;
             }
             catch (NoSuchElementException)
             {

@@ -7,8 +7,11 @@
       <li v-if="userRole === 'Specialist'" class="nav-center-buttons">
           <RouterLink to="/patienten" aria-current="page">Patiënten</RouterLink>
       </li>
-      <li v-else-if="userRole === 'Huisarts'" class="nav-center-buttons">
+      <li v-if="userRole === 'Huisarts'" class="nav-center-buttons">
           <RouterLink to="/patienten" aria-current="page">Patiënten</RouterLink>
+      </li>
+            <li v-if="userRole === 'Huisarts'" class="nav-center-buttons">
+          <RouterLink to="/doorverwijzing-aanmaken" aria-current="page">Doorverwijzing aanmaken</RouterLink>
       </li>
       <li v-else-if="userRole === 'Patiënt'" class="nav-center-buttons">
           <RouterLink to="/afspraken" aria-current="appointments page">Mijn afspraken</RouterLink>

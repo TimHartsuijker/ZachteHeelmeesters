@@ -1,7 +1,12 @@
 <template>
   <div class="referral-view-page">
     <div class="referral-view-card">
-    <h1>Create Referral</h1>
+    <div v-if="errorMessage" class="error-text">
+      {{ errorMessage }}
+    </div>
+    <div v-if="successMessage" class="success-text">
+      {{ successMessage }}
+    </div>
     <form>
       <div class="referral-view-form-group" >
         <select v-model="referral.patientId">
@@ -40,6 +45,8 @@ const router = useRouter();
 
 const treatmentCodes = ref([]);
 const patients = ref([]);
+const errorMessage = ref('');
+const successMessage = ref('');
 
 const referral = ref({
   patientId: '',
@@ -69,17 +76,19 @@ const loadPatients = async () => {
 
 const submitReferral = async () => {
   try {
+    errorMessage.value = '';
+    successMessage.value = '';
     const doctorId = sessionStorage.getItem('userId');
     
     if (!doctorId) {
-      console.error('No doctor ID found. User may not be logged in.');
+      errorMessage.value = 'geen doctor gevonden, u bent niet ingelogd als doctor';
       return;
     }
 
     // Find the treatment ID from the selected code
     const selectedTreatment = treatmentCodes.value.find(t => t.code === referral.value.treatmentCode);
     if (!selectedTreatment) {
-      console.error('Invalid treatment code selected.');
+      errorMessage.value = 'Ongeldige behandelingscode geselecteerd.';
       return;
     }
 
@@ -92,10 +101,18 @@ const submitReferral = async () => {
       createdAt: new Date().toISOString()
     });
 
+    successMessage.value = 'Doorverwijzing succesvol aangemaakt!';
+    
+    // Reset form
+    referral.value = {
+      patientId: '',
+      treatmentCode: '',
+      note: ''
+    };
     console.log('Referral submitted successfully:', response.data);
   } catch (error) {
-    console.error('Error submitting referral:', error.response?.data || error.message);
-    // You can add user-facing error handling here (e.g., show a toast notification)
+    errorMessage.value = error.response?.data?.message || error.message || 'Er is een fout opgetreden bij het verzenden van de verwijzing.';
+    console.error('error bij het maken van doorverwijzing: ', error.response?.data || error.message);
   }
 };
 

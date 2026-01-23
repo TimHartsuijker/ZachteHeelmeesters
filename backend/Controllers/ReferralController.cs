@@ -32,14 +32,20 @@ namespace backend.Controllers
                 return BadRequest(new { message = "Alle velden moeten ingevuld zijn." });
             }
 
-            // 2 Controleer of patient bestaat
+            // 2 Controleer of code al bestaat
+            if (_context.Referrals.Any(r => r.Code == request.Code))
+            {
+                return BadRequest(new { message = "deze code bestaal al" });
+            }
+
+            // 3 Controleer of patient bestaat
             var patient = _context.Users.FirstOrDefault(r => r.Id == request.PatientId);
             if (patient == null)
             {
                 return BadRequest(new { message = "De opgegeven patient bestaat niet." });
             }
 
-            // 3 Maak nieuwe doorverwijzing aan
+            // 4 Maak nieuwe doorverwijzing aan
             var referral = new Referral
             {
                 Code = request.Code,
@@ -50,7 +56,7 @@ namespace backend.Controllers
                 CreatedAt = DateTime.UtcNow
             };
 
-            // 4 Opslaan in database
+            // 5 Opslaan in database
             _context.Referrals.Add(referral);
             _context.SaveChanges();
 

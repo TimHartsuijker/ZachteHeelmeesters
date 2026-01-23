@@ -1,4 +1,7 @@
-﻿using backend.Models;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using backend.Models;
 using Microsoft.AspNetCore.Identity;
 
 namespace backend.Data
@@ -9,13 +12,42 @@ namespace backend.Data
         {
             context.Database.EnsureCreated();
 
+            // 1. Zorg dat alle rollen bestaan
+            EnsureRolesExist(context);
+
             var passwordHasher = new PasswordHasher<User>();
 
+            // 2. Haal rollen op
             var patientRole = context.Roles.First(r => r.RoleName == "Patiënt");
             var doctorRole = context.Roles.First(r => r.RoleName == "Specialist");
             var generalPracticioner = context.Roles.First(r => r.RoleName == "Huisarts");
             var adminRole = context.Roles.First(r => r.RoleName == "Admin");
+            var adminMedewerkerRole = context.Roles.First(r => r.RoleName == "Administratiemedewerker");
 
+            // 3. Seed administratiemedewerker
+            if (!context.Users.Any(u => u.Email == "adminmedewerker@example.com"))
+            {
+                var adminMedewerker = new User
+                {
+                    FirstName = "Admin",
+                    LastName = "Medewerker",
+                    Email = "adminmedewerker@example.com",
+                    StreetName = "Adminstraat",
+                    HouseNumber = "50",
+                    PostalCode = "1234AB",
+                    PhoneNumber = "0611111111",
+                    DateOfBirth = DateTime.UtcNow.AddYears(-30),
+                    Gender = "Vrouw",
+                    CitizenServiceNumber = "111111111",
+                    CreatedAt = DateTime.UtcNow,
+                    RoleId = adminMedewerkerRole.Id
+                };
+
+                adminMedewerker.PasswordHash = passwordHasher.HashPassword(adminMedewerker, "AdminMed123");
+                context.Users.Add(adminMedewerker);
+                context.SaveChanges();
+                Console.WriteLine($"[DbSeederTest] Created Admin Medewerker user with ID: {adminMedewerker.Id}");
+            }
 
             // Doctor user seeden (eerst zodat patient koppeling kan krijgen)
             var doctorUser = context.Users.FirstOrDefault(u => u.Email == "testdoctor@example.com");
@@ -121,7 +153,7 @@ namespace backend.Data
                     HouseNumber = "99",
                     PostalCode = "9999AA",
                     PhoneNumber = "0600000000",
-                    DateOfBirth = DateTime.Now,
+                    DateOfBirth = DateTime.UtcNow,
                     Gender = "Man",
                     CitizenServiceNumber = "012345678",
                     CreatedAt = DateTime.UtcNow,
@@ -146,7 +178,7 @@ namespace backend.Data
                     HouseNumber = "1",
                     PostalCode = "1234AB",
                     PhoneNumber = "0612345678",
-                    DateOfBirth = DateTime.Now,
+                    DateOfBirth = DateTime.UtcNow,
                     Gender = "Man",
                     CitizenServiceNumber = "987654322",
                     CreatedAt = DateTime.UtcNow,
@@ -171,7 +203,7 @@ namespace backend.Data
                     HouseNumber = "1",
                     PostalCode = "1234AB",
                     PhoneNumber = "0612345678",
-                    DateOfBirth = DateTime.Now,
+                    DateOfBirth = DateTime.UtcNow,
                     Gender = "Man",
                     CitizenServiceNumber = "987654323",
                     CreatedAt = DateTime.UtcNow,
@@ -190,6 +222,34 @@ namespace backend.Data
                 {
                     Console.WriteLine($"[DbSeederTest]   - User ID {user.Id}: {user.Email}");
                 }
+            }
+        }
+
+        private static void EnsureRolesExist(AppDbContext context)
+        {
+            var requiredRoles = new List<string>
+            {
+                "Patiënt",
+                "Huisarts",
+                "Specialist",
+                "Admin",
+                "Administratiemedewerker"
+            };
+
+            bool changesMade = false;
+            foreach (var roleName in requiredRoles)
+            {
+                if (!context.Roles.Any(r => r.RoleName == roleName))
+                {
+                    context.Roles.Add(new Role { RoleName = roleName });
+                    Console.WriteLine($"[DbSeederTest] Created role: {roleName}");
+                    changesMade = true;
+                }
+            }
+
+            if (changesMade)
+            {
+                context.SaveChanges();
             }
         }
     }

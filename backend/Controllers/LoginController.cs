@@ -23,7 +23,7 @@ namespace backend.Controllers
             _passwordHasher = new PasswordHasher<User>();
             _logger = logger;
         }
-        
+
 
         [HttpGet]
         public IActionResult TestEndpoint()
@@ -55,8 +55,9 @@ namespace backend.Controllers
                 return Unauthorized(new { message = "Inloggegevens zijn incorrect" });
             }
 
-            // 🔒 ADMIN MAG HIER NIET INLOGGEN
-            if (user.Role.RoleName == "Admin")
+            // 🔒 ALLEEN ADMIN MAG HIER NIET INLOGGEN
+            // Administratiemedewerker WEL toegestaan!
+            if (user.Role.RoleName == "Admin")  // Alleen Admin blokkeren
             {
                 return Unauthorized(new { message = "Gebruik de admin login pagina" });
             }
@@ -85,6 +86,7 @@ namespace backend.Controllers
                 }
             });
         }
+
         [HttpPost("admin")]
         public async Task<IActionResult> AdminLogin([FromBody] LoginRequest request)
         {
@@ -98,7 +100,9 @@ namespace backend.Controllers
                 .Include(u => u.Role)
                 .FirstOrDefaultAsync(u => u.Email == request.Email);
 
-            if (user == null || user.Role.RoleName != "Admin")
+            // ✅ ACCEPTEER ZOWEL ADMIN ALS ADMINISTRATIEMEDEWERKER
+            if (user == null ||
+                (user.Role.RoleName != "Admin" && user.Role.RoleName != "Administratiemedewerker"))
             {
                 return Unauthorized(new { message = "Inloggegevens zijn incorrect" });
             }
@@ -183,12 +187,5 @@ namespace backend.Controllers
                 return StatusCode(500, new { message = "Er is een fout opgetreden bij het ophalen van gebruikersgegevens" });
             }
         }
-
     }
 }
-
-
-
- 
-
-        

@@ -9,6 +9,7 @@ import AdminLoginView from "../views/AdminLoginView.vue";
 import AdminDashboardView from "../views/AdminDashboardView.vue";
 import UsersView from "../views/AdminUserManagementView.vue";
 import DoctorPatientsView from "../views/DoctorPatientsView.vue";
+import AdminCreateUserView from "../views/AdminCreateUserView.vue";
 
 const routes = [
   { 
@@ -75,6 +76,12 @@ const routes = [
     name: "DoctorPatients",
     component: DoctorPatientsView,
     meta: { requiresAuth: true, allowedRoles: ['Huisarts', 'Specialist'] },
+  },
+  {
+    path: "/admin/create-user",
+    name: "AdminCreateUser",
+    component: AdminCreateUserView,
+    meta: { requiresAuth: true, allowedRoles: ['Admin', 'Administratiemedewerker'] },
   }
 ]
 

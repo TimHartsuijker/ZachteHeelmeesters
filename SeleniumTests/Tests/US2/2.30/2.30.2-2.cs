@@ -1,8 +1,7 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
-using SeleniumTests.Pages;
 using System;
 
 namespace SeleniumTests
@@ -12,9 +11,7 @@ namespace SeleniumTests
     {
         private IWebDriver driver;
         private WebDriverWait wait;
-        private string baseUrl = "https://localhost:5173";
-
-        private LoginPage loginPage;
+        private string baseUrl = "http://localhost";
 
         [TestInitialize]
         public void Setup()
@@ -25,15 +22,13 @@ namespace SeleniumTests
 
             driver = new ChromeDriver(options);
             wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-
-            loginPage = new LoginPage(driver);
-            Console.WriteLine("Setup voltooid.");
+            Console.WriteLine("Setup completed.");
         }
 
         [TestCleanup]
         public void Cleanup()
         {
-            Console.WriteLine("Test afgerond. Browser wordt afgesloten.");
+            Console.WriteLine("Test finished. Closing browser.");
             driver.Quit();
             driver.Dispose();
         }
@@ -41,37 +36,52 @@ namespace SeleniumTests
         [TestMethod]
         public void NavigationMenu_ContainsCorrectOptions()
         {
-            Console.WriteLine("Test gestart: NavigationMenu_ContainsCorrectOptions");
+            Console.WriteLine("Test started: NavigationMenu_ContainsCorrectOptions");
+            Console.WriteLine("Test case: TC2.30.2-2 - Verifying available dashboard functionality");
+            Console.WriteLine("NOTE: The dashboard uses panels instead of a traditional menu.");
 
-            // Stap 1: Navigeren naar loginpagina en inloggen
-            Console.WriteLine("Stap 1: Navigeren naar loginpagina...");
-            driver.Navigate().GoToUrl($"{baseUrl}/");
-            Console.WriteLine("Stap 1b: Inloggegevens invoeren...");
-            loginPage.EnterEmail("patient@example.com");
-            loginPage.EnterPassword("Test123!");
-            Console.WriteLine("Stap 1c: Inloggen...");
-            loginPage.ClickLogin();
+            // Step 1: Login
+            Console.WriteLine("Step 1: Navigating to login page...");
+            driver.Navigate().GoToUrl($"{baseUrl}/login");
 
-            // Stap 2: Wachten tot dashboard geladen is
-            Console.WriteLine("Stap 2: Wachten tot dashboard zichtbaar is...");
-            wait.Until(d => d.FindElement(By.Id("dashboard-container")));
-            Console.WriteLine("Dashboard geladen!");
+            Console.WriteLine("Step 1b: Entering login credentials...");
+            driver.FindElement(By.Id("email")).SendKeys("gebruiker@example.com");
+            driver.FindElement(By.Id("wachtwoord")).SendKeys("Wachtwoord123");
 
-            // Stap 3: Controleren menu-opties
-            string[] expectedItems = { "Dashboard", "Afspraken", "Facturen", "Medisch dossier" };
-            Console.WriteLine("Stap 3: Controleren navigatiemenu zichtbaar...");
-            var navMenu = driver.FindElement(By.Id("navigation-menu"));
-            Assert.IsTrue(navMenu.Displayed, "Navigatiemenu is niet zichtbaar.");
+            Console.WriteLine("Step 1c: Logging in...");
+            driver.FindElement(By.Id("login-btn")).Click();
 
-            foreach (string item in expectedItems)
-            {
-                Console.WriteLine($"Zoeken naar menu item: {item}");
-                var element = navMenu.FindElement(By.XPath($".//*[contains(text(),'{item}')]"));
-                Assert.IsTrue(element.Displayed, $"Menu item '{item}' is niet zichtbaar.");
-                Console.WriteLine($"Menu item '{item}' gevonden!");
-            }
+            // Step 2: Wait for dashboard
+            Console.WriteLine("Step 2: Waiting for dashboard...");
+            wait.Until(d => d.FindElement(By.CssSelector("[data-test='welcome-message']")));
+            Console.WriteLine("Dashboard loaded!");
 
-            Console.WriteLine("Test succesvol afgerond.");
+            // Step 3: Verify functionality
+            Console.WriteLine("Step 3: Verifying available functionality...");
+
+            var welcomeMessage = driver.FindElement(By.CssSelector("[data-test='welcome-message']"));
+            Assert.IsTrue(welcomeMessage.Displayed, "Welcome message is not visible.");
+            Console.WriteLine($"✓ Welcome message: {welcomeMessage.Text}");
+
+            var leftPanel = driver.FindElement(By.ClassName("panel-left"));
+            var rightPanel = driver.FindElement(By.ClassName("panel-right"));
+
+            Assert.IsTrue(leftPanel.Displayed, "Left panel is not visible.");
+            Assert.IsTrue(rightPanel.Displayed, "Right panel is not visible.");
+
+            var leftTitle = leftPanel.FindElement(By.TagName("h2")).Text;
+            var rightTitle = rightPanel.FindElement(By.TagName("h2")).Text;
+
+            Console.WriteLine($"✓ Left panel title: {leftTitle}");
+            Console.WriteLine($"✓ Right panel title: {rightTitle}");
+
+            bool hasAppointments = leftTitle.Contains("Afspraken") || leftTitle.Contains("Appointments");
+            bool hasReferrals = rightTitle.Contains("Doorverwijzingen") || rightTitle.Contains("Referrals");
+
+            Assert.IsTrue(hasAppointments, $"Left panel does not contain appointments. Found: {leftTitle}");
+            Assert.IsTrue(hasReferrals, $"Right panel does not contain referrals. Found: {rightTitle}");
+
+            Console.WriteLine("✓ Test passed: Dashboard shows correct functionality.");
         }
     }
 }

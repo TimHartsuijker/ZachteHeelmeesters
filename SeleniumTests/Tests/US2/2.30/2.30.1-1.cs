@@ -1,20 +1,17 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
-using SeleniumTests.Pages;
 using System;
 
 namespace SeleniumTests
 {
     [TestClass]
-    public class _2_30_1
+    public class _2_30_1_1
     {
         private IWebDriver driver;
         private WebDriverWait wait;
-        private string baseUrl = "https://localhost:5173";
-
-        private LoginPage loginPage;
+        private string baseUrl = "http://localhost";
 
         [TestInitialize]
         public void Setup()
@@ -25,8 +22,6 @@ namespace SeleniumTests
 
             driver = new ChromeDriver(options);
             wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-
-            loginPage = new LoginPage(driver);
         }
 
         [TestCleanup]
@@ -39,41 +34,53 @@ namespace SeleniumTests
         [TestMethod]
         public void TC_2_30_1_1_Dashboard_DisplaysWelcomeMessage()
         {
-            Console.WriteLine("Test gestart: TC_2_30_1_1_Dashboard_DisplaysWelcomeMessage");
+            Console.WriteLine("Test started: TC_2_30_1_1_Dashboard_DisplaysWelcomeMessage");
 
-            // Stap 1: Ga naar loginpagina
-            //Console.WriteLine("Navigeren naar loginpagina...");
-            //driver.Navigate().GoToUrl($"{baseUrl}/login");
-            //Console.WriteLine("Navigatie voltooid!");
+            // Step 1: Navigate to login page
+            Console.WriteLine("Navigating to login page...");
+            driver.Navigate().GoToUrl($"{baseUrl}/login");
+            Console.WriteLine("Navigation completed!");
 
-            //// Stap 2: Geldige inloggegevens invoeren
-            //Console.WriteLine("Geldige inloggegevens invullen...");
-            //loginPage.EnterEmail("patient@example.com");
-            //loginPage.EnterPassword("Test123!");
-            //Console.WriteLine("Inloggegevens ingevuld.");
+            // Step 2: Enter valid login credentials
+            Console.WriteLine("Entering valid login credentials...");
 
-            //// Stap 3: Klik op Inloggen
-            //Console.WriteLine("Klikken op inloggen...");
-            //loginPage.ClickLogin();
-            //Console.WriteLine("Login verstuurd.");
+            // Find elements directly and fill them in
+            var emailInput = driver.FindElement(By.Id("email"));
+            emailInput.SendKeys("gebruiker@example.com");
 
-            // Stap 4: Wachten tot dashboard geladen is
-            //Console.WriteLine("Wachten tot dashboard verschijnt...");
-            //wait.Until(d => d.FindElement(By.Id("dashboard-container")));
-            //Console.WriteLine("Dashboard succesvol geladen!");
+            var passwordInput = driver.FindElement(By.Id("wachtwoord"));
+            passwordInput.SendKeys("Wachtwoord123");
 
-            // Stap 5: Check of welkomstboodschap zichtbaar is
-            Console.WriteLine("Controleren of de welkomstboodschap zichtbaar is...");
+            Console.WriteLine("Login credentials entered.");
 
-            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            // Step 3: Click login
+            Console.WriteLine("Clicking login button...");
+            var loginButton = driver.FindElement(By.Id("login-btn"));
+            loginButton.Click();
+            Console.WriteLine("Login submitted.");
+
+            // Step 4: Wait until dashboard is loaded
+            Console.WriteLine("Waiting for dashboard to appear...");
+            wait.Until(d => d.FindElement(By.CssSelector("[data-test='welcome-message']")));
+            Console.WriteLine("Dashboard successfully loaded!");
+
+            // Step 5: Verify welcome message is visible
+            Console.WriteLine("Verifying that the welcome message is visible...");
+
             var welcomeMessage = wait.Until(d =>
                 d.FindElement(By.CssSelector("[data-test='welcome-message']")));
 
             Assert.IsTrue(welcomeMessage.Displayed,
-                "Welkomstboodschap wordt niet weergegeven op het dashboard.");
-            Console.WriteLine($"Welkomstboodschap gevonden: {welcomeMessage.Text}");
+                "Welcome message is not displayed on the dashboard.");
 
-            Console.WriteLine("Test succesvol afgerond.");
-        }
+            // Additional verification
+            string expectedName = "Test Gebruiker";
+            Assert.IsTrue(welcomeMessage.Text.Contains(expectedName),
+                $"Welcome message does not contain the expected name '{expectedName}'. Actual text: {welcomeMessage.Text}");
+
+            Console.WriteLine($"Welcome message found: {welcomeMessage.Text}");
+
+            Console.WriteLine("Test completed successfully.");
         }
     }
+}

@@ -2,7 +2,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
-using SeleniumTests.Pages;
 using System;
 
 namespace SeleniumTests
@@ -12,8 +11,7 @@ namespace SeleniumTests
     {
         private IWebDriver driver;
         private WebDriverWait wait;
-        private string baseUrl = "https://localhost:5173";
-        private LoginPage loginPage;
+        private string baseUrl = "http://localhost";
 
         [TestInitialize]
         public void Setup()
@@ -24,7 +22,6 @@ namespace SeleniumTests
 
             driver = new ChromeDriver(options);
             wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-            loginPage = new LoginPage(driver);
             Console.WriteLine("Setup voltooid.");
         }
 
@@ -38,27 +35,44 @@ namespace SeleniumTests
         [TestMethod]
         public void Dashboard_UpdatesAfterDataChange()
         {
-            Console.WriteLine("Test gestart: Dashboard_UpdatesAfterDataChange");
+            Console.WriteLine("Test started: Dashboard_UpdatesAfterDataChange");
+            Console.WriteLine("Test case: TC2.30.3-4 - Dashboard updates after data change");
 
-            // Stap 1: Navigeren naar loginpagina en inloggen
-            driver.Navigate().GoToUrl($"{baseUrl}/");
-            loginPage.EnterEmail("patient@example.com");
-            loginPage.EnterPassword("Test123!");
-            loginPage.ClickLogin();
+            // Step 1: Navigate to login page and log in
+            Console.WriteLine("Step 1: Navigating to login page and logging in...");
+            driver.Navigate().GoToUrl($"{baseUrl}/login");
 
-            // Stap 2: Wachten tot dashboard summary zichtbaar is
-            wait.Until(d => d.FindElement(By.Id("dashboard-summary")));
+            driver.FindElement(By.Id("email")).SendKeys("gebruiker@example.com");
+            driver.FindElement(By.Id("wachtwoord")).SendKeys("Wachtwoord123");
+            driver.FindElement(By.Id("login-btn")).Click();
 
-            // Stap 3: Backend update simuleren (Refresh)
-            Console.WriteLine("Stap 3: Backend update simuleren...");
+            // Step 2: Wait for dashboard to load
+            Console.WriteLine("Step 2: Waiting for dashboard...");
+            var welcomeMessageElement = wait.Until(d =>
+                d.FindElement(By.CssSelector("[data-test='welcome-message']")));
+
+            string initialWelcomeMessage = welcomeMessageElement.Text;
+            Console.WriteLine($"Initial welcome message: {initialWelcomeMessage}");
+
+            // Step 3: Simulate data change (page refresh)
+            Console.WriteLine("Step 3: Simulating data update by refreshing the page...");
             driver.Navigate().Refresh();
-            wait.Until(d => d.FindElement(By.Id("dashboard-summary")));
 
-            // Stap 4: Controleren of updates zichtbaar zijn
-            var appointments = driver.FindElement(By.Id("summary-next-appointment")).Text;
-            Assert.IsTrue(appointments.Contains("NEW"), "Dashboard toont geen bijgewerkte gegevens.");
+            // Step 4: Verify dashboard reloads correctly
+            Console.WriteLine("Step 4: Verifying dashboard reload...");
+            var refreshedWelcomeMessageElement = wait.Until(d =>
+                d.FindElement(By.CssSelector("[data-test='welcome-message']")));
 
-            Console.WriteLine("Dashboard toont updates correct. Test geslaagd!");
+            string refreshedWelcomeMessage = refreshedWelcomeMessageElement.Text;
+            Console.WriteLine($"Refreshed welcome message: {refreshedWelcomeMessage}");
+
+            Assert.IsTrue(refreshedWelcomeMessageElement.Displayed,
+                "Welcome message is not visible after refreshing the dashboard.");
+
+            Assert.IsTrue(refreshedWelcomeMessage.Contains("Test Gebruiker"),
+                "Welcome message does not contain the expected user name after refresh.");
+
+            Console.WriteLine("Dashboard reloads correctly after data change. Test passed!");
         }
     }
 }

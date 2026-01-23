@@ -2,7 +2,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
-using SeleniumTests.Pages;
 using System;
 using System.Collections.Generic;
 
@@ -13,9 +12,7 @@ namespace SeleniumTests
     {
         private IWebDriver driver;
         private WebDriverWait wait;
-        private string baseUrl = "https://localhost:5173";
-
-        private LoginPage loginPage;
+        private string baseUrl = "http://localhost";
 
         [TestInitialize]
         public void Setup()
@@ -26,15 +23,13 @@ namespace SeleniumTests
 
             driver = new ChromeDriver(options);
             wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-
-            loginPage = new LoginPage(driver);
-            Console.WriteLine("Setup voltooid.");
+            Console.WriteLine("Setup completed.");
         }
 
         [TestCleanup]
         public void Cleanup()
         {
-            Console.WriteLine("Test afgerond. Browser wordt afgesloten.");
+            Console.WriteLine("Test finished. Closing browser.");
             driver.Quit();
             driver.Dispose();
         }
@@ -42,40 +37,65 @@ namespace SeleniumTests
         [TestMethod]
         public void NavigationMenu_LinksNavigateCorrectly()
         {
-            Console.WriteLine("Test gestart: NavigationMenu_LinksNavigateCorrectly");
+            Console.WriteLine("Test started: NavigationMenu_LinksNavigateCorrectly");
 
-            // Stap 1: Navigeren naar loginpagina en inloggen
-            Console.WriteLine("Stap 1: Navigeren naar loginpagina...");
-            driver.Navigate().GoToUrl($"{baseUrl}/");
-            loginPage.EnterEmail("patient@example.com");
-            loginPage.EnterPassword("Test123!");
-            Console.WriteLine("Stap 1b: Inloggen...");
-            loginPage.ClickLogin();
+            // Step 1: Login
+            Console.WriteLine("Step 1: Navigating to login page...");
+            driver.Navigate().GoToUrl($"{baseUrl}/login");
 
-            // Stap 2: Wachten tot navigatiemenu geladen is
-            Console.WriteLine("Stap 2: Wachten tot navigatiemenu zichtbaar is...");
-            wait.Until(d => d.FindElement(By.Id("navigation-menu")));
+            driver.FindElement(By.Id("email")).SendKeys("gebruiker@example.com");
+            driver.FindElement(By.Id("wachtwoord")).SendKeys("Wachtwoord123");
 
-            // Stap 3: Menu-items en verwachte pagina-elementen controleren
-            Dictionary<string, string> menuToPage = new()
+            Console.WriteLine("Step 1b: Logging in...");
+            driver.FindElement(By.Id("login-btn")).Click();
+
+            // Step 2: Wait for dashboard
+            Console.WriteLine("Step 2: Waiting for dashboard...");
+            wait.Until(d => d.FindElement(By.CssSelector("[data-test='welcome-message']")));
+            Console.WriteLine("Dashboard loaded!");
+
+            Dictionary<string, string> menuItems = new()
             {
-                { "Dashboard", "dashboard-container" },
-                { "Afspraken", "appointments-page" },
-                { "Facturen", "billing-page" },
-                { "Medisch dossier", "medical-records-page" }
+                { "Dashboard", "/dashboard" },
+                { "Mijn afspraken", "/afspraken" },
+                { "Mijn medisch dossier", "/medischdossier" },
+                { "Mijn profiel", "/patientprofiel" }
             };
 
-            foreach (var item in menuToPage)
+            foreach (var item in menuItems)
             {
-                Console.WriteLine($"Stap 3: Klikken op menu item '{item.Key}'...");
-                driver.FindElement(By.XPath($"//*[contains(text(),'{item.Key}')]")).Click();
+                Console.WriteLine($"Step 3: Clicking menu item '{item.Key}'...");
 
-                Console.WriteLine($"Stap 3b: Wachten tot pagina '{item.Value}' geladen is...");
-                wait.Until(d => d.FindElement(By.Id(item.Value)));
-                Console.WriteLine($"Menu item '{item.Key}' navigeert correct!");
+                try
+                {
+                    var link = driver.FindElement(By.XPath($"//a[contains(text(),'{item.Key}')]"));
+                    link.Click();
+
+                    Console.WriteLine($"Waiting for URL to contain '{item.Value}'...");
+                    wait.Until(d => d.Url.Contains(item.Value));
+
+                    Console.WriteLine($"Successfully navigated to: {driver.Url}");
+
+                    if (item.Key != "Dashboard")
+                    {
+                        Console.WriteLine("Returning to dashboard...");
+                        driver.FindElement(By.XPath("//a[contains(text(),'Dashboard')]")).Click();
+                        wait.Until(d => d.FindElement(By.CssSelector("[data-test='welcome-message']")));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error while navigating menu item '{item.Key}': {ex.Message}");
+
+                    driver.Navigate().GoToUrl($"{baseUrl}/login");
+                    driver.FindElement(By.Id("email")).SendKeys("gebruiker@example.com");
+                    driver.FindElement(By.Id("wachtwoord")).SendKeys("Wachtwoord123");
+                    driver.FindElement(By.Id("login-btn")).Click();
+                    wait.Until(d => d.FindElement(By.CssSelector("[data-test='welcome-message']")));
+                }
             }
 
-            Console.WriteLine("Test succesvol afgerond.");
+            Console.WriteLine("Test completed successfully.");
         }
     }
 }

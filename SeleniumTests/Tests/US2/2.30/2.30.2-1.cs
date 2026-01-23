@@ -1,8 +1,7 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
-using SeleniumTests.Pages;
 using System;
 
 namespace SeleniumTests
@@ -12,9 +11,7 @@ namespace SeleniumTests
     {
         private IWebDriver driver;
         private WebDriverWait wait;
-        private string baseUrl = "https://localhost:5173";
-
-        private LoginPage loginPage;
+        private string baseUrl = "http://localhost";
 
         [TestInitialize]
         public void Setup()
@@ -25,16 +22,13 @@ namespace SeleniumTests
 
             driver = new ChromeDriver(options);
             wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-
-            loginPage = new LoginPage(driver);
-
-            Console.WriteLine("Setup voltooid. Browser gestart.");
+            Console.WriteLine("Setup completed. Browser started.");
         }
 
         [TestCleanup]
         public void Cleanup()
         {
-            Console.WriteLine("Test afgerond. Browser wordt afgesloten.");
+            Console.WriteLine("Test finished. Closing browser.");
             driver.Quit();
             driver.Dispose();
         }
@@ -42,32 +36,55 @@ namespace SeleniumTests
         [TestMethod]
         public void NavigationMenu_VisibleAfterLogin()
         {
-            Console.WriteLine("Test gestart: NavigationMenu_VisibleAfterLogin");
+            Console.WriteLine("Test started: NavigationMenu_VisibleAfterLogin");
+            Console.WriteLine("Test case: TC2.30.2-1 - Visibility of navigation elements after login");
+            Console.WriteLine("NOTE: The dashboard does not have a traditional menu, but panels representing functionality.");
 
-            // Stap 1: Navigeren naar loginpagina
-            Console.WriteLine("Stap 1: Navigeren naar loginpagina...");
-            driver.Navigate().GoToUrl($"{baseUrl}/");
-            Console.WriteLine("Navigatie voltooid!");
+            // Step 1: Navigate to login page
+            Console.WriteLine("Step 1: Navigating to login page...");
+            driver.Navigate().GoToUrl($"{baseUrl}/login");
+            Console.WriteLine("Navigation completed!");
 
-            // Stap 2: Geldige login invoeren
-            Console.WriteLine("Stap 2: Email invoeren...");
-            loginPage.EnterEmail("patient@example.com");
-            Console.WriteLine("Stap 2b: Wachtwoord invoeren...");
-            loginPage.EnterPassword("Test123!");
-            Console.WriteLine("Stap 2c: Inloggen...");
-            loginPage.ClickLogin();
-            Console.WriteLine("Inloggen voltooid!");
+            // Step 2: Enter valid login credentials
+            Console.WriteLine("Step 2: Entering email...");
+            var emailInput = driver.FindElement(By.Id("email"));
+            emailInput.SendKeys("gebruiker@example.com");
 
-            // Stap 3: Wachten tot dashboard geladen is
-            Console.WriteLine("Stap 3: Wachten op dashboard...");
-            wait.Until(d => d.FindElement(By.Id("dashboard-container")));
-            Console.WriteLine("Dashboard geladen!");
+            Console.WriteLine("Step 2b: Entering password...");
+            var passwordInput = driver.FindElement(By.Id("wachtwoord"));
+            passwordInput.SendKeys("Wachtwoord123");
 
-            // Stap 4: Controleren of navigatiemenu zichtbaar is
-            Console.WriteLine("Stap 4: Controleren navigatiemenu...");
-            var navMenu = driver.FindElement(By.Id("navigation-menu"));
-            Assert.IsTrue(navMenu.Displayed, "Het navigatiemenu is niet zichtbaar na het inloggen.");
-            Console.WriteLine("Navigatiemenu is zichtbaar! Test geslaagd.");
+            Console.WriteLine("Step 2c: Logging in...");
+            var loginButton = driver.FindElement(By.Id("login-btn"));
+            loginButton.Click();
+            Console.WriteLine("Login completed!");
+
+            // Step 3: Wait for dashboard
+            Console.WriteLine("Step 3: Waiting for dashboard...");
+            wait.Until(d => d.FindElement(By.CssSelector("[data-test='welcome-message']")));
+            Console.WriteLine("Dashboard loaded!");
+
+            // Step 4: Verify dashboard navigation elements
+            Console.WriteLine("Step 4: Verifying dashboard navigation elements...");
+
+            var welcomeMessage = driver.FindElement(By.CssSelector("[data-test='welcome-message']"));
+            Assert.IsTrue(welcomeMessage.Displayed, "Welcome message is not visible.");
+
+            var dashboardGrid = driver.FindElement(By.ClassName("dashboard-grid"));
+            Assert.IsTrue(dashboardGrid.Displayed, "Dashboard grid is not visible.");
+
+            var leftPanel = driver.FindElement(By.ClassName("panel-left"));
+            Assert.IsTrue(leftPanel.Displayed, "Left panel (Appointments) is not visible.");
+
+            var rightPanel = driver.FindElement(By.ClassName("panel-right"));
+            Assert.IsTrue(rightPanel.Displayed, "Right panel (Referrals) is not visible.");
+
+            Console.WriteLine("✓ Dashboard navigation elements are visible:");
+            Console.WriteLine($"  - Welcome message: {welcomeMessage.Text}");
+            Console.WriteLine($"  - Left panel: {leftPanel.FindElement(By.TagName("h2")).Text}");
+            Console.WriteLine($"  - Right panel: {rightPanel.FindElement(By.TagName("h2")).Text}");
+
+            Console.WriteLine("Test passed: Dashboard displays all navigation elements.");
         }
     }
 }

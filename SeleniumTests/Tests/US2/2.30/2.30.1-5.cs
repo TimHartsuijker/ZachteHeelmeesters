@@ -2,7 +2,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
-using SeleniumTests.Pages;
 using System;
 
 namespace SeleniumTests
@@ -12,9 +11,7 @@ namespace SeleniumTests
     {
         private IWebDriver driver;
         private WebDriverWait wait;
-        private string baseUrl = "https://localhost:5173";
-
-        private LoginPage loginPage;
+        private string baseUrl = "http://localhost";
 
         [TestInitialize]
         public void Setup()
@@ -25,7 +22,6 @@ namespace SeleniumTests
 
             driver = new ChromeDriver(options);
             wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-            loginPage = new LoginPage(driver);
         }
 
         [TestCleanup]
@@ -38,40 +34,44 @@ namespace SeleniumTests
         [TestMethod]
         public void TC_2_30_1_5_Dashboard_NameMatchesDatabase()
         {
-            Console.WriteLine("Test gestart: TC_2_30_1_5_Dashboard_NameMatchesDatabase");
+            Console.WriteLine("Test started: TC_2_30_1_5_Dashboard_NameMatchesDatabase");
 
-            string expectedName = "John Doe"; // aanpassen aan database
+            string expectedName = "Test Gebruiker"; // Name of gebruiker@example.com in database
 
-            // Stap 1: Navigeren naar loginpagina
-            Console.WriteLine("Stap 1: Navigeren naar loginpagina...");
+            // Step 1: Navigate to login page
+            Console.WriteLine("Step 1: Navigating to login page...");
             driver.Navigate().GoToUrl($"{baseUrl}/login");
-            Console.WriteLine("Navigatie voltooid!");
+            Console.WriteLine("Navigation completed!");
 
-            // Stap 2: Inloggegevens invoeren
-            Console.WriteLine("Stap 2: Inloggegevens invullen...");
-            loginPage.EnterEmail("patient@example.com");
-            loginPage.EnterPassword("Test123!");
-            Console.WriteLine("Inloggegevens ingevuld!");
+            // Step 2: Enter login credentials
+            Console.WriteLine("Step 2: Entering login credentials...");
+            var emailInput = driver.FindElement(By.Id("email"));
+            emailInput.SendKeys("gebruiker@example.com");
 
-            // Stap 3: Klik op Inloggen
-            Console.WriteLine("Stap 3: Klikken op inloggen...");
-            loginPage.ClickLogin();
-            Console.WriteLine("Login verstuurd!");
+            var passwordInput = driver.FindElement(By.Id("wachtwoord"));
+            passwordInput.SendKeys("Wachtwoord123");
+            Console.WriteLine("Login credentials entered!");
 
-            // Stap 4: Wachten tot dashboard geladen is
-            Console.WriteLine("Stap 4: Dashboard laden...");
-            wait.Until(d => d.FindElement(By.Id("dashboard-container")));
-            Console.WriteLine("Dashboard succesvol geladen!");
+            // Step 3: Click login
+            Console.WriteLine("Step 3: Clicking login...");
+            var loginButton = driver.FindElement(By.Id("login-btn"));
+            loginButton.Click();
+            Console.WriteLine("Login submitted!");
 
-            // Stap 5: Ophalen en controleren welkomsttekst
-            Console.WriteLine("Stap 5: Controleren naam in welkomstboodschap...");
-            var message = driver.FindElement(By.XPath("//*[contains(text(),'Welkom')]"));
+            // Step 4: Wait for dashboard
+            Console.WriteLine("Step 4: Loading dashboard...");
+            wait.Until(d => d.FindElement(By.CssSelector("[data-test='welcome-message']")));
+            Console.WriteLine("Dashboard successfully loaded!");
+
+            // Step 5: Verify welcome message name
+            Console.WriteLine("Step 5: Verifying name in welcome message...");
+            var message = driver.FindElement(By.CssSelector("[data-test='welcome-message']"));
 
             Assert.IsTrue(message.Text.Contains(expectedName),
-                $"Naam komt niet overeen. Verwacht: {expectedName} — Kreeg: {message.Text}");
+                $"Name does not match. Expected: {expectedName} — Actual: {message.Text}");
 
-            Console.WriteLine("PASS: Welkomstnaam komt overeen met database.");
-            Console.WriteLine("Test succesvol afgerond.");
+            Console.WriteLine($"PASS: Welcome name matches database value: {message.Text}");
+            Console.WriteLine("Test completed successfully.");
         }
     }
 }

@@ -1,0 +1,107 @@
+:root {
+  --dashboard-bg-color: #fbfcff;
+}
+
+/* =========================
+   MAIN LAYOUT
+========================= */
+
+.dashboard-main {
+  max-width: 1400px;
+  margin: 0 auto;               /* centreert alles */
+  padding: 96px 32px 32px;      /* ruimte onder navbar */
+  box-sizing: border-box;
+}
+
+/* =========================
+   WELCOME
+========================= */
+
+.welcome-box {
+  margin-bottom: 32px;
+}
+
+.welcome-box h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+/* =========================
+   OVERZICHT KAART
+========================= */
+
+.dashboard-overzicht {
+  background: var(--dashboard-bg-color);
+  padding: 32px;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  box-sizing: border-box;
+}
+
+.dashboard-overzicht h2 {
+  margin: 0 0 16px 0;
+  font-size: 22px;
+}
+
+.dashboard-overzicht p {
+  margin: 0;
+  line-height: 1.6;
+  color: #333;
+}
+
+/* =========================
+   PANELS
+========================= */
+
+.dashboard-grid {
+  display: flex;
+  gap: 24px;
+  margin-top: 32px;
+}
+
+.panel {
+  flex: 1;
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+  box-sizing: border-box;
+}
+
+.panel h2 {
+  margin: 0 0 12px 0;
+  font-size: 18px;
+}
+
+/* =========================
+   TABLET & MOBIEL
+========================= */
+
+@media (max-width: 1024px) {
+  .dashboard-main {
+    padding: 88px 24px 24px;
+  }
+
+  .dashboard-grid {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-main {
+    padding: 80px 16px 16px;
+  }
+
+  .welcome-box h1 {
+    font-size: 22px;
+  }
+
+  .dashboard-overzicht {
+    padding: 20px;
+  }
+
+  .panel {
+    padding: 18px;
+  }
+}

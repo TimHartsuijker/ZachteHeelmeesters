@@ -1,0 +1,15 @@
+# Backend negeren
+**/bin/
+**/obj/
+backend/bin/
+backend/obj/
+
+# Frontend negeren
+**/node_modules/
+frontend/node_modules/
+frontend/dist/
+
+# Docker mappen
+.git
+.vs
+.vscode

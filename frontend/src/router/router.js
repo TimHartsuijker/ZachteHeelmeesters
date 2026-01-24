@@ -10,6 +10,8 @@ import AdminDashboardView from "../views/AdminDashboardView.vue";
 import UsersView from "../views/AdminUserManagementView.vue";
 import CreateReferralView from '../views/CreateReferralView.vue' 
 import DoctorPatientsView from "../views/DoctorPatientsView.vue";
+import DoorverwijzingenInzien from '../views/DoorverwijzingenInzien.vue';
+import Patientprofiel from '../views/Patientprofiel.vue';
 
 const routes = [
   { 
@@ -54,6 +56,12 @@ const routes = [
     meta: { requiresAuth: true, allowedRoles: ['Patiënt'] }
   },
   {
+    path: '/patientprofiel',
+    name: 'patientprofiel',
+    component: Patientprofiel,
+    meta: { requiresAuth: true, allowedRoles: ['Patiënt'] }
+  },
+  {
     path: '/agenda',
     name: 'agenda',
     component: AgendaView,
@@ -82,6 +90,12 @@ const routes = [
     name: "DoctorPatients",
     component: DoctorPatientsView,
     meta: { requiresAuth: true, allowedRoles: ['Huisarts', 'Specialist'] },
+  },
+  {
+    path: "/doorverwijzingen-inzien",
+    name: "DoorverwijzingenInzien",
+    component: DoorverwijzingenInzien,
+    meta: { requiresAuth: true, allowedRoles: ['Patiënt'] },
   }
 ]
 

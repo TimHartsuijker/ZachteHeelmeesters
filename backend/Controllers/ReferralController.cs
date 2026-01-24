@@ -3,6 +3,7 @@ using backend.Models;
 using backend.DTOs;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend.Controllers
 {
@@ -61,6 +62,40 @@ namespace backend.Controllers
             _context.SaveChanges();
 
             return Created("/", new { message = "Nieuwe doorverwijzing aangemaakt" });
+        }
+
+        [HttpGet("patient/{patientId}")]
+        public async Task<IActionResult> GetReferralsByPatient(int patientId)
+        {
+            try
+            {
+                var referrals = await _context.Referrals
+                    .Include(r => r.Treatment)
+                    .Include(r => r.Patient)
+                    .Include(r => r.Doctor)
+                    .Where(r => r.PatientId == patientId)
+                    .Select(r => new ReferralDto
+                    {
+                        Id = r.Id,
+                        Code = r.Code,
+                        TreatmentId = r.TreatmentId,
+                        TreatmentCode = r.Treatment.Code,
+                        TreatmentDescription = r.Treatment.Description,
+                        PatientId = r.PatientId,
+                        PatientName = $"{r.Patient.FirstName} {r.Patient.LastName}",
+                        DoctorId = r.DoctorId,
+                        DoctorName = $"{r.Doctor.FirstName} {r.Doctor.LastName}",
+                        Note = r.Note,
+                        CreatedAt = r.CreatedAt
+                    })
+                    .ToListAsync();
+
+                return Ok(referrals);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error fetching referrals", error = ex.Message });
+            }
         }
     }
 }

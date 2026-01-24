@@ -183,5 +183,33 @@ namespace backend.Controllers
                 return StatusCode(500, new { message = "Error fetching medical record", error = ex.Message });
             }
         }
+        [HttpGet("all-with-roles")]
+        public async Task<IActionResult> GetAllUsersWithRoles()
+        {
+            try
+            {
+                var users = await _context.Users
+                    .Include(u => u.Role)
+                    .OrderByDescending(u => u.CreatedAt)
+                    .Select(u => new
+                    {
+                        u.Id,
+                        u.FirstName,
+                        u.LastName,
+                        u.Email,
+                        u.PhoneNumber,
+                        u.CreatedAt,
+                        RoleId = u.Role.Id,
+                        RoleName = u.Role.RoleName
+                    })
+                    .ToListAsync();
+
+                return Ok(users);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error fetching users", error = ex.Message });
+            }
+        }
     }
 }

@@ -55,11 +55,11 @@ namespace backend.Controllers
                 return Unauthorized(new { message = "Inloggegevens zijn incorrect" });
             }
 
-            // 🔒 ALLEEN ADMIN MAG HIER NIET INLOGGEN
-            // Administratiemedewerker WEL toegestaan!
-            if (user.Role.RoleName == "Admin")  // Alleen Admin blokkeren
+            // 🔒 Admin accounts moeten via admin login pagina
+            if (user.Role.RoleName == "Admin")
             {
-                return Unauthorized(new { message = "Gebruik de admin login pagina" });
+                _logger.LogWarning($"Admin account {request.Email} tried to login via normal login");
+                return Unauthorized(new { message = "Gebruik de admin login pagina voor deze account" });
             }
 
             var result = _passwordHasher.VerifyHashedPassword(
@@ -70,12 +70,15 @@ namespace backend.Controllers
 
             if (result == PasswordVerificationResult.Failed)
             {
+                _logger.LogWarning($"Incorrect password for {request.Email}");
                 return Unauthorized(new { message = "Inloggegevens zijn incorrect" });
             }
 
+            _logger.LogInformation($"Login successful for {request.Email} (Role: {user.Role.RoleName})");
+
             return Ok(new
             {
-                message = "Login ok",
+                message = "Login succesvol",
                 user = new
                 {
                     id = user.Id,
@@ -90,9 +93,12 @@ namespace backend.Controllers
         [HttpPost("admin")]
         public async Task<IActionResult> AdminLogin([FromBody] LoginRequest request)
         {
+            _logger.LogInformation($"Admin login attempt for email: {request?.Email}");
+
             if (string.IsNullOrWhiteSpace(request.Email) ||
                 string.IsNullOrWhiteSpace(request.Wachtwoord))
             {
+                _logger.LogWarning("Admin login attempt with missing fields");
                 return BadRequest(new { message = "Gegevens moeten ingevuld zijn" });
             }
 
@@ -100,11 +106,11 @@ namespace backend.Controllers
                 .Include(u => u.Role)
                 .FirstOrDefaultAsync(u => u.Email == request.Email);
 
-            // ✅ ACCEPTEER ZOWEL ADMIN ALS ADMINISTRATIEMEDEWERKER
-            if (user == null ||
-                (user.Role.RoleName != "Admin" && user.Role.RoleName != "Administratiemedewerker"))
+            // ✅ ALLEEN Admin accounts via deze login
+            if (user == null || user.Role.RoleName != "Admin")
             {
-                return Unauthorized(new { message = "Inloggegevens zijn incorrect" });
+                _logger.LogWarning($"Unauthorized admin login attempt for {request.Email}");
+                return Unauthorized(new { message = "Inloggegevens zijn incorrect of geen admin account" });
             }
 
             var result = _passwordHasher.VerifyHashedPassword(
@@ -115,14 +121,15 @@ namespace backend.Controllers
 
             if (result == PasswordVerificationResult.Failed)
             {
-                _logger.LogWarning($"Login attempt failed: incorrect password for {request.Email}");
+                _logger.LogWarning($"Admin login incorrect password for {request.Email}");
                 return Unauthorized(new { message = "Inloggegevens zijn incorrect" });
             }
 
-            _logger.LogInformation($"Login successful for {request.Email}");
+            _logger.LogInformation($"Admin login successful for {request.Email}");
+
             return Ok(new
             {
-                message = "Login ok",
+                message = "Admin login succesvol",
                 user = new
                 {
                     id = user.Id,
@@ -184,6 +191,7 @@ namespace backend.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error getting user details for userId: {UserId}", userId);
                 return StatusCode(500, new { message = "Er is een fout opgetreden bij het ophalen van gebruikersgegevens" });
             }
         }

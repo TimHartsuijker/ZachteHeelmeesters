@@ -28,7 +28,9 @@ namespace backend.Controllers
         {
             try
             {
-                // AC6.10.3: Validatie van ingevulde gegevens
+                _logger.LogInformation($"Create user attempt for email: {request?.Email}");
+
+                // Validatie
                 if (request == null)
                     return BadRequest(new { message = "Gegevens zijn vereist" });
 
@@ -47,52 +49,43 @@ namespace backend.Controllers
                 if (existingUser != null)
                     return BadRequest(new { message = "Een gebruiker met dit e-mailadres bestaat al" });
 
-                // Valideer BSN indien aanwezig
-                if (!string.IsNullOrWhiteSpace(request.CitizenServiceNumber))
-                {
-                    if (!System.Text.RegularExpressions.Regex.IsMatch(request.CitizenServiceNumber, @"^\d{9}$"))
-                        return BadRequest(new { message = "BSN moet 9 cijfers bevatten" });
-                }
-
-                // Vind de geselecteerde rol (AC6.10.5)
+                // Vind de geselecteerde rol
                 var role = await _context.Roles.FindAsync(request.RoleId);
                 if (role == null)
                     return BadRequest(new { message = "Ongeldige rol geselecteerd" });
 
-                // Maak nieuwe gebruiker aan
+                // 🔧 Genereer wachtwoord als die niet is meegegeven
+                var password = string.IsNullOrWhiteSpace(request.Password)
+                    ? GenerateTemporaryPassword()
+                    : request.Password;
+
+                // Maak nieuwe gebruiker aan met ALLE verplichte velden
                 var newUser = new User
                 {
                     FirstName = request.FirstName,
                     LastName = request.LastName,
                     Email = request.Email,
                     StreetName = request.StreetName ?? "Niet opgegeven",
-                    HouseNumber = request.HouseNumber ?? "Niet opgegeven",
-                    PostalCode = request.PostalCode ?? "Niet opgegeven",
-                    CitizenServiceNumber = request.CitizenServiceNumber ?? "000000000",
-                    DateOfBirth = request.DateOfBirth ?? DateTime.Now.AddYears(-30),
+                    HouseNumber = request.HouseNumber ?? "0",
+                    PostalCode = request.PostalCode ?? "0000AA",
+                    CitizenServiceNumber = request.CitizenServiceNumber ?? GenerateRandomBSN(),
+                    DateOfBirth = request.DateOfBirth ?? DateTime.UtcNow.AddYears(-30),
                     Gender = request.Gender ?? "Zeg ik liever niet",
                     PhoneNumber = request.PhoneNumber,
                     RoleId = request.RoleId,
                     CreatedAt = DateTime.UtcNow,
-                    // Standaard wachtwoord genereren (moet later gewijzigd worden)
-                    PasswordHash = ""
+                    // PracticeName wordt niet meer gebruikt
+                    PracticeName = null
                 };
 
-                // Genereer een tijdelijk wachtwoord
-                var tempPassword = GenerateTemporaryPassword();
-                newUser.PasswordHash = _passwordHasher.HashPassword(newUser, tempPassword);
+                // Hash het wachtwoord
+                newUser.PasswordHash = _passwordHasher.HashPassword(newUser, password);
 
-                // Voor artsen/specialisten extra velden
-                if (role.RoleName == "Huisarts" || role.RoleName == "Specialist")
-                {
-                    newUser.PracticeName = request.PracticeName;
-                }
-
-                // AC6.10.4: Opslaan in database
+                // Opslaan
                 _context.Users.Add(newUser);
                 await _context.SaveChangesAsync();
 
-                _logger.LogInformation($"Nieuwe gebruiker aangemaakt door admin: {newUser.Email}, Rol: {role.RoleName}");
+                _logger.LogInformation($"User created successfully: {newUser.Email}, Role: {role.RoleName}");
 
                 return Ok(new
                 {
@@ -105,23 +98,34 @@ namespace backend.Controllers
                         lastName = newUser.LastName,
                         role = role.RoleName
                     },
-                    temporaryPassword = tempPassword // Alleen voor ontwikkeldoeleinden, in productie via email versturen
+                    temporaryPassword = password // Ter info voor admin
                 });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Fout bij aanmaken gebruiker");
-                return StatusCode(500, new { message = "Er is een fout opgetreden bij het aanmaken van de gebruiker", error = ex.Message });
+                return StatusCode(500, new
+                {
+                    message = "Er is een fout opgetreden bij het aanmaken van de gebruiker",
+                    error = ex.Message,
+                    details = ex.InnerException?.Message
+                });
             }
         }
 
         private string GenerateTemporaryPassword()
         {
-            // Genereer een willekeurig wachtwoord van 8 tekens
-            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+            // Genereer een veilig wachtwoord
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%";
             var random = new Random();
-            return new string(Enumerable.Repeat(chars, 8)
+            return new string(Enumerable.Repeat(chars, 10)
                 .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
+        private string GenerateRandomBSN()
+        {
+            var random = new Random();
+            return random.Next(100000000, 999999999).ToString();
         }
     }
 }

@@ -1,15 +1,19 @@
 <template>
   <div class="admin-create-user-page align-under-nav">
     <div class="main-users">
-      <h2>Nieuwe Gebruiker Aanmaken</h2>
+      <!-- Terug knop naar overzicht -->
+      <div class="back-button">
+        <RouterLink to="/administratie/accounts" class="back-link">
+          ← Terug naar Accounts Overzicht
+        </RouterLink>
+      </div>
       
-      <!-- AC6.10.1: Formulier voor account aanmaken -->
+      <h1>Nieuw Account Aanmaken</h1>
+      
       <form @submit.prevent="createUser" class="create-user-form">
         
         <!-- Persoonlijke gegevens -->
         <div class="form-section">
-          <h3>Persoonlijke Gegevens</h3>
-          
           <div class="form-row">
             <div class="form-group">
               <label for="firstName">Voornaam *</label>
@@ -35,14 +39,95 @@
           </div>
           
           <div class="form-group">
-            <label for="email">E-mailadres *</label>
+            <label for="email">Email *</label>
             <input 
               type="email" 
               id="email" 
               v-model="formData.email" 
               required
-              placeholder="voorbeeld@email.com"
+              placeholder="email@example.com"
             />
+          </div>
+          
+          <div class="form-group">
+            <label for="phoneNumber">Telefoonnummer</label>
+            <input 
+              type="tel" 
+              id="phoneNumber" 
+              v-model="formData.phoneNumber"
+              placeholder="0612345678"
+            />
+          </div>
+          
+          <!-- WACHTWOORD VELDEN - NIET VERPLICHT -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="password">Wachtwoord</label>
+              <input 
+                type="password" 
+                id="password" 
+                v-model="formData.password"
+                placeholder="Minimaal 8 karakters (leeg voor automatisch)"
+                minlength="8"
+              />
+              <p class="help-text">Laat leeg voor automatisch gegenereerd wachtwoord</p>
+            </div>
+            
+            <div class="form-group">
+              <label for="confirmPassword">Bevestig Wachtwoord</label>
+              <input 
+                type="password" 
+                id="confirmPassword" 
+                v-model="confirmPassword"
+                placeholder="Herhaal wachtwoord (alleen als ingevuld)"
+              />
+            </div>
+          </div>
+          
+          <!-- Adresgegevens -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="streetName">Straatnaam</label>
+              <input 
+                type="text" 
+                id="streetName" 
+                v-model="formData.streetName"
+                placeholder="Straatnaam"
+              />
+            </div>
+            
+            <div class="form-group">
+              <label for="houseNumber">Huisnummer</label>
+              <input 
+                type="text" 
+                id="houseNumber" 
+                v-model="formData.houseNumber"
+                placeholder="123"
+              />
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="postalCode">Postcode</label>
+              <input 
+                type="text" 
+                id="postalCode" 
+                v-model="formData.postalCode"
+                placeholder="1234AB"
+              />
+            </div>
+            
+            <div class="form-group">
+              <label for="citizenServiceNumber">BSN</label>
+              <input 
+                type="text" 
+                id="citizenServiceNumber" 
+                v-model="formData.citizenServiceNumber"
+                placeholder="123456789"
+                maxlength="9"
+              />
+            </div>
           </div>
           
           <div class="form-row">
@@ -66,94 +151,26 @@
               </select>
             </div>
           </div>
-          
-          <div class="form-group">
-            <label for="phoneNumber">Telefoonnummer</label>
-            <input 
-              type="tel" 
-              id="phoneNumber" 
-              v-model="formData.phoneNumber"
-              placeholder="0612345678"
-            />
-          </div>
         </div>
         
-        <!-- Adresgegevens -->
+        <!-- Rol selectie -->
         <div class="form-section">
-          <h3>Adresgegevens</h3>
-          
-          <div class="form-row">
-            <div class="form-group">
-              <label for="streetName">Straatnaam</label>
-              <input 
-                type="text" 
-                id="streetName" 
-                v-model="formData.streetName"
-                placeholder="Straatnaam"
-              />
-            </div>
-            
-            <div class="form-group">
-              <label for="houseNumber">Huisnummer</label>
-              <input 
-                type="text" 
-                id="houseNumber" 
-                v-model="formData.houseNumber"
-                placeholder="123"
-              />
-            </div>
-          </div>
-          
           <div class="form-group">
-            <label for="postalCode">Postcode</label>
-            <input 
-              type="text" 
-              id="postalCode" 
-              v-model="formData.postalCode"
-              placeholder="1234AB"
-            />
-          </div>
-          
-          <div class="form-group">
-            <label for="citizenServiceNumber">BSN</label>
-            <input 
-              type="text" 
-              id="citizenServiceNumber" 
-              v-model="formData.citizenServiceNumber"
-              placeholder="123456789"
-              maxlength="9"
-            />
-          </div>
-        </div>
-        
-        <!-- AC6.10.5: Rol selectie -->
-        <div class="form-section">
-          <h3>Account Type *</h3>
-          
-          <div class="form-group">
-            <label for="roleId">Soort Gebruiker</label>
+            <label for="roleId">Rol *</label>
             <select 
               id="roleId" 
               v-model="formData.roleId" 
               required
-              @change="onRoleChange"
+              class="role-select"
             >
-              <option value="">Selecteer rol</option>
-              <option v-for="role in roles" :key="role.id" :value="role.id">
+              <option value="">Selecteer een rol</option>
+              <option v-for="role in filteredRoles" :key="role.id" :value="role.id">
                 {{ role.roleName }}
               </option>
             </select>
-          </div>
-          
-          <!-- Extra velden voor artsen/specialisten -->
-          <div v-if="showPracticeField" class="form-group">
-            <label for="practiceName">Praktijknaam</label>
-            <input 
-              type="text" 
-              id="practiceName" 
-              v-model="formData.practiceName"
-              placeholder="Naam van de praktijk"
-            />
+            <p class="help-text" v-if="formData.roleId && selectedRoleName === 'Admin'">
+              <strong>Let op:</strong> Admin accounts moeten inloggen via de aparte admin login pagina.
+            </p>
           </div>
         </div>
         
@@ -162,22 +179,13 @@
           {{ errorMessage }}
         </div>
         
-        <!-- Succesmelding -->
-        <div v-if="successMessage" class="success-message">
-          {{ successMessage }}
-          <div v-if="temporaryPassword" class="temp-password">
-            <strong>Tijdelijk wachtwoord:</strong> {{ temporaryPassword }}
-            <small>De gebruiker moet dit wachtwoord bij eerste login wijzigen.</small>
-          </div>
-        </div>
-        
-        <!-- AC6.10.2: Knop om account toe te voegen -->
+        <!-- Knoppen -->
         <div class="form-actions">
           <button type="submit" class="btn-primary" :disabled="isLoading">
             {{ isLoading ? 'Bezig...' : 'Account Aanmaken' }}
           </button>
-          <button type="button" class="btn-secondary" @click="resetForm">
-            Formulier Leegmaken
+          <button type="button" class="btn-secondary" @click="cancelForm">
+            Annuleren
           </button>
         </div>
         
@@ -198,35 +206,35 @@ const formData = ref({
   firstName: '',
   lastName: '',
   email: '',
+  phoneNumber: '',
+  password: '', // NIET verplicht
   streetName: '',
   houseNumber: '',
   postalCode: '',
   citizenServiceNumber: '',
   dateOfBirth: '',
   gender: '',
-  phoneNumber: '',
-  roleId: '',
-  practiceName: ''
+  roleId: ''
 })
 
+const confirmPassword = ref('')
 const roles = ref([])
 const isLoading = ref(false)
 const errorMessage = ref('')
-const successMessage = ref('')
-const temporaryPassword = ref('')
 
-// Computed property om te bepalen of praktijknaam veld moet worden getoond
-const showPracticeField = computed(() => {
-  const selectedRole = roles.value.find(r => r.id === parseInt(formData.value.roleId))
-  return selectedRole && ['Huisarts', 'Specialist'].includes(selectedRole.roleName)
+// Filter rollen - NU ook Administratiemedewerker toestaan
+const filteredRoles = computed(() => {
+  return roles.value.filter(role => 
+    role.roleName !== 'Patiënt'
+    // ALLEEN Patiënt uitsluiten, dus Admin en Administratiemedewerker zijn toegestaan
+  )
 })
 
-// Functie bij wijzigen rol
-const onRoleChange = () => {
-  if (!showPracticeField.value) {
-    formData.value.practiceName = ''
-  }
-}
+// Bepaal geselecteerde rol naam
+const selectedRoleName = computed(() => {
+  const role = roles.value.find(r => r.id === parseInt(formData.value.roleId))
+  return role ? role.roleName : ''
+})
 
 // Laad rollen bij mount
 onMounted(async () => {
@@ -239,18 +247,32 @@ onMounted(async () => {
   }
 })
 
-// AC6.10.2 & AC6.10.3 & AC6.10.4: Account aanmaken functie
+// Account aanmaken functie
 const createUser = async () => {
   // Reset messages
   errorMessage.value = ''
-  successMessage.value = ''
-  temporaryPassword.value = ''
   
-  // Validatie
+  console.log('Formulier data:', formData.value)
+  console.log('Confirm password:', confirmPassword.value)
+  
+  // Basis validatie
   if (!formData.value.firstName || !formData.value.lastName || 
       !formData.value.email || !formData.value.roleId) {
     errorMessage.value = 'Vul alle verplichte velden in (gemarkeerd met *)'
     return
+  }
+  
+  // Wachtwoord validatie - ALLEEN als ingevuld
+  if (formData.value.password) {
+    if (formData.value.password !== confirmPassword.value) {
+      errorMessage.value = 'Wachtwoorden komen niet overeen'
+      return
+    }
+    
+    if (formData.value.password.length < 8) {
+      errorMessage.value = 'Wachtwoord moet minimaal 8 karakters lang zijn'
+      return
+    }
   }
   
   // Email validatie
@@ -272,26 +294,58 @@ const createUser = async () => {
   try {
     // Prepare data for API
     const requestData = {
-      ...formData.value,
-      dateOfBirth: formData.value.dateOfBirth || null
+      firstName: formData.value.firstName,
+      lastName: formData.value.lastName,
+      email: formData.value.email,
+      phoneNumber: formData.value.phoneNumber || null,
+      password: formData.value.password || null, // Kan null zijn
+      streetName: formData.value.streetName || null,
+      houseNumber: formData.value.houseNumber || null,
+      postalCode: formData.value.postalCode || null,
+      citizenServiceNumber: formData.value.citizenServiceNumber || null,
+      dateOfBirth: formData.value.dateOfBirth || null,
+      gender: formData.value.gender || null,
+      roleId: parseInt(formData.value.roleId)
     }
     
-    // API call
+    console.log('Versturen naar API:', requestData)
+    
+    // API call naar AdminUserController
     const response = await axios.post('/api/adminuser/create', requestData)
     
+    console.log('API Response:', response.data)
+    
     if (response.status === 200) {
-      successMessage.value = response.data.message
-      temporaryPassword.value = response.data.temporaryPassword
-      resetForm()
+      // ✅ DIRECT TERUG NAAR OVERZICHT MET NOTIFICATIE
+      const successMessage = 'Het account is aangemaakt!';
+      const userEmail = formData.value.email;
       
-      // Optioneel: doorsturen naar gebruikersoverzicht
-      setTimeout(() => {
-        router.push('/admin/users')
-      }, 3000)
+      // Sla notificatie op voor AccountsOverview
+      sessionStorage.setItem('accountCreatedNotification', successMessage);
+      sessionStorage.setItem('createdUserEmail', userEmail);
+      
+      // Reset formulier
+      resetForm();
+      
+      // Ga direct terug naar overzicht
+      router.push('/administratie/accounts');
     }
   } catch (error) {
     console.error('Fout bij aanmaken gebruiker:', error)
-    errorMessage.value = error.response?.data?.message || 'Er is een fout opgetreden bij het aanmaken van het account'
+    
+    if (error.response?.data?.message) {
+      errorMessage.value = error.response.data.message
+    } else if (error.response?.data?.error) {
+      // Toon backend error details
+      errorMessage.value = `Backend fout: ${error.response.data.error}`
+      if (error.response.data.details) {
+        errorMessage.value += ` (${error.response.data.details})`
+      }
+    } else if (error.code === 'ERR_NETWORK') {
+      errorMessage.value = 'Kan geen verbinding maken met de server. Controleer of de backend draait.'
+    } else {
+      errorMessage.value = 'Er is een fout opgetreden bij het aanmaken van het account.'
+    }
   } finally {
     isLoading.value = false
   }
@@ -303,22 +357,29 @@ const resetForm = () => {
     firstName: '',
     lastName: '',
     email: '',
+    phoneNumber: '',
+    password: '',
     streetName: '',
     houseNumber: '',
     postalCode: '',
     citizenServiceNumber: '',
     dateOfBirth: '',
     gender: '',
-    phoneNumber: '',
-    roleId: '',
-    practiceName: ''
+    roleId: ''
   }
+  confirmPassword.value = ''
+}
+
+// Annuleren
+const cancelForm = () => {
+  router.push('/administratie/accounts')
 }
 </script>
 
 <style scoped>
 .admin-create-user-page {
   padding: 2rem;
+  width: 100%;
 }
 
 .main-users {
@@ -326,77 +387,148 @@ const resetForm = () => {
   border-radius: 12px;
   padding: 2rem;
   box-shadow: 0 2px 16px rgba(0,0,0,0.1);
-  max-width: 800px;
+  max-width: 100%;
   margin: 0 auto;
 }
 
-h2 {
-  color: #333;
-  margin-bottom: 2rem;
-  text-align: center;
+.back-button {
+  margin-bottom: 1.5rem;
 }
 
-h3 {
-  color: #555;
-  margin: 1.5rem 0 1rem 0;
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  color: #666;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+
+.back-link:hover {
+  color: #00960c;
+}
+
+h1 {
+  color: #333;
+  margin-bottom: 2rem;
+  font-size: 1.8rem;
   padding-bottom: 0.5rem;
-  border-bottom: 2px solid #B0DB9C;
+  border-bottom: 2px solid #eee;
+}
+
+.create-user-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
 }
 
 .form-section {
-  margin-bottom: 2rem;
-  padding: 1.5rem;
-  background: #f9f9f9;
+  background: #f8f9fa;
   border-radius: 8px;
+  padding: 1.5rem;
+  border: 1px solid #dee2e6;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group:last-child {
+  margin-bottom: 0;
 }
 
 .form-row {
   display: flex;
   gap: 1rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  width: 100%;
 }
 
 .form-row .form-group {
   flex: 1;
+  margin-bottom: 0;
+  min-width: 0; /* Voorkomt overflow */
 }
 
-.form-group {
-  margin-bottom: 1rem;
+.form-row:last-child {
+  margin-bottom: 0;
 }
 
-.form-group label {
+/* Eenvoudigere label styling */
+label {
   display: block;
   margin-bottom: 0.5rem;
-  font-weight: 500;
-  color: #555;
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+  width: 100%;
 }
 
-.form-group input,
-.form-group select {
+/* Input velden styling - volle breedte */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="password"],
+input[type="date"],
+select {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
   font-size: 1rem;
-  transition: border-color 0.3s;
+  background-color: white;
+  color: #333;
+  box-sizing: border-box;
 }
 
-.form-group input:focus,
-.form-group select:focus {
+input:focus,
+select:focus {
   outline: none;
-  border-color: #B0DB9C;
-  box-shadow: 0 0 0 2px rgba(176, 219, 156, 0.2);
+  border-color: #00960c;
+  box-shadow: 0 0 0 2px rgba(0, 150, 12, 0.1);
 }
 
-.form-group input[required] {
-  border-left: 4px solid #B0DB9C;
+/* Rol dropdown specifieke styling */
+.role-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23333' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 16px 12px;
+  padding-right: 2.5rem;
 }
 
+/* Hulpteksten */
+.help-text {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 0.5rem;
+  font-style: italic;
+  width: 100%;
+}
+
+/* Foutmelding */
+.error-message {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 1rem;
+  border-radius: 4px;
+  border: 1px solid #f5c6cb;
+  margin-top: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Formulier acties */
 .form-actions {
   display: flex;
   gap: 1rem;
-  justify-content: center;
+  justify-content: flex-end;
   margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #eee;
+  width: 100%;
 }
 
 .btn-primary {
@@ -404,11 +536,12 @@ h3 {
   background-color: #00960c;
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
   transition: background-color 0.3s;
+  min-width: 150px;
 }
 
 .btn-primary:hover:not(:disabled) {
@@ -416,55 +549,57 @@ h3 {
 }
 
 .btn-primary:disabled {
-  background-color: #ccc;
+  background-color: #cccccc;
   cursor: not-allowed;
 }
 
 .btn-secondary {
   padding: 0.75rem 2rem;
-  background-color: #f0f0f0;
-  color: #333;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 6px;
   font-size: 1rem;
+  font-weight: 500;
   cursor: pointer;
   transition: background-color 0.3s;
+  min-width: 150px;
 }
 
 .btn-secondary:hover {
-  background-color: #e0e0e0;
+  background-color: #545b62;
 }
 
-.error-message {
-  background-color: #fee;
-  color: #d32f2f;
-  padding: 1rem;
-  border-radius: 6px;
-  margin: 1rem 0;
-  border-left: 4px solid #d32f2f;
+/* Vereiste velden indicatie */
+label[for]:has(+ input[required])::after,
+label[for]:has(+ select[required])::after {
+  content: " *";
+  color: #dc3545;
 }
 
-.success-message {
-  background-color: #e8f5e8;
-  color: #388e3c;
-  padding: 1rem;
-  border-radius: 6px;
-  margin: 1rem 0;
-  border-left: 4px solid #388e3c;
+/* Volledige breedte voor belangrijke velden */
+.form-group.full-width {
+  width: 100%;
 }
 
-.temp-password {
-  margin-top: 1rem;
-  padding: 0.75rem;
-  background: #fff;
-  border-radius: 4px;
-  border: 1px dashed #388e3c;
+.form-group.full-width input,
+.form-group.full-width select {
+  width: 100%;
 }
 
-.temp-password small {
-  display: block;
-  margin-top: 0.5rem;
-  color: #666;
-  font-size: 0.85rem;
+/* Compactere layout opties */
+.form-group.compact {
+  margin-bottom: 1rem;
+}
+
+.form-group.compact label {
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+
+.form-group.compact input,
+.form-group.compact select {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.95rem;
 }
 </style>

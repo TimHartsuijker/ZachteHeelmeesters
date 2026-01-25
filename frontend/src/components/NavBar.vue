@@ -17,7 +17,7 @@
       <li v-else-if="userRole === 'Admin'" class="nav-center-buttons">
         <RouterLink to="/admin/users" aria-current="user-management page">Gebruikersbeheer</RouterLink>
       </li>
-      <li v-if="userRole === 'Administratiemedewerker'" class="nav-center-buttons">
+      <li v-else-if="userRole === 'Administratiemedewerker'" class="nav-center-buttons">
         <RouterLink to="/administratie/accounts" aria-current="accounts page">
           Accounts Overzicht
         </RouterLink>

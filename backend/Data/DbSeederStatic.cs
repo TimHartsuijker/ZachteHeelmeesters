@@ -8,17 +8,18 @@ namespace backend.Data
         {
             context.Database.EnsureCreated();
 
-            // Rollen
-            if (!context.Roles.Any())
+            // Lijst met rollen die we sowieso nodig hebben
+            string[] rolesToSeed = { "Patiënt", "Admin", "Huisarts", "Specialist" };
+
+            foreach (var roleName in rolesToSeed)
             {
-                context.Roles.AddRange(
-                    new Role {RoleName = "Patiënt" },
-                    new Role {RoleName = "Admin" },
-                    new Role {RoleName = "Huisarts" },
-                    new Role {RoleName = "Specialist" }
-                );
+                // Check per rol of deze al bestaat
+                if (!context.Roles.Any(r => r.RoleName == roleName))
+                {
+                    context.Roles.Add(new Role { RoleName = roleName });
+                }
             }
-           
+
             //// Departments
             //if (!context.Departments.Any())
             //{
@@ -36,6 +37,7 @@ namespace backend.Data
             //}
 
             context.SaveChanges();
+            Console.WriteLine("[DbSeederStatic] Basisrollen gecontroleerd/aangemaakt.");
         }
     }
 }

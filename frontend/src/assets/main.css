@@ -100,10 +100,6 @@ button[type="submit"]:hover {
   background-color: #007a0a;
 }
 
-button[type="submit"]:active {
-  background-color: #006008;
-}
-
 .error-text {
   color: #d32f2f;
   margin-top: 5px;

@@ -11,6 +11,7 @@ namespace backend.Data
             context.Database.EnsureCreated();
 
             var passwordHasher = new PasswordHasher<User>();
+            string GenerateUniqueBSN() => new Random().Next(100000000, 999999999).ToString();
 
             // Veilige manier om rollen op te halen of aan te maken
             Role GetOrCreateRole(string name)
@@ -50,7 +51,7 @@ namespace backend.Data
                     PostalCode = "1234AB",
                     PhoneNumber = "0631234567",
                     DateOfBirth = new DateTime(1990, 1, 1),
-                    CitizenServiceNumber = "012948356",
+                    CitizenServiceNumber = GenerateUniqueBSN(),
                     Gender = "Man",
                     CreatedAt = DateTime.UtcNow,
                     RoleId = specialistRole.Id
@@ -78,7 +79,7 @@ namespace backend.Data
                     StreetName = "Teststraat",
                     HouseNumber = "1",
                     PostalCode = "1234AB",
-                    CitizenServiceNumber = "123456789",
+                    CitizenServiceNumber = GenerateUniqueBSN(),
                     DateOfBirth = new DateTime(2000, 1, 1),
                     Gender = "Vrouw",
                     PhoneNumber = "0612345678",
@@ -109,7 +110,7 @@ namespace backend.Data
                     StreetName = "Teststraat",
                     HouseNumber = "2",
                     PostalCode = "1234AB",
-                    CitizenServiceNumber = "987654321",
+                    CitizenServiceNumber = GenerateUniqueBSN(),
                     DateOfBirth = new DateTime(2001, 2, 2),
                     Gender = "Vrouw",
                     PhoneNumber = "0612345679",
@@ -142,7 +143,7 @@ namespace backend.Data
                     PhoneNumber = "0600000000",
                     DateOfBirth = DateTime.Now,
                     Gender = "Man",
-                    CitizenServiceNumber = "012345678",
+                    CitizenServiceNumber = GenerateUniqueBSN(),
                     CreatedAt = DateTime.UtcNow,
                     RoleId = adminRole.Id
                 };
@@ -167,7 +168,7 @@ namespace backend.Data
                     PhoneNumber = "0612345678",
                     DateOfBirth = DateTime.Now,
                     Gender = "Man",
-                    CitizenServiceNumber = "987654322",
+                    CitizenServiceNumber = GenerateUniqueBSN(),
                     CreatedAt = DateTime.UtcNow,
                     RoleId = gpRole.Id
                 };
@@ -192,7 +193,7 @@ namespace backend.Data
                     PhoneNumber = "0612345678",
                     DateOfBirth = DateTime.Now,
                     Gender = "Man",
-                    CitizenServiceNumber = "987654323",
+                    CitizenServiceNumber = GenerateUniqueBSN(),
                     CreatedAt = DateTime.UtcNow,
                     RoleId = gpRole.Id
                 };
@@ -226,7 +227,7 @@ namespace backend.Data
                     RoleId = gpRole.Id,
                     DateOfBirth = new DateTime(1975, 5, 20),
                     PracticeName = "Jansen General Practice",
-                    CitizenServiceNumber = "123456789",
+                    CitizenServiceNumber = GenerateUniqueBSN(),
                     Gender = "Man"
                 };
 
@@ -252,7 +253,7 @@ namespace backend.Data
                     PhoneNumber = "0687654321",
                     CreatedAt = DateTime.UtcNow,
                     RoleId = patientRole.Id,
-                    CitizenServiceNumber = "223456789",
+                    CitizenServiceNumber = GenerateUniqueBSN(),
                     Gender = "Vrouw",
                     DateOfBirth = new DateTime(1990, 1, 12)
                 };

@@ -53,8 +53,11 @@ using (var scope = app.Services.CreateScope())
         // Seed test data alleen in Development mode
         if (app.Environment.IsDevelopment())
         {
-            DbSeederTest.Seed(context);
-            DbSeederMedicalFiles.Seed(context);
+            try { DbSeederTest.Seed(context); }
+            catch (Exception ex) { Console.WriteLine($"[Seeder] Test users failed: {ex.Message}"); }
+
+            try { DbSeederMedicalFiles.Seed(context); }
+            catch (Exception ex) { Console.WriteLine($"[Seeder] Medical files failed: {ex.Message}"); }
         }
     }
     catch (Exception ex)

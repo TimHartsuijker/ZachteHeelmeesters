@@ -222,6 +222,18 @@ admin-dashboard-page {
   background-color: #f0f0f0;
 }
 
+.router-link-active {
+  background-color: #B0DB9C;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.router-link-exact-active {
+  font-weight: bold;
+  border-bottom: 2px solid #2e7d32; 
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
+}
+
 /* Logout knop rechts */
 .logout-btn {
   background-color: #B0DB9C;

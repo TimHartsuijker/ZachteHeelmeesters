@@ -12,7 +12,6 @@ import CreateReferralView from '../views/CreateReferralView.vue'
 import DoctorPatientsView from "../views/DoctorPatientsView.vue";
 import DoorverwijzingenInzien from '../views/DoorverwijzingenInzien.vue';
 import Patientprofiel from '../views/Patientprofiel.vue';
-import DoctorPatientsView from "../views/DoctorPatientsView.vue";
 import AccountsOverviewView from "../views/AccountsOverviewView.vue";
 import AdminCreateUserView from "../views/AdminCreateUserView.vue"; 
 
@@ -32,7 +31,8 @@ const routes = [
   {
     path: '/dossier',
     name: 'dossier',
-    component: MedicalDossier
+    component: MedicalDossier,
+    meta: { requiresAuth: true, allowedRoles: ['Patient'] }
   },
   {
     path: '/dossier/:patientId',

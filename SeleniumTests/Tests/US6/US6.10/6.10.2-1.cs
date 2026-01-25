@@ -47,7 +47,7 @@ namespace SeleniumTests
             // Step 2: Login as administrative employee
             loginPage.EnterEmail("admin@example.com");
             loginPage.EnterPassword("AdminPassword123!");
-            loginPage.ClickLoginButton();
+            loginPage.ClickLogin();
 
             wait.Until(drv => drv.Url.Contains("dashboard"));
             Console.WriteLine("Admin successfully logged in.");

@@ -3,6 +3,7 @@ using backend.Models;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend.Controllers
 {
@@ -57,7 +58,7 @@ namespace backend.Controllers
             if (user.Role.RoleName == "Admin")
             {
                 _logger.LogWarning($"Admin account {request.Email} tried to login via normal login");
-                return Unauthorized(new { message = "Gebruik de admin login pagina voor deze account" });
+                return Unauthorized(new { message = "Gebruik de admin login pagina voor dit account" });
             }
 
             var result = _passwordHasher.VerifyHashedPassword(

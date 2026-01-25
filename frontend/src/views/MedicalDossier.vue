@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { reactive, ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import NavBar from '@/components/NavBar.vue';
 import axios from 'axios';
 
 axios.defaults.withCredentials = true;
@@ -288,9 +287,6 @@ onMounted(() => {
 
 <template>
   <div class="min-h-screen bg-[#ECFAE5] flex flex-col" style="padding-top: 70px;">
-    <!-- Navigation -->
-    <NavBar />
-
     <!-- Main Container -->
     <div class="flex-1 flex flex-col items-center">
       <!-- Content wrapper with 70% width -->

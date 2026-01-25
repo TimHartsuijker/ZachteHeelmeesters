@@ -1,6 +1,4 @@
 <template>
-  <Navbar />
-
   <main class="profiel-container">
 
     <section class="profiel-boven">

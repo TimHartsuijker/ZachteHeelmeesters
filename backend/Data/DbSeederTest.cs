@@ -47,6 +47,15 @@ namespace backend.Data
 
             // --- SEEDING START ---
 
+            // 6. Extra Huisartsen (Doctor1 & Doctor2)
+            var mainDoctor = EnsureUser(new User
+            {
+                FirstName = "Huisarts", LastName = "Een", Email = "doctor1@example.com",
+                StreetName = "Doctorstraat", HouseNumber = "1", PostalCode = "1234AB",
+                PhoneNumber = "0612345671", DateOfBirth = DateTime.UtcNow,
+                Gender = "Man", CitizenServiceNumber = "987654322", RoleId = gpRole.Id
+            }, "Huisarts123");
+
             // 1. Administratie Medewerker
             EnsureUser(new User
             {
@@ -56,8 +65,8 @@ namespace backend.Data
                 Gender = "Vrouw", CitizenServiceNumber = "111111111", RoleId = adminMedewerkerRole.Id
             }, "AdminMed123");
 
-            // 2. Hoofd Specialist (Doctor)
-            var mainDoctor = EnsureUser(new User
+            // 2. Specialist (Doctor)
+            EnsureUser(new User
             {
                 FirstName = "Test", LastName = "Doctor", Email = "testdoctor@example.com",
                 StreetName = "Teststraat", HouseNumber = "1A", PostalCode = "1234AB",
@@ -93,15 +102,6 @@ namespace backend.Data
                 PhoneNumber = "0600000000", DateOfBirth = DateTime.UtcNow,
                 Gender = "Man", CitizenServiceNumber = "012345678", RoleId = adminRole.Id
             }, "Admin123");
-
-            // 6. Extra Huisartsen (Doctor1 & Doctor2)
-            EnsureUser(new User
-            {
-                FirstName = "Huisarts", LastName = "Een", Email = "doctor1@example.com",
-                StreetName = "Doctorstraat", HouseNumber = "1", PostalCode = "1234AB",
-                PhoneNumber = "0612345671", DateOfBirth = DateTime.UtcNow,
-                Gender = "Man", CitizenServiceNumber = "987654322", RoleId = gpRole.Id
-            }, "Huisarts123");
 
             EnsureUser(new User
             {

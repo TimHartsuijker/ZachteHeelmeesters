@@ -100,11 +100,13 @@ const login = async () => {
       // ✅ CORRECTE REDIRECT OP BASIS VAN ROL
       switch (userData?.role) {
         case "Specialist":
+          router.push("/patienten");
+          break;
         case "Huisarts":
-          router.push("/doorverwijzing-aanmaken");
+          router.push("/patienten");
           break;
         case "Administratiemedewerker":
-          router.push("/admin/create-user"); // Direct naar account aanmaken pagina
+          router.push("/administratie/accounts");
           break;
         case "Admin":
           router.push("/admin/dashboard");

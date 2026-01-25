@@ -50,7 +50,7 @@ namespace SeleniumTests
             Console.WriteLine("Logging in as administrative employee...");
             loginPage.EnterEmail("admin@example.com");
             loginPage.EnterPassword("AdminPassword123!");
-            loginPage.ClickLoginButton();
+            loginPage.ClickLogin();
 
             // Wait until dashboard or homepage is loaded
             wait.Until(drv => drv.Url.Contains("dashboard"));

@@ -9,7 +9,7 @@ namespace backend.Data
             context.Database.EnsureCreated();
 
             // Lijst met rollen die we sowieso nodig hebben
-            string[] rolesToSeed = { "Patiënt", "Admin", "Huisarts", "Specialist" };
+            string[] rolesToSeed = { "Patiënt", "Admin", "Huisarts", "Specialist", "Administratiemedewerker" };
 
             foreach (var roleName in rolesToSeed)
             {

@@ -97,40 +97,82 @@ const login = async () => {
         sessionStorage.setItem("userRole", userData.role);
       }
 
-      // Redirect op basis van rol
+      // ✅ CORRECTE REDIRECT OP BASIS VAN ROL
       switch (userData?.role) {
         case "Specialist":
         case "Huisarts":
           router.push("/patienten");
           break;
+        case "Administratiemedewerker":
+          router.push("/admin/create-user"); // Direct naar account aanmaken pagina
+          break;
         case "Admin":
           router.push("/admin/dashboard");
           break;
-        default:
+        default: // Patiënt
           router.push("/dashboard");
           break;
       }
     }
   } catch (error) {
-    // Detailed error logging
-    console.error("Login error details:", {
-      message: error.message,
-      status: error.response?.status,
-      data: error.response?.data,
-      headers: error.response?.headers,
-      config: error.config
-    });
+    // Als de error is "Gebruik de admin login pagina", probeer dan admin login
+    if (error.response?.status === 401 && 
+        error.response?.data?.message === "Gebruik de admin login pagina") {
+      
+      // Probeer via admin login (voor het geval iemand per ongeluk hier probeert)
+      try {
+        const adminResponse = await axios.post("/api/login/admin", {
+          email: email.value,
+          wachtwoord: wachtwoord.value,
+        }, {
+          withCredentials: true
+        });
 
-    if (error.response?.data?.message) {
-      loginErrorMessage.value = error.response.data.message;
-    } else if (error.code === 'ERR_NETWORK') {
-      loginErrorMessage.value = "Verbindingsfout met server. Zorg dat de backend draait";
+        if (adminResponse.status === 200) {
+          const userData = adminResponse.data.user;
+          console.log("Admin login gelukt!", userData);
+
+          // Sessie opslaan
+          sessionStorage.setItem("isLoggedIn", "true");
+          if (userData?.id) {
+            sessionStorage.setItem("userId", String(userData.id));
+          }
+          if (userData?.role) {
+            sessionStorage.setItem("userRole", userData.role);
+          }
+
+          // Redirect voor admin rollen
+          if (userData?.role === "Admin") {
+            router.push("/admin/dashboard");
+          } else if (userData?.role === "Administratiemedewerker") {
+            router.push("/admin/create-user");
+          }
+        }
+      } catch (adminError) {
+        handleLoginError(adminError);
+      }
     } else {
-      loginErrorMessage.value = "Er is iets misgegaan bij het inloggen.";
+      handleLoginError(error);
     }
-
-    loginError.value = true;
   }
 };
-</script>
 
+// Helper functie voor error handling
+const handleLoginError = (error) => {
+  console.error("Login error details:", {
+    message: error.message,
+    status: error.response?.status,
+    data: error.response?.data,
+  });
+
+  if (error.response?.data?.message) {
+    loginErrorMessage.value = error.response.data.message;
+  } else if (error.code === 'ERR_NETWORK') {
+    loginErrorMessage.value = "Verbindingsfout met server. Zorg dat de backend draait";
+  } else {
+    loginErrorMessage.value = "Er is iets misgegaan bij het inloggen.";
+  }
+
+  loginError.value = true;
+};
+</script>

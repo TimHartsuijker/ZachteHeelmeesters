@@ -59,27 +59,29 @@
             />
           </div>
           
-          <!-- WACHTWOORD VELDEN - NIET VERPLICHT -->
+          <!-- 🔧 WACHTWOORD VELDEN - NU WEL VERPLICHT -->
           <div class="form-row">
             <div class="form-group">
-              <label for="password">Wachtwoord</label>
+              <label for="password">Wachtwoord *</label>
               <input 
                 type="password" 
                 id="password" 
                 v-model="formData.password"
-                placeholder="Minimaal 8 karakters (leeg voor automatisch)"
+                required
+                placeholder="Minimaal 8 karakters"
                 minlength="8"
               />
-              <p class="help-text">Laat leeg voor automatisch gegenereerd wachtwoord</p>
+              <p class="help-text">Wachtwoord moet minimaal 8 karakters lang zijn</p>
             </div>
             
             <div class="form-group">
-              <label for="confirmPassword">Bevestig Wachtwoord</label>
+              <label for="confirmPassword">Bevestig Wachtwoord *</label>
               <input 
                 type="password" 
                 id="confirmPassword" 
                 v-model="confirmPassword"
-                placeholder="Herhaal wachtwoord (alleen als ingevuld)"
+                required
+                placeholder="Herhaal wachtwoord"
               />
             </div>
           </div>
@@ -207,7 +209,7 @@ const formData = ref({
   lastName: '',
   email: '',
   phoneNumber: '',
-  password: '', // NIET verplicht
+  password: '', // 🔧 NU verplicht
   streetName: '',
   houseNumber: '',
   postalCode: '',
@@ -255,24 +257,25 @@ const createUser = async () => {
   console.log('Formulier data:', formData.value)
   console.log('Confirm password:', confirmPassword.value)
   
-  // Basis validatie
+  // 🔧 WACHTWOORD NU TOEGEVOEGD AAN BASISVALIDATIE
   if (!formData.value.firstName || !formData.value.lastName || 
-      !formData.value.email || !formData.value.roleId) {
+      !formData.value.email || !formData.value.password || // 🔧 Password nu verplicht
+      !formData.value.roleId) {
     errorMessage.value = 'Vul alle verplichte velden in (gemarkeerd met *)'
     return
   }
   
-  // Wachtwoord validatie - ALLEEN als ingevuld
-  if (formData.value.password) {
-    if (formData.value.password !== confirmPassword.value) {
-      errorMessage.value = 'Wachtwoorden komen niet overeen'
-      return
-    }
-    
-    if (formData.value.password.length < 8) {
-      errorMessage.value = 'Wachtwoord moet minimaal 8 karakters lang zijn'
-      return
-    }
+  // 🔧 Wachtwoord validatie - NU ALTIJD omdat het verplicht is
+  // 1. Controleer of wachtwoorden overeenkomen
+  if (formData.value.password !== confirmPassword.value) {
+    errorMessage.value = 'Wachtwoorden komen niet overeen'
+    return
+  }
+  
+  // 2. Controleer minimale lengte
+  if (formData.value.password.length < 8) {
+    errorMessage.value = 'Wachtwoord moet minimaal 8 karakters lang zijn'
+    return
   }
   
   // Email validatie
@@ -298,7 +301,7 @@ const createUser = async () => {
       lastName: formData.value.lastName,
       email: formData.value.email,
       phoneNumber: formData.value.phoneNumber || null,
-      password: formData.value.password || null, // Kan null zijn
+      password: formData.value.password, // 🔧 NU altijd meegestuurd (niet meer null)
       streetName: formData.value.streetName || null,
       houseNumber: formData.value.houseNumber || null,
       postalCode: formData.value.postalCode || null,
@@ -358,7 +361,7 @@ const resetForm = () => {
     lastName: '',
     email: '',
     phoneNumber: '',
-    password: '',
+    password: '', // 🔧 Reset naar lege string
     streetName: '',
     houseNumber: '',
     postalCode: '',
@@ -601,5 +604,52 @@ label[for]:has(+ select[required])::after {
 .form-group.compact select {
   padding: 0.5rem 0.75rem;
   font-size: 0.95rem;
+}
+
+input[type="password"] {
+  position: relative;
+}
+
+label[for="password"]::after,
+label[for="confirmPassword"]::after {
+  content: " *";
+  color: #dc3545;
+  margin-left: 2px;
+}
+
+.help-text {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 0.5rem;
+  font-style: italic;
+  width: 100%;
+}
+
+.password-strength {
+  height: 4px;
+  background-color: #e9ecef;
+  margin-top: 4px;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.password-strength-bar {
+  height: 100%;
+  transition: width 0.3s, background-color 0.3s;
+}
+
+.password-strength.weak .password-strength-bar {
+  width: 33%;
+  background-color: #dc3545;
+}
+
+.password-strength.medium .password-strength-bar {
+  width: 66%;
+  background-color: #ffc107;
+}
+
+.password-strength.strong .password-strength-bar {
+  width: 100%;
+  background-color: #28a745;
 }
 </style>

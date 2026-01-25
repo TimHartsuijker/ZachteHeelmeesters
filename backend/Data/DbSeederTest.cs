@@ -25,13 +25,13 @@ namespace backend.Data
             var adminMedewerkerRole = context.Roles.First(r => r.RoleName == "Administratiemedewerker");
 
             // 3. Seed administratiemedewerker
-            if (!context.Users.Any(u => u.Email == "adminmedewerker@example.com"))
+            if (!context.Users.Any(u => u.Email == "administratie@example.com"))
             {
                 var adminMedewerker = new User
                 {
                     FirstName = "Admin",
                     LastName = "Medewerker",
-                    Email = "adminmedewerker@example.com",
+                    Email = "administratie@example.com",
                     StreetName = "Adminstraat",
                     HouseNumber = "50",
                     PostalCode = "1234AB",

@@ -21,7 +21,7 @@ services:
         condition: service_healthy
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=db;Database=ZachteHeelmeesters_Dev;User=sa;Password=ZHM_Dev_Password1!;TrustServerCertificate=True;Encrypt=False
+      - ConnectionStrings__DefaultConnection=Server=db;Database=ZachteHeelmeesters_Dev;User=sa;Password='ZHM_Dev_Password1!';TrustServerCertificate=True;Encrypt=False;Connect Retry Count=5;Connect Retry Interval=10
     # Do not publish backend directly; proxy will route /api to this service
   client:
     build:

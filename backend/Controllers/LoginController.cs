@@ -4,13 +4,16 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace backend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [EnableCors("AllowFrontend")]
+    [EnableCors("frontend")]
     public class LoginController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -55,7 +58,7 @@ namespace backend.Controllers
                 return Unauthorized(new { message = "Inloggegevens zijn incorrect" });
             }
 
-            // 🔒 Admin accounts moeten via admin login pagina
+            // ADMIN MAG HIER NIET INLOGGEN
             if (user.Role.RoleName == "Admin")
             {
                 _logger.LogWarning($"Admin account {request.Email} tried to login via normal login");
@@ -73,7 +76,7 @@ namespace backend.Controllers
                 _logger.LogWarning($"Incorrect password for {request.Email}");
                 return Unauthorized(new { message = "Inloggegevens zijn incorrect" });
             }
-
+            
             _logger.LogInformation($"Login successful for {request.Email} (Role: {user.Role.RoleName})");
 
             return Ok(new
@@ -197,3 +200,4 @@ namespace backend.Controllers
         }
     }
 }
+

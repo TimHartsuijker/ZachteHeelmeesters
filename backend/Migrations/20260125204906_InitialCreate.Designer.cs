@@ -12,15 +12,15 @@ using backend.Data;
 namespace backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260112101202_UpdateMedicalRecordFileForBinaryStorage")]
-    partial class UpdateMedicalRecordFileForBinaryStorage
+    [Migration("20260125204906_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.0")
+                .HasAnnotation("ProductVersion", "8.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -99,6 +99,40 @@ namespace backend.Migrations
                     b.ToTable("Departments");
                 });
 
+            modelBuilder.Entity("backend.Models.DoctorAvailability", b =>
+                {
+                    b.Property<int>("AvailabilityId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AvailabilityId"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DoctorId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsAvailable")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Reason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("AvailabilityId");
+
+                    b.HasIndex("DoctorId", "DateTime")
+                        .IsUnique();
+
+                    b.ToTable("DoctorAvailabilities");
+                });
+
             modelBuilder.Entity("backend.Models.MedicalRecordAccess", b =>
                 {
                     b.Property<int>("SpecialistId")
@@ -125,8 +159,12 @@ namespace backend.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AppointmentId")
+                    b.Property<int?>("AppointmentId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Category")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -134,8 +172,15 @@ namespace backend.Migrations
                     b.Property<int>("CreatedById")
                         .HasColumnType("int");
 
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("PatientId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.HasKey("Id");
 
@@ -208,6 +253,11 @@ namespace backend.Migrations
 
                     b.Property<int>("DoctorId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Note")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<int>("PatientId")
                         .HasColumnType("int");
@@ -357,8 +407,7 @@ namespace backend.Migrations
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
                         .HasMaxLength(15)
@@ -455,6 +504,17 @@ namespace backend.Migrations
                     b.Navigation("Treatment");
                 });
 
+            modelBuilder.Entity("backend.Models.DoctorAvailability", b =>
+                {
+                    b.HasOne("backend.Models.User", "Doctor")
+                        .WithMany()
+                        .HasForeignKey("DoctorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Doctor");
+                });
+
             modelBuilder.Entity("backend.Models.MedicalRecordAccess", b =>
                 {
                     b.HasOne("backend.Models.User", "Patient")
@@ -478,9 +538,7 @@ namespace backend.Migrations
                 {
                     b.HasOne("backend.Models.Appointment", "Appointment")
                         .WithMany()
-                        .HasForeignKey("AppointmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("AppointmentId");
 
                     b.HasOne("backend.Models.User", "CreatedBy")
                         .WithMany("CreatedMedicalRecordEntries")

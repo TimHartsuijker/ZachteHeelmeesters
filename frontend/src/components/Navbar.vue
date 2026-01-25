@@ -3,19 +3,16 @@
     <!-- Andere gebruikers: Specialist & Admin -->
     <ul v-if="userRole !== 'Patiënt'" class="nav-center-buttons">
       <li v-if="userRole === 'Specialist'">
-        <RouterLink to="/agenda" aria-current="page">Agenda</RouterLink>
+        <RouterLink to="/agenda" aria-current="calendar page">Agenda</RouterLink>
       </li>
-      <li v-if="userRole === 'Specialist'" class="nav-center-buttons">
-          <RouterLink to="/patienten" aria-current="page">Patiënten</RouterLink>
+      <li v-if="userRole === 'Specialist' || userRole === 'Huisarts'" class="nav-center-buttons">
+          <RouterLink to="/patienten" aria-current="patient overview page">Patiënten</RouterLink>
       </li>
       <li v-else-if="userRole === 'Huisarts'" class="nav-center-buttons">
-          <RouterLink to="/patienten" aria-current="page">Patiënten</RouterLink>
-      </li>
-      <li v-else-if="userRole === 'Patiënt'" class="nav-center-buttons">
-          <RouterLink to="/afspraken" aria-current="appointments page">Mijn afspraken</RouterLink>
+          <RouterLink to="/doorverwijzing-aanmaken" aria-current="create referral page">Doorverwijzing Aanmaken</RouterLink>
       </li>
       <li v-else-if="userRole === 'Admin'" class="nav-center-buttons">
-        <RouterLink to="/admin/users" aria-current="user-management page">Gebruikersbeheer</RouterLink>
+        <RouterLink to="/admin/users" aria-current="user management page">Gebruikersbeheer</RouterLink>
       </li>
       <li v-else-if="userRole === 'Administratiemedewerker'" class="nav-center-buttons">
         <RouterLink to="/administratie/accounts" aria-current="accounts page">
@@ -29,11 +26,14 @@
       <li>
         <RouterLink to="/dashboard">Dashboard</RouterLink>
       </li>
-      <li>
+      <!-- <li>
         <RouterLink to="/afspraken">Mijn afspraken</RouterLink>
+      </li> -->
+      <li>
+        <RouterLink to="/dossier">Mijn medisch dossier</RouterLink>
       </li>
       <li>
-        <RouterLink to="/medischdossier">Mijn medisch dossier</RouterLink>
+        <RouterLink to="/doorverwijzingen-inzien">Mijn doorverwijzingen</RouterLink>
       </li>
       <li>
         <RouterLink to="/patientprofiel">Mijn profiel</RouterLink>
@@ -52,11 +52,14 @@
       <li @click="menuOpen = false">
         <RouterLink to="/dashboard">Dashboard</RouterLink>
       </li>
-      <li @click="menuOpen = false">
+      <!-- <li @click="menuOpen = false">
         <RouterLink to="/afspraken">Mijn afspraken</RouterLink>
+      </li> -->
+      <li @click="menuOpen = false">
+        <RouterLink to="/dossier">Mijn medisch dossier</RouterLink>
       </li>
       <li @click="menuOpen = false">
-        <RouterLink to="/medischdossier">Mijn medisch dossier</RouterLink>
+        <RouterLink to="/doorverwijzingen-inzien">Mijn doorverwijzingen</RouterLink>
       </li>
       <li @click="menuOpen = false">
         <RouterLink to="/patientprofiel">Mijn profiel</RouterLink>

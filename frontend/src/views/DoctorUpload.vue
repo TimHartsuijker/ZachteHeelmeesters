@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import FileUpload from '@/components/FileUpload.vue';
-import NavBar from '@/components/NavBar.vue';
 
 // TODO: Get these from authentication/session
 const DOCTOR_ID = 2;
@@ -24,10 +23,6 @@ function onUploadError(error: string) {
 
 <template>
   <div class="min-h-screen bg-[#ECFAE5] flex flex-col" style="padding-top: 70px;">
-    
-    <!-- Navigation -->
-    <NavBar />
-
     <!-- Success message -->
     <div v-if="uploadSuccess" class="mx-auto mt-6 max-w-2xl w-full px-4">
       <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">

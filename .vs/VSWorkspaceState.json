@@ -1,9 +1,7 @@
 {
   "ExpandedNodes": [
-    "",
-    "\\SeleniumTests",
-    "\\SeleniumTests\\Tests",
-    "\\SeleniumTests\\Tests\\US4"
+    ""
   ],
+  "SelectedNode": "\\backend.sln",
   "PreviewInSolutionExplorer": false
 }

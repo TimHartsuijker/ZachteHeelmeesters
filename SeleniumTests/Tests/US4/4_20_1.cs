@@ -12,8 +12,8 @@ public class _4_20_1
     public void RetrieveAvailableTimeSlots_ByUserID()
     {
         // Arrange
-        IWebDriver driver = null;
-        WebDriverWait wait = null;
+        IWebDriver? driver = null;
+        WebDriverWait? wait = null;
         
         try
         {

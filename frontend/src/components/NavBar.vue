@@ -5,7 +5,16 @@
       <li v-if="userRole === 'Specialist'">
         <RouterLink to="/agenda" aria-current="page">Agenda</RouterLink>
       </li>
-      <li v-else-if="userRole === 'Admin'">
+      <li v-if="userRole === 'Specialist'" class="nav-center-buttons">
+          <RouterLink to="/patienten" aria-current="page">Patiënten</RouterLink>
+      </li>
+      <li v-else-if="userRole === 'Huisarts'" class="nav-center-buttons">
+          <RouterLink to="/patienten" aria-current="page">Patiënten</RouterLink>
+      </li>
+      <li v-else-if="userRole === 'Patiënt'" class="nav-center-buttons">
+          <RouterLink to="/afspraken" aria-current="appointments page">Mijn afspraken</RouterLink>
+      </li>
+      <li v-else-if="userRole === 'Admin'" class="nav-center-buttons">
         <RouterLink to="/admin/users" aria-current="user-management page">Gebruikersbeheer</RouterLink>
       </li>
     </ul>
@@ -52,11 +61,28 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 import LogoutButton from './LogoutButton.vue';
 
 const menuOpen = ref(false);
-const toggleMenu = () => menuOpen.value = !menuOpen.value;
+const userRole = ref(sessionStorage.getItem('userRole'));
 
-const userRole = sessionStorage.getItem('userRole');
+const toggleMenu = () => {
+  menuOpen.value = !menuOpen.value;
+};
+
+// Functie om de rol te updaten als de sessie verandert
+const updateSession = () => {
+  userRole.value = sessionStorage.getItem('userRole');
+};
+
+onMounted(() => {
+  // Luister naar een custom event als je de rol dynamisch wilt bijwerken
+  window.addEventListener('session-updated', updateSession);
+});
+
+onBeforeUnmount(() => {
+  // Netjes opruimen om memory leaks te voorkomen
+  window.removeEventListener('session-updated', updateSession);
+});
 </script>

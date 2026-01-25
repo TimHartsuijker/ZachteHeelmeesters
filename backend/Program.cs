@@ -12,18 +12,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// 3. CORS configuratie (één duidelijke policy genaamd "frontend")
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("frontend", policy =>
-    {
-        policy.WithOrigins("http://localhost:5173", "http://localhost:5174", "http://localhost:3000", "http://localhost:5016")
-              .AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials();
-    });
-});
-
 // 4. Session & Cache services
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
@@ -33,6 +21,20 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+// Add CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("frontend", builder =>
+    {
+        builder.WithOrigins(
+                "http://localhost",
+                "http://localhost:5173",
+                "http://127.0.0.1:5173")
+               .AllowAnyMethod();
+    });
+});
+
+// App bouwen
 var app = builder.Build();
 
 // 5. MIGRATIONS + SEEDING (NA Build, VOOR Run)
@@ -44,7 +46,6 @@ using (var scope = app.Services.CreateScope())
         var context = services.GetRequiredService<AppDbContext>();
 
         // Voer migraties uit
-        context.Database.Migrate();
 
         // Seed basis data (Rollen, etc.)
         DbSeederStatic.Seed(context);
@@ -53,6 +54,7 @@ using (var scope = app.Services.CreateScope())
         if (app.Environment.IsDevelopment())
         {
             DbSeederTest.Seed(context);
+            DbSeederMedicalFiles.Seed(context);
         }
     }
     catch (Exception ex)
@@ -72,8 +74,9 @@ if (app.Environment.IsDevelopment())
 app.UseCors("frontend");
 app.UseSession();
 
-app.UseAuthentication(); // Eerst wie ben je
-app.UseAuthorization();  // Dan wat mag je
+app.UseAuthorization();
+
+app.UseAuthorization();
 
 app.MapControllers();
 

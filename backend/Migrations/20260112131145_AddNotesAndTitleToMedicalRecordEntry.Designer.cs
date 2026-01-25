@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using backend.Data;
 
@@ -11,13 +12,15 @@ using backend.Data;
 namespace backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260112131145_AddNotesAndTitleToMedicalRecordEntry")]
+    partial class AddNotesAndTitleToMedicalRecordEntry
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.11")
+                .HasAnnotation("ProductVersion", "8.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -94,40 +97,6 @@ namespace backend.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Departments");
-                });
-
-            modelBuilder.Entity("backend.Models.DoctorAvailability", b =>
-                {
-                    b.Property<int>("AvailabilityId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AvailabilityId"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("DoctorId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsAvailable")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Reason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("AvailabilityId");
-
-                    b.HasIndex("DoctorId", "DateTime")
-                        .IsUnique();
-
-                    b.ToTable("DoctorAvailabilities");
                 });
 
             modelBuilder.Entity("backend.Models.MedicalRecordAccess", b =>
@@ -399,7 +368,8 @@ namespace backend.Migrations
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("PhoneNumber")
                         .HasMaxLength(15)
@@ -494,17 +464,6 @@ namespace backend.Migrations
                     b.Navigation("Specialist");
 
                     b.Navigation("Treatment");
-                });
-
-            modelBuilder.Entity("backend.Models.DoctorAvailability", b =>
-                {
-                    b.HasOne("backend.Models.User", "Doctor")
-                        .WithMany()
-                        .HasForeignKey("DoctorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Doctor");
                 });
 
             modelBuilder.Entity("backend.Models.MedicalRecordAccess", b =>

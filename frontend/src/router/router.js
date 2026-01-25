@@ -8,6 +8,7 @@ import AgendaView from '../views/AgendaView.vue';
 import AdminLoginView from "../views/AdminLoginView.vue";
 import AdminDashboardView from "../views/AdminDashboardView.vue";
 import UsersView from "../views/AdminUserManagementView.vue";
+import Patientprofiel from '../views/Patientprofiel.vue';
 import DoctorPatientsView from "../views/DoctorPatientsView.vue";
 
 const routes = [
@@ -50,6 +51,12 @@ const routes = [
     path: '/dashboard', 
     name: 'dashboard',
     component: DashboardView,
+    meta: { requiresAuth: true, allowedRoles: ['Patiënt'] }
+  },
+  {
+    path: '/patientprofiel',
+    name: 'patientprofiel',
+    component: Patientprofiel,
     meta: { requiresAuth: true, allowedRoles: ['Patiënt'] }
   },
   {

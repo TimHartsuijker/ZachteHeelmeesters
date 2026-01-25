@@ -21,6 +21,9 @@
         <button type="submit" id="admin-login-btn">
           Login als beheerder
         </button>
+        <div class="login-link">
+          <RouterLink to="/login" aria-current="login">Terug</RouterLink>
+        </div>
       </form>
 
     </div>

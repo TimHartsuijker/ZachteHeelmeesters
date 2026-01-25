@@ -12,6 +12,9 @@ import CreateReferralView from '../views/CreateReferralView.vue'
 import DoctorPatientsView from "../views/DoctorPatientsView.vue";
 import DoorverwijzingenInzien from '../views/DoorverwijzingenInzien.vue';
 import Patientprofiel from '../views/Patientprofiel.vue';
+import DoctorPatientsView from "../views/DoctorPatientsView.vue";
+import AccountsOverviewView from "../views/AccountsOverviewView.vue";
+import AdminCreateUserView from "../views/AdminCreateUserView.vue"; 
 
 const routes = [
   { 
@@ -96,7 +99,19 @@ const routes = [
     name: "DoorverwijzingenInzien",
     component: DoorverwijzingenInzien,
     meta: { requiresAuth: true, allowedRoles: ['Patiënt'] },
-  }
+  },
+  {
+    path: "/administratie/accounts",
+    name: "AccountsOverview",
+    component: AccountsOverviewView,
+    meta: { requiresAuth: true, allowedRoles: ['Administratiemedewerker'] },
+  },
+  {
+    path: "/administratie/create-user",
+    name: "AdminCreateUser",
+    component: AdminCreateUserView,
+    meta: { requiresAuth: true, allowedRoles: ['Administratiemedewerker'] },
+  },
 ]
 
 const router = createRouter({
@@ -108,15 +123,19 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const userRole = sessionStorage.getItem('userRole');
   const isLoggedIn = sessionStorage.getItem('userId') !== null;
-  const isAdminLoggedIn = sessionStorage.getItem('adminId') !== null;
 
   if (to.path == '/') {
-    return next({ name: isLoggedIn || isAdminLoggedIn ? 'dashboard' : 'login' });
+    return next({ name: isLoggedIn ? 'dashboard' : 'login' });
   }
 
   if (to.meta.requiresAuth) {
     
-    if (!isLoggedIn && !isAdminLoggedIn) {
+    if (!isLoggedIn) {
+      // Voor administratie: naar normale login
+      if (to.path.startsWith('/administratie')) {
+        return next({ name: 'login' });
+      }
+      // Voor admin: naar admin login
       if (to.path.startsWith('/admin')) {
         return next({ name: 'AdminLogin' });
       }
@@ -124,11 +143,10 @@ router.beforeEach((to, from, next) => {
     }
 
     if (to.meta.allowedRoles && !to.meta.allowedRoles.includes(userRole)) {
-      console.warn(`Toegang geweigerd voor rol: ${userRole}`);
-
+      console.warn(`Toegang geweigerd voor rol: ${userRole} tot ${to.path}`);
       return router.back();
     }
-  } else if ((to.name === 'login' || to.name === 'AdminLogin') && (isLoggedIn || isAdminLoggedIn)) {
+  } else if ((to.name === 'login' || to.name === 'AdminLogin') && isLoggedIn) {
     return router.back();
   }
   next();

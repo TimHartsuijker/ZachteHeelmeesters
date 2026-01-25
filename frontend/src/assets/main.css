@@ -100,10 +100,6 @@ button[type="submit"]:hover {
   background-color: #007a0a;
 }
 
-button[type="submit"]:active {
-  background-color: #006008;
-}
-
 .error-text {
   color: #d32f2f;
   margin-top: 5px;
@@ -612,4 +608,43 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+/* Admin Create User Styling */
+.create-user-form {
+  width: 100%;
+}
+
+.form-section {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid #dee2e6;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #495057;
+}
+
+.required-field::after {
+  content: " *";
+  color: #dc3545;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+  padding: 0.5rem 1.5rem;
+  font-size: 1rem;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
 }

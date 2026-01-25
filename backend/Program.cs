@@ -12,18 +12,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// 3. CORS configuratie (één duidelijke policy genaamd "frontend")
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("frontend", policy =>
-    {
-        policy.WithOrigins("http://localhost:5173", "http://localhost:5174", "http://localhost:3000", "http://localhost:5016")
-              .AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials();
-    });
-});
-
 // 4. Session & Cache services
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
@@ -42,9 +30,7 @@ builder.Services.AddCors(options =>
                 "http://localhost",
                 "http://localhost:5173",
                 "http://127.0.0.1:5173")
-               .AllowAnyMethod()
-               .AllowAnyHeader()
-               .AllowCredentials();
+               .AllowAnyMethod();
     });
 });
 

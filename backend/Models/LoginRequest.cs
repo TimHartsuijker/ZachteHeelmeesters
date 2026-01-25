@@ -4,7 +4,9 @@ namespace backend.Models
 {
     public class LoginRequest
     {
-        public required string Email { get; set; }
-        public required string Wachtwoord { get; set; }
+        [Required, EmailAddress]
+        public string Email { get; set; }
+        [Required]
+        public string Wachtwoord { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using backend.Data;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
@@ -41,7 +42,8 @@ namespace SeleniumTests.Base
         protected DossierPage dossierPage { get; private set; } = null!;
         protected TestHelpers helpers { get; private set; } = null!;
         protected PatientOverviewPage patientOverviewPage { get; private set; } = null!;
-        protected PatientMedicalRecordPage medicalRecordPage { get; private set; } = null!;
+        protected MedicalRecordPage medicalRecordPage { get; private set; } = null!;
+        protected CalendarPage calendarPage { get; private set; } = null!;
 
         [TestInitialize]
         public virtual void Setup()
@@ -56,7 +58,15 @@ namespace SeleniumTests.Base
                 ContextSetup();
             }
 
-            var options = new ChromeOptions();
+            ChromeOptions options = new();
+
+            options.AddUserProfilePreference("profile.password_manager_leak_detection", false);
+            options.AddUserProfilePreference("credentials_enable_service", false);
+            options.AddUserProfilePreference("profile.password_manager_enabled", false);
+
+            options.AddArgument("--safebrowsing-disable-extension-blacklist");
+            options.AddArgument("--safebrowsing-disable-download-protection");
+
             options.AddArgument("--start-maximized");
             options.AddArgument("--ignore-certificate-errors");
 
@@ -84,7 +94,27 @@ namespace SeleniumTests.Base
             dossierPage = new DossierPage(driver);
             helpers = new TestHelpers(driver, loginPage, dossierPage);
             patientOverviewPage = new PatientOverviewPage(driver);
-            medicalRecordPage = new PatientMedicalRecordPage(driver);
+            medicalRecordPage = new MedicalRecordPage(driver);
+            calendarPage = new CalendarPage(driver);
+        }
+
+        protected void RetryVerification(Action action, int maxAttempts = 3, int delayMs = 2000)
+        {
+            for (int attempt = 1; attempt <= maxAttempts; attempt++)
+            {
+                try
+                {
+                    action();
+                    LogInfo($"Retry-Check: Attempt {attempt} successful.");
+                    return; // Succes! Verlaat de loop.
+                }
+                catch (Exception ex) when (attempt < maxAttempts)
+                {
+                    LogInfo($"Retry-Check: Attempt {attempt} failed. Retrying in {delayMs}ms... (Error: {ex.Message.Split('\n')[0]})");
+                    System.Threading.Thread.Sleep(delayMs);
+                    driver.Navigate().Refresh(); // Forceer een herlaadbeurt bij elke retry
+                }
+            }
         }
 
         #region Logging Engine
@@ -136,12 +166,14 @@ namespace SeleniumTests.Base
         #region Database Context
         public void ContextSetup()
         {
+            // Gebruik de exacte string die overeenkomt met je Docker setup
+            string connString = "Server=127.0.0.1,1433;Database=ZachteHeelmeesters_Dev;User Id=sa;Password=ZHM_Dev_Password1!;TrustServerCertificate=True;Encrypt=False;Connect Timeout=30;";
+
             var options = new DbContextOptionsBuilder<AppDbContext>()
-                .UseSqlServer("Server=localhost,1433;Database=ZachteHeelmeesters_Dev;User=sa;Password=ZHM_Dev_Password1!;TrustServerCertificate=True;Encrypt=False")
+                .UseSqlServer(connString)
                 .Options;
 
             _context = new AppDbContext(options);
-            ResetDatabase();
         }
 
         private void ResetDatabase()

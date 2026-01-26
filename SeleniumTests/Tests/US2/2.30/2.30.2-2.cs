@@ -1,87 +1,54 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Support.UI;
-using System;
+using SeleniumTests.Base;
 
-namespace SeleniumTests
+namespace US2._30
 {
     [TestClass]
-    public class _2_30_2_2
+    public class _2_30_2_2 : BaseTest
     {
-        private IWebDriver driver;
-        private WebDriverWait wait;
-        private string baseUrl = "http://localhost";
-
-        [TestInitialize]
-        public void Setup()
-        {
-            var options = new ChromeOptions();
-            options.AddArgument("--start-maximized");
-            options.AddArgument("--ignore-certificate-errors");
-
-            driver = new ChromeDriver(options);
-            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-            Console.WriteLine("Setup completed.");
-        }
-
-        [TestCleanup]
-        public void Cleanup()
-        {
-            Console.WriteLine("Test finished. Closing browser.");
-            driver.Quit();
-            driver.Dispose();
-        }
-
         [TestMethod]
         public void NavigationMenu_ContainsCorrectOptions()
         {
-            Console.WriteLine("Test started: NavigationMenu_ContainsCorrectOptions");
-            Console.WriteLine("Test case: TC2.30.2-2 - Verifying available dashboard functionality");
-            Console.WriteLine("NOTE: The dashboard uses panels instead of a traditional menu.");
+            const string EMAIL = "gebruiker@example.com";
+            const string PASSWORD = "Wachtwoord123";
 
-            // Step 1: Login
-            Console.WriteLine("Step 1: Navigating to login page...");
-            driver.Navigate().GoToUrl($"{baseUrl}/login");
+            // Stap 1: Login via POM
+            LogStep(1, "Navigating to login page and entering credentials.");
+            loginPage.Navigate();
+            loginPage.PerformLogin(EMAIL, PASSWORD);
+            LogInfo("Login submitted.");
 
-            Console.WriteLine("Step 1b: Entering login credentials...");
-            driver.FindElement(By.Id("email")).SendKeys("gebruiker@example.com");
-            driver.FindElement(By.Id("wachtwoord")).SendKeys("Wachtwoord123");
+            // Stap 2: Wachten op Dashboard via POM verificatie
+            LogStep(2, "Waiting for Dashboard to load.");
+            RetryVerification(() =>
+            {
+                Assert.IsTrue(dashboardPage.IsWelcomeMessageDisplayed(), "Dashboard failed to load: Welcome message not found.");
+            });
+            LogSuccess(2, "Dashboard loaded successfully.");
 
-            Console.WriteLine("Step 1c: Logging in...");
-            driver.FindElement(By.Id("login-btn")).Click();
+            // Stap 3: Functionaliteit Verifiëren via POM
+            LogStep(3, "Verifying presence and titles of dashboard panels.");
 
-            // Step 2: Wait for dashboard
-            Console.WriteLine("Step 2: Waiting for dashboard...");
-            wait.Until(d => d.FindElement(By.CssSelector("[data-test='welcome-message']")));
-            Console.WriteLine("Dashboard loaded!");
+            RetryVerification(() =>
+            {
+                // Controleer zichtbaarheid van componenten via de DashboardPage POM
+                Assert.IsTrue(dashboardPage.IsDashboardGridDisplayed(), "Dashboard grid is not visible.");
 
-            // Step 3: Verify functionality
-            Console.WriteLine("Step 3: Verifying available functionality...");
+                // Haal titels op via POM methodes
+                string leftTitle = dashboardPage.GetLeftPanelTitle();
+                string rightTitle = dashboardPage.GetRightPanelTitle();
 
-            var welcomeMessage = driver.FindElement(By.CssSelector("[data-test='welcome-message']"));
-            Assert.IsTrue(welcomeMessage.Displayed, "Welcome message is not visible.");
-            Console.WriteLine($"✓ Welcome message: {welcomeMessage.Text}");
+                LogInfo($"Checking titles - Left: '{leftTitle}', Right: '{rightTitle}'");
 
-            var leftPanel = driver.FindElement(By.ClassName("panel-left"));
-            var rightPanel = driver.FindElement(By.ClassName("panel-right"));
+                // Controleer op correcte opties (NL/EN support)
+                bool hasAppointments = leftTitle.Contains("Afspraken") || leftTitle.Contains("Appointments");
+                bool hasReferrals = rightTitle.Contains("Doorverwijzingen") || rightTitle.Contains("Referrals");
 
-            Assert.IsTrue(leftPanel.Displayed, "Left panel is not visible.");
-            Assert.IsTrue(rightPanel.Displayed, "Right panel is not visible.");
+                Assert.IsTrue(hasAppointments, $"Left panel does not contain expected 'Appointments' title. Found: {leftTitle}");
+                Assert.IsTrue(hasReferrals, $"Right panel does not contain expected 'Referrals' title. Found: {rightTitle}");
 
-            var leftTitle = leftPanel.FindElement(By.TagName("h2")).Text;
-            var rightTitle = rightPanel.FindElement(By.TagName("h2")).Text;
-
-            Console.WriteLine($"✓ Left panel title: {leftTitle}");
-            Console.WriteLine($"✓ Right panel title: {rightTitle}");
-
-            bool hasAppointments = leftTitle.Contains("Afspraken") || leftTitle.Contains("Appointments");
-            bool hasReferrals = rightTitle.Contains("Doorverwijzingen") || rightTitle.Contains("Referrals");
-
-            Assert.IsTrue(hasAppointments, $"Left panel does not contain appointments. Found: {leftTitle}");
-            Assert.IsTrue(hasReferrals, $"Right panel does not contain referrals. Found: {rightTitle}");
-
-            Console.WriteLine("✓ Test passed: Dashboard shows correct functionality.");
+                LogSuccess(3, $"Verified correct options: {leftTitle} and {rightTitle}.");
+            });
         }
     }
 }

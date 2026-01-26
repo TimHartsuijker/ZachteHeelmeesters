@@ -4,7 +4,7 @@ using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
 using System;
 
-namespace SeleniumTests
+namespace US2._30
 {
     [TestClass]
     public class _2_30_3_1

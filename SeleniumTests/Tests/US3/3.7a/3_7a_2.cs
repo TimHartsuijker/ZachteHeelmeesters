@@ -1,103 +1,71 @@
 using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Support.UI;
+using SeleniumTests.Base;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace SeleniumTests;
-
-[TestClass]
-public class _3_7a_2
+namespace US3._7
 {
-    [TestMethod]
-    public void SaveWithoutChanges_ShowsNoChangesAlert()
+    [TestClass]
+    public class _3_7a_2 : BaseTest
     {
-        // Arrange
-        IWebDriver driver = null;
-        try
+        [TestMethod]
+        public void TC_3_7a_2_SaveWithoutChanges_SaveButtonDisabled()
         {
-            Console.WriteLine("LOG [Step 1] Start test: SaveWithoutChanges_ShowsNoChangesAlert");
-            driver = new ChromeDriver();
+            // Stap 1: Login als Admin
+            LogStep(1, "Logging in as administrator...");
+            adminLoginPage.Navigate();
+            wait.Until(d => adminLoginPage.IsPasswordInputDisplayed());
+            adminLoginPage.PerformLogin("admin@example.com", "Admin123");
+            wait.Until(d => !adminLoginPage.IsPasswordInputDisplayed());
+            LogSuccess(1, "Admin login successful.");
 
-            // Step 2: Navigate directly to Gebruikers page
-            driver.Navigate().GoToUrl("http://localhost/admin/users");
-            Console.WriteLine("LOG [Step 2] Navigated to Gebruikers page.");
-
-            // Wait for page to load
-            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            // Stap 2: Navigatie naar Gebruikersbeheer
+            LogStep(2, "Navigating to User Management page...");
+            userManagementPage.Navigate();
             wait.Until(d => d.FindElements(By.ClassName("user-row")).Count > 0);
-            Console.WriteLine("LOG [Step 3] Page loaded with users.");
+            LogSuccess(2, "User Management page loaded with users.");
 
-            // Step 3: Find the first user's row
+            // Stap 3: Identificatie eerste gebruiker
+            LogStep(3, "Finding the first user row in the list...");
             var userRows = driver.FindElements(By.ClassName("user-row"));
-            if (userRows.Count == 0)
-            {
-                throw new Exception("No users found on the page.");
-            }
+            Assert.IsTrue(userRows.Count > 0, "Geen gebruikers gevonden op de pagina.");
+
             var firstUserRow = userRows[0];
-            Console.WriteLine("LOG [Step 4] Found first user row.");
+            LogSuccess(3, "First user row identified.");
 
-            // Step 4: Click Save button without making changes
+            // Stap 4: Controleer status van de Save button zonder wijzigingen
+            LogStep(4, "Verifying that the 'Save' button is disabled when no changes are made...");
             var saveButton = firstUserRow.FindElement(By.ClassName("save-btn"));
-            saveButton.Click();
-            Console.WriteLine("LOG [Step 5] Clicked 'Save' button without changing any fields.");
 
-            // Step 5: Wait for alert and verify message
-            try
+            // Verifieer dat de knop disabled is (via de 'disabled' attribute of Selenium Enabled property)
+            bool isBtnDisabled = !saveButton.Enabled || saveButton.GetAttribute("disabled") == "true";
+
+            Assert.IsTrue(isBtnDisabled, "De Save button zou disabled moeten zijn als er geen wijzigingen zijn aangebracht.");
+            LogInfo("Save button status: Disabled (Correct)");
+            LogSuccess(4, "Verified: Save button is properly disabled without changes.");
+
+            // Stap 5: Optionele verificatie - Wordt de knop enabled na een wijziging?
+            LogStep(5, "Verifying button becomes enabled after changing a role...");
+            var roleSelect = firstUserRow.FindElement(By.ClassName("role-select"));
+            var selectElement = new OpenQA.Selenium.Support.UI.SelectElement(roleSelect);
+
+            // Selecteer een andere optie dan de huidige
+            string currentRole = selectElement.SelectedOption.Text;
+            var otherOption = selectElement.Options.FirstOrDefault(o => o.Text != currentRole);
+
+            if (otherOption != null)
             {
-                wait.Until(d => {
-                    try
-                    {
-                        d.SwitchTo().Alert();
-                        return true;
-                    }
-                    catch (NoAlertPresentException)
-                    {
-                        return false;
-                    }
-                });
-                
-                IAlert alert = driver.SwitchTo().Alert();
-                string alertText = alert.Text;
-                Console.WriteLine($"LOG [Step 6] Alert shown: '{alertText}'");
-                
-                if (alertText.Trim() == "Geen wijzigingen om op te slaan.")
-                {
-                    Console.WriteLine("LOG [Step 7] PASS: Correct alert message shown.");
-                }
-                else
-                {
-                    Console.WriteLine("LOG [Step 7] FAIL: Incorrect alert message.");
-                    alert.Accept();
-                    throw new Exception("Unexpected alert message: " + alertText);
-                }
-                alert.Accept();
-                Console.WriteLine("LOG [Step 8] Alert accepted.");
+                selectElement.SelectByText(otherOption.Text);
+                LogInfo($"Changed role to: {otherOption.Text}");
+
+                Assert.IsTrue(saveButton.Enabled, "De Save button zou enabled moeten worden na een wijziging.");
+                LogSuccess(5, "Verified: Save button enabled after user input.");
             }
-            catch (WebDriverTimeoutException)
+            else
             {
-                Console.WriteLine("LOG [Step 6] FAIL: No alert appeared after clicking save without changes.");
-                throw new Exception("Expected alert did not appear.");
+                LogInfo("Skipping Step 5: No alternative roles available to test state change.");
             }
 
-            // Step 6: Test completed
-            Console.WriteLine("LOG [Step 9] Test completed successfully.");
-        }
-        catch (NoSuchElementException ex)
-        {
-            Console.WriteLine("ERROR [E001] Element not found: " + ex.Message);
-            throw;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("ERROR [E999] Unexpected error: " + ex.ToString());
-            throw;
-        }
-        finally
-        {
-            if (driver != null)
-            {
-                driver.Quit();
-                Console.WriteLine("LOG [Step 10] WebDriver closed.");
-            }
+            LogSuccess(6, "Test completed successfully: Save button state logic is correct.");
         }
     }
 }

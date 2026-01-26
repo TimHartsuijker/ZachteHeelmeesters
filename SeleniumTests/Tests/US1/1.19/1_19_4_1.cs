@@ -32,7 +32,8 @@ namespace US1._19
 
             // Stap 4: Verificatie dashboard
             LogStep(4, "Verifying if user reached the dashboard...");
-            Assert.IsTrue(driver.Url.Contains("/dashboard"), "Gebruiker is niet doorgestuurd naar het dashboard.");
+            Assert.IsTrue(driver.Url.Contains("/dashboard"), 
+                "Gebruiker is niet doorgestuurd naar het dashboard.");
             LogSuccess(4, "User is successfully logged in and present on the dashboard.");
 
             // Stap 5: Finale status check

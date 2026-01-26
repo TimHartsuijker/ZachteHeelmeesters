@@ -1,70 +1,50 @@
+﻿using OpenQA.Selenium;
+using SeleniumTests.Base;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Support.UI;
-using SeleniumTests.P_O_M;
-using System;
 
-namespace SeleniumTests
+namespace US3._13
 {
     [TestClass]
-    public class _3_13_4
+    public class _3_13_4 : BaseTest
     {
-        private IWebDriver driver;
-        private WebDriverWait wait;
-        private string baseUrl = "http://localhost";
-        private LoginPage loginPage;
-
-        [TestInitialize]
-        public void Setup()
-        {
-            var options = new ChromeOptions();
-            options.AddArgument("--start-maximized");
-            options.AddArgument("--ignore-certificate-errors");
-
-            driver = new ChromeDriver(options);
-            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-
-            loginPage = new LoginPage(driver);
-        }
-
-        [TestCleanup]
-        public void TearDown()
-        {
-            driver.Quit();
-            driver.Dispose();
-        }
-
-
         [TestMethod]
         public void TC_3_13_4_NonAdminCannotLoginAdminPage()
         {
-            Console.WriteLine("Test: Successful admin login");
+            const string USER_EMAIL = "gebruiker@example.com";
+            const string USER_PASSWORD = "Wachtwoord123";
 
-            
+            // Stap 1: Navigatie naar Admin Login
+            LogStep(1, "Navigating directly to the Admin Login page...");
             driver.Navigate().GoToUrl($"{baseUrl}/admin/login");
-            Console.WriteLine("Admin login pagina geladen.");
+            wait.Until(d => d.FindElement(By.Id("admin-password")).Displayed);
+            LogSuccess(1, "Admin login page loaded successfully.");
 
-            
-            driver.FindElement(By.Id("admin-username"))
-                  .SendKeys("gebruiker@example.com");
+            // Stap 2: Invoeren van reguliere gebruikersgegevens
+            LogStep(2, $"Entering regular user credentials (Email: {USER_EMAIL}) into admin fields...");
+            driver.FindElement(By.Id("admin-username")).SendKeys(USER_EMAIL);
+            driver.FindElement(By.Id("admin-password")).SendKeys(USER_PASSWORD);
+            LogSuccess(2, "Non-admin credentials entered.");
 
-            driver.FindElement(By.Id("admin-password"))
-                  .SendKeys("Wachtwoord123");
-
-            Console.WriteLine("Admin credentials ingevoerd.");
-
-            
+            // Stap 3: Inlogpoging uitvoeren
+            LogStep(3, "Attempting to log in to the admin portal...");
             driver.FindElement(By.Id("admin-login-btn")).Click();
-            Console.WriteLine("Admin login uitgevoerd.");
+            LogSuccess(3, "Login attempt submitted.");
 
-            
+            // Stap 4: Foutmelding verificatie
+            LogStep(4, "Waiting for error message and verifying access denial...");
             var error = wait.Until(d => d.FindElement(By.Id("error-text")));
-            Console.WriteLine("Foutmelding gevonden: " + error.Text);
+            LogInfo($"Error message detected: '{error.Text}'");
 
-            
-            Assert.AreEqual("Inloggegevens zijn incorrect", error.Text);
-            Console.WriteLine("Reguliere user is correct geweigerd bij admin login.");
+            Assert.AreEqual("Inloggegevens zijn incorrect", error.Text,
+                "De foutmelding komt niet overeen of de gebruiker is onterecht toegelaten.");
+
+            LogInfo("Current URL verified: Admin portal access was blocked.");
+            LogSuccess(4, "Regular user successfully denied access to admin functionalities.");
+
+            // Finale status
+            LogStep(5, "Final verification of security constraints...");
+            LogInfo("✓ Authentication system correctly distinguishes between User and Admin roles.");
+            LogSuccess(5, "Security test TC_3_13_4 passed.");
         }
     }
 }

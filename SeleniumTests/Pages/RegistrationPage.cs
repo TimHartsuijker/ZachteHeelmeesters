@@ -4,8 +4,8 @@ using System;
 namespace SeleniumTests.Pages
 {
     public class RegistrationPage (IWebDriver driver) : BasePage(driver)
-    { 
-        public static string Path => "/register";
+    {
+        protected override string Path => "/register";
 
         // Locators
         private static By FirstNameInput => By.Id("firstname");

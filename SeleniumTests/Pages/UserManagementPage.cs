@@ -9,7 +9,7 @@ namespace SeleniumTests.Pages
     public class UserManagementPage(IWebDriver driver) : BasePage(driver)
     {
         // URL
-        public static string Path => "/admin/users";
+        protected override string Path => "/admin/users";
 
         public static By SaveButton => By.ClassName("save-btn");
 

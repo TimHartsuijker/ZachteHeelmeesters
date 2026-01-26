@@ -1,36 +1,11 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Support.UI;
-using System;
+﻿using OpenQA.Selenium;
+using SeleniumTests.Base;
 
-namespace SeleniumTests
+namespace US2._30
 {
     [TestClass]
-    public class _2_30_1_2
+    public class _2_30_1_2: BaseTest
     {
-        private IWebDriver driver;
-        private WebDriverWait wait;
-        private string baseUrl = "http://localhost";
-
-        [TestInitialize]
-        public void Setup()
-        {
-            var options = new ChromeOptions();
-            options.AddArgument("--start-maximized");
-            options.AddArgument("--ignore-certificate-errors");
-
-            driver = new ChromeDriver(options);
-            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-        }
-
-        [TestCleanup]
-        public void Cleanup()
-        {
-            driver.Quit();
-            driver.Dispose();
-        }
-
         [TestMethod]
         public void TC_2_30_1_2_Dashboard_PersonalizedWelcomeMessage()
         {

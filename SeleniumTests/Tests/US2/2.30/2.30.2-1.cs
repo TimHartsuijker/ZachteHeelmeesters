@@ -1,90 +1,58 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Support.UI;
-using System;
+using SeleniumTests.Base;
 
-namespace SeleniumTests
+namespace US2._30
 {
     [TestClass]
-    public class _2_30_2_1
+    public class _2_30_2_1 : BaseTest
     {
-        private IWebDriver driver;
-        private WebDriverWait wait;
-        private string baseUrl = "http://localhost";
-
-        [TestInitialize]
-        public void Setup()
-        {
-            var options = new ChromeOptions();
-            options.AddArgument("--start-maximized");
-            options.AddArgument("--ignore-certificate-errors");
-
-            driver = new ChromeDriver(options);
-            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-            Console.WriteLine("Setup completed. Browser started.");
-        }
-
-        [TestCleanup]
-        public void Cleanup()
-        {
-            Console.WriteLine("Test finished. Closing browser.");
-            driver.Quit();
-            driver.Dispose();
-        }
-
         [TestMethod]
         public void NavigationMenu_VisibleAfterLogin()
         {
-            Console.WriteLine("Test started: NavigationMenu_VisibleAfterLogin");
-            Console.WriteLine("Test case: TC2.30.2-1 - Visibility of navigation elements after login");
-            Console.WriteLine("NOTE: The dashboard does not have a traditional menu, but panels representing functionality.");
+            const string EMAIL = "gebruiker@example.com";
+            const string PASSWORD = "Wachtwoord123";
 
-            // Step 1: Navigate to login page
-            Console.WriteLine("Step 1: Navigating to login page...");
-            driver.Navigate().GoToUrl($"{baseUrl}/login");
-            Console.WriteLine("Navigation completed!");
+            // STAP 1 & 2: Navigatie en Login via POM
+            LogStep(1, "Navigating to login page and performing login.");
+            loginPage.Navigate();
 
-            // Step 2: Enter valid login credentials
-            Console.WriteLine("Step 2: Entering email...");
-            var emailInput = driver.FindElement(By.Id("email"));
-            emailInput.SendKeys("gebruiker@example.com");
+            // Wachten tot het veld interactief is (gebruikt de 'wait' van BaseTest)
+            wait.Until(_ => loginPage.IsPasswordInputDisplayed());
 
-            Console.WriteLine("Step 2b: Entering password...");
-            var passwordInput = driver.FindElement(By.Id("wachtwoord"));
-            passwordInput.SendKeys("Wachtwoord123");
+            loginPage.PerformLogin(EMAIL, PASSWORD);
+            LogSuccess(1, "Login credentials submitted successfully.");
 
-            Console.WriteLine("Step 2c: Logging in...");
-            var loginButton = driver.FindElement(By.Id("login-btn"));
-            loginButton.Click();
-            Console.WriteLine("Login completed!");
+            // STAP 3: Dashboard laden
+            LogStep(2, "Waiting for dashboard elements to be visible.");
+            RetryVerification(() =>
+            {
+                Assert.IsTrue(dashboardPage.IsWelcomeMessageDisplayed(), "Dashboard failed to load: Welcome message not visible.");
+            });
+            LogSuccess(2, "Dashboard successfully loaded.");
 
-            // Step 3: Wait for dashboard
-            Console.WriteLine("Step 3: Waiting for dashboard...");
-            wait.Until(d => d.FindElement(By.CssSelector("[data-test='welcome-message']")));
-            Console.WriteLine("Dashboard loaded!");
+            // STAP 4: Verificatie van navigatie-elementen (Panels)
+            LogStep(3, "Verifying visibility of dashboard grid and functional panels.");
 
-            // Step 4: Verify dashboard navigation elements
-            Console.WriteLine("Step 4: Verifying dashboard navigation elements...");
+            RetryVerification(() =>
+            {
+                // Verifieer Grid
+                Assert.IsTrue(dashboardPage.IsDashboardGridDisplayed(), "Dashboard grid is not visible.");
 
-            var welcomeMessage = driver.FindElement(By.CssSelector("[data-test='welcome-message']"));
-            Assert.IsTrue(welcomeMessage.Displayed, "Welcome message is not visible.");
+                // Verifieer de Navbar (die je in de POM hebt toegevoegd)
+                Assert.IsTrue(dashboardPage.IsNavbarVisible(), "Top navigation bar is not visible.");
 
-            var dashboardGrid = driver.FindElement(By.ClassName("dashboard-grid"));
-            Assert.IsTrue(dashboardGrid.Displayed, "Dashboard grid is not visible.");
+                // Verifieer Panels via de titels (dit bewijst dat ze niet alleen bestaan, maar ook data bevatten)
+                string leftTitle = dashboardPage.GetLeftPanelTitle();
+                string rightTitle = dashboardPage.GetRightPanelTitle();
+                string welcomeText = dashboardPage.GetWelcomeMessageText();
 
-            var leftPanel = driver.FindElement(By.ClassName("panel-left"));
-            Assert.IsTrue(leftPanel.Displayed, "Left panel (Appointments) is not visible.");
+                LogInfo($"Dashboard Content: Welcome='{welcomeText}', Left='{leftTitle}', Right='{rightTitle}'");
 
-            var rightPanel = driver.FindElement(By.ClassName("panel-right"));
-            Assert.IsTrue(rightPanel.Displayed, "Right panel (Referrals) is not visible.");
+                Assert.IsFalse(string.IsNullOrWhiteSpace(leftTitle), "Left panel title is empty.");
+                Assert.IsFalse(string.IsNullOrWhiteSpace(rightTitle), "Right panel title is empty.");
 
-            Console.WriteLine("✓ Dashboard navigation elements are visible:");
-            Console.WriteLine($"  - Welcome message: {welcomeMessage.Text}");
-            Console.WriteLine($"  - Left panel: {leftPanel.FindElement(By.TagName("h2")).Text}");
-            Console.WriteLine($"  - Right panel: {rightPanel.FindElement(By.TagName("h2")).Text}");
-
-            Console.WriteLine("Test passed: Dashboard displays all navigation elements.");
+                LogSuccess(3, "All dashboard navigation elements (Navbar, Grid, Panels) are visible and populated.");
+            });
         }
     }
 }

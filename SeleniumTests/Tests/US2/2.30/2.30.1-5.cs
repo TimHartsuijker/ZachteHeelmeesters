@@ -1,77 +1,54 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Support.UI;
-using System;
+using SeleniumTests.Base;
 
-namespace SeleniumTests
+namespace US2._30
 {
     [TestClass]
-    public class _2_30_1_5
+    public class _2_30_1_5 : BaseTest
     {
-        private IWebDriver driver;
-        private WebDriverWait wait;
-        private string baseUrl = "http://localhost";
-
-        [TestInitialize]
-        public void Setup()
-        {
-            var options = new ChromeOptions();
-            options.AddArgument("--start-maximized");
-            options.AddArgument("--ignore-certificate-errors");
-
-            driver = new ChromeDriver(options);
-            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-        }
-
-        [TestCleanup]
-        public void Cleanup()
-        {
-            driver.Quit();
-            driver.Dispose();
-        }
-
         [TestMethod]
         public void TC_2_30_1_5_Dashboard_NameMatchesDatabase()
         {
-            Console.WriteLine("Test started: TC_2_30_1_5_Dashboard_NameMatchesDatabase");
+            // Data configuratie
+            const string EMAIL = "gebruiker@example.com";
+            const string PASSWORD = "Wachtwoord123";
+            const string EXPECTED_NAME = "Test Gebruiker";
 
-            string expectedName = "Test Gebruiker"; // Name of gebruiker@example.com in database
+            // STAP 1: Navigatie
+            LogStep(1, "Navigating to login page.");
+            loginPage.Navigate();
 
-            // Step 1: Navigate to login page
-            Console.WriteLine("Step 1: Navigating to login page...");
-            driver.Navigate().GoToUrl($"{baseUrl}/login");
-            Console.WriteLine("Navigation completed!");
+            // Wachten op input veld (via POM methode)
+            wait.Until(_ => loginPage.IsPasswordInputDisplayed());
+            LogSuccess(1, "Login page is ready.");
 
-            // Step 2: Enter login credentials
-            Console.WriteLine("Step 2: Entering login credentials...");
-            var emailInput = driver.FindElement(By.Id("email"));
-            emailInput.SendKeys("gebruiker@example.com");
+            // STAP 2: Login
+            LogStep(2, $"Logging in with credentials for: {EMAIL}");
+            loginPage.PerformLogin(EMAIL, PASSWORD);
+            LogInfo("Credentials submitted.");
 
-            var passwordInput = driver.FindElement(By.Id("wachtwoord"));
-            passwordInput.SendKeys("Wachtwoord123");
-            Console.WriteLine("Login credentials entered!");
+            // STAP 3: Dashboard laden
+            LogStep(3, "Waiting for dashboard to load.");
+            RetryVerification(() =>
+            {
+                Assert.IsTrue(dashboardPage.IsWelcomeMessageDisplayed(),
+                    "Dashboard welcome message not visible after login.");
+            });
+            LogSuccess(3, "Dashboard loaded successfully.");
 
-            // Step 3: Click login
-            Console.WriteLine("Step 3: Clicking login...");
-            var loginButton = driver.FindElement(By.Id("login-btn"));
-            loginButton.Click();
-            Console.WriteLine("Login submitted!");
+            // STAP 4: Data Verificatie
+            LogStep(4, $"Verifying if welcome message contains database name: '{EXPECTED_NAME}'");
 
-            // Step 4: Wait for dashboard
-            Console.WriteLine("Step 4: Loading dashboard...");
-            wait.Until(d => d.FindElement(By.CssSelector("[data-test='welcome-message']")));
-            Console.WriteLine("Dashboard successfully loaded!");
+            RetryVerification(() =>
+            {
+                string actualMessage = dashboardPage.GetWelcomeMessageText();
+                LogInfo($"Found message text: '{actualMessage}'");
 
-            // Step 5: Verify welcome message name
-            Console.WriteLine("Step 5: Verifying name in welcome message...");
-            var message = driver.FindElement(By.CssSelector("[data-test='welcome-message']"));
+                Assert.IsTrue(actualMessage.Contains(EXPECTED_NAME),
+                    $"Database name mismatch. Expected: '{EXPECTED_NAME}' | Actual: '{actualMessage}'");
 
-            Assert.IsTrue(message.Text.Contains(expectedName),
-                $"Name does not match. Expected: {expectedName} — Actual: {message.Text}");
-
-            Console.WriteLine($"PASS: Welcome name matches database value: {message.Text}");
-            Console.WriteLine("Test completed successfully.");
+                LogSuccess(4, $"Name verification passed: '{actualMessage}' matches expected data.");
+            });
         }
     }
 }

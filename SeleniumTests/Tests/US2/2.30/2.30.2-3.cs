@@ -5,7 +5,7 @@ using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections.Generic;
 
-namespace SeleniumTests
+namespace US2._30
 {
     [TestClass]
     public class _2_30_2_3
@@ -58,7 +58,7 @@ namespace SeleniumTests
             {
                 { "Dashboard", "/dashboard" },
                 { "Mijn afspraken", "/afspraken" },
-                { "Mijn medisch dossier", "/medischdossier" },
+                { "Mijn medisch dossier", "/dossier" },
                 { "Mijn profiel", "/patientprofiel" }
             };
 

@@ -9,6 +9,7 @@ namespace SeleniumTests.Pages
         protected readonly IWebDriver Driver = driver;
         protected readonly WebDriverWait Wait = new(driver, TimeSpan.FromSeconds(10));
         protected readonly string BaseUrl = "http://localhost";
+        protected abstract string Path { get; }
 
         // === Gedeelde Acties ===
         public void NavigateTo(string url) => Driver.Navigate().GoToUrl(url);

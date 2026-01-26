@@ -1,10 +1,11 @@
 ﻿using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
 
 namespace SeleniumTests.Pages
 {
     public class LoginPage(IWebDriver driver) : BasePage(driver)
     {
-        public static string Path => "/login";
+        protected override string Path => "/login";
 
         // Locators
         private static By EmailInput => By.Id("email");
@@ -44,9 +45,28 @@ namespace SeleniumTests.Pages
 
         public void PerformLogin(string email, string password)
         {
+            Wait.Until(d => IsPasswordInputDisplayed());
             SendKeys(EmailInput, email);
             SendKeys(PasswordInput, password);
             Click(LoginButton);
+            HandlePasswordAlert();
+        }
+
+        public void HandlePasswordAlert()
+        {
+            try
+            {
+                var shortWait = new WebDriverWait(Driver, TimeSpan.FromSeconds(3));
+                IAlert alert = shortWait.Until(d => d.SwitchTo().Alert());
+
+                alert.Accept();
+            }
+            catch (WebDriverTimeoutException)
+            {
+            }
+            catch (NoAlertPresentException)
+            {
+            }
         }
     }
 }

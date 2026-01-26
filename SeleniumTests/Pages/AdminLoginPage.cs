@@ -4,7 +4,7 @@ namespace SeleniumTests.Pages
 {
     public class AdminLoginPage(IWebDriver driver) : BasePage(driver)
     {
-        public static string Path => "/admin/login";
+        protected override string Path => "/admin/login";
 
         // Locators
         private static By EmailInput => By.Id("admin-username");

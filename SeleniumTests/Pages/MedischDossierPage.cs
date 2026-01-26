@@ -9,7 +9,7 @@ namespace SeleniumTests.Pages
     public class DossierPage(IWebDriver driver): BasePage(driver)
     {
         // URL
-        public string Path => "/dossier";
+        protected override string Path => "/dossier";
 
         // ---------- FILTERS ----------
         private By TreatmentDropdown => By.CssSelector("select.filter-select");

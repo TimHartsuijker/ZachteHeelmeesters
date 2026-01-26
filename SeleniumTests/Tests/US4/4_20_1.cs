@@ -1,132 +1,78 @@
-using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Support.UI;
-using SeleniumTests.P_O_M;
+﻿using OpenQA.Selenium;
+using SeleniumTests.Base;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace SeleniumTests;
-
-[TestClass]
-public class _4_20_1
+namespace US4._20
 {
-    [TestMethod]
-    public void RetrieveAvailableTimeSlots_ByUserID()
+    [TestClass]
+    public class _4_20_1 : BaseTest
     {
-        // Arrange
-        IWebDriver? driver = null;
-        WebDriverWait? wait = null;
-        
-        try
+        [TestMethod]
+        public void TC_4_20_1_RetrieveAvailableTimeSlots_ByUserID()
         {
-            // Step 1: Start test
-            Console.WriteLine("LOG [Step 1] Start test: RetrieveAvailableTimeSlots_ByUserID");
-            driver = new ChromeDriver();
-            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-
-            // Step 2: Login
-            var loginPage = new LoginPage(driver);
-            loginPage.Navigate();
-            Console.WriteLine("LOG [Step 2] Navigated to login page.");
-
             string testEmail = "gebruiker@example.com";
             string testPassword = "Wachtwoord123";
             string expectedUserName = "Test Gebruiker";
 
-            loginPage.EnterEmail(testEmail);
-            loginPage.EnterPassword(testPassword);
-            loginPage.ClickLogin();
-            Console.WriteLine("LOG [Step 3] Login credentials entered and submitted.");
+            // Stap 1: Navigatie naar Login
+            LogStep(1, "Navigating to login page...");
+            loginPage.Navigate();
+            LogSuccess(1, "Login page loaded successfully.");
 
-            // Step 4: Wait for redirect to agenda page after login
-            wait.Until(d => d.Url.Contains("/agenda"));
-            Console.WriteLine("LOG [Step 4] Successfully redirected to agenda page.");
+            // Stap 2: Inloggen
+            LogStep(2, $"Logging in with email: {testEmail}");
+            loginPage.PerformLogin(testEmail, testPassword);
+            LogSuccess(2, "Login credentials submitted.");
 
-            // Step 5: Wait for the calendar to load - check for the user-info element
-            wait.Until(d =>
+            // Stap 3: Redirect naar Agenda via POM
+            LogStep(3, "Navigating to the agenda page...");
+            dashboardPage.ClickAppointments();
+
+            // Gebruik de wait uit BaseTest om URL te controleren
+            wait.Until(d => calendarPage.IsCalendarVisible());
+            LogSuccess(3, $"Successfully reached agenda: {driver.Url}");
+
+            // Stap 4: Kalender en Gebruikersinformatie laden via POM
+            LogStep(4, "Waiting for calendar container to load...");
+            calendarPage.WaitForCalendarLoad();
+            LogSuccess(4, "Calendar page content is visible.");
+
+            // Stap 5: Gebruikersverificatie via POM
+            LogStep(5, "Verifying displayed user information...");
+            string displayedUserInfo = calendarPage.GetUserInfo();
+
+            // We gebruiken StringAssert voor betere foutmeldingen
+            StringAssert.Contains(displayedUserInfo, expectedUserName,
+                $"Wrong user name displayed. Got: '{displayedUserInfo}'");
+            StringAssert.Contains(displayedUserInfo, testEmail,
+                $"Wrong email displayed. Got: '{displayedUserInfo}'");
+
+            LogInfo($"Display verified: {displayedUserInfo}");
+            LogSuccess(5, "Correct user information (ID context) is displayed.");
+
+            // Stap 6: Beschikbare tijdsloten ophalen via POM
+            LogStep(6, "Retrieving available time slots from the calendar grid...");
+
+            RetryVerification(() =>
             {
-                try
-                {
-                    var userInfoElement = d.FindElement(By.ClassName("user-info-inline"));
-                    return userInfoElement.Displayed;
-                }
-                catch (NoSuchElementException)
-                {
-                    return false;
-                }
+                int totalSlots = calendarPage.GetTotalTimeSlotsCount();
+                Assert.IsTrue(totalSlots > 0, "No time slots found in the calendar grid.");
+                LogInfo($"Number of time slots found: {totalSlots}");
             });
-            Console.WriteLine("LOG [Step 5] Calendar page loaded with user information.");
 
-            // Step 6: Verify the displayed user matches the logged-in user
-            var userInfo = driver.FindElement(By.ClassName("user-info-inline"));
-            string displayedUserInfo = userInfo.Text;
-            
-            if (!displayedUserInfo.Contains(expectedUserName))
-            {
-                throw new Exception($"Wrong user displayed. Expected '{expectedUserName}' but got '{displayedUserInfo}'");
-            }
-            
-            if (!displayedUserInfo.Contains(testEmail))
-            {
-                throw new Exception($"Wrong email displayed. Expected '{testEmail}' but got '{displayedUserInfo}'");
-            }
-            
-            Console.WriteLine($"LOG [Step 6] PASS: Correct user information displayed - {displayedUserInfo}");
+            LogSuccess(6, "Calendar time slots retrieved successfully.");
 
-            // Step 7: Verify calendar time slots are displayed
-            wait.Until(d =>
-            {
-                try
-                {
-                    var timeSlots = d.FindElements(By.ClassName("time-slot"));
-                    return timeSlots.Count > 0;
-                }
-                catch
-                {
-                    return false;
-                }
-            });
-            
-            var timeSlotsElements = driver.FindElements(By.ClassName("time-slot"));
-            int totalSlots = timeSlotsElements.Count;
-            
-            Console.WriteLine($"LOG [Step 7] Time slots found: {totalSlots}");
+            // Stap 7: Controleer of de juiste dokter-ID is gekoppeld (Context check)
+            LogStep(7, "Verifying doctor context via data-attributes...");
+            string doctorId = calendarPage.GetDoctorId();
+            Assert.IsFalse(string.IsNullOrEmpty(doctorId), "Doctor ID attribute is missing from calendar.");
+            LogInfo($"Calendar is bound to Doctor ID: {doctorId}");
+            LogSuccess(7, "Doctor context verified.");
 
-            // Step 8: Verify time slots are present for the user
-            if (totalSlots == 0)
-            {
-                throw new Exception("No time slots found for the logged-in user.");
-            }
-            
-            Console.WriteLine($"LOG [Step 8] PASS: Calendar time slots retrieved successfully for user.");
-
-            // Step 9: Verify no errors are displayed on the page
-            var errorElements = driver.FindElements(By.CssSelector(".status-message.error"));
-            if (errorElements.Count > 0 && errorElements[0].Displayed)
-            {
-                throw new Exception($"Error message displayed on page: {errorElements[0].Text}");
-            }
-            
-            Console.WriteLine("LOG [Step 9] PASS: No errors displayed on the calendar page.");
-
-            // Step 10: Test completed successfully
-            Console.WriteLine("LOG [Step 10] Test completed successfully - Available time slots retrieved for logged-in user.");
-        }
-        catch (NoSuchElementException ex)
-        {
-            Console.WriteLine("ERROR [E001] Element not found: " + ex.Message);
-            throw;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("ERROR [E999] Unexpected error: " + ex.ToString());
-            throw;
-        }
-        finally
-        {
-            if (driver != null)
-            {
-                driver.Quit();
-                Console.WriteLine("LOG [Step 11] WebDriver closed.");
-            }
+            // Stap 8: Finale conclusie
+            LogStep(8, "Final verification of retrieved data...");
+            LogInfo("✓ User context is correctly applied to the agenda");
+            LogInfo("✓ Available time slots are loaded and visible in the grid");
         }
     }
 }

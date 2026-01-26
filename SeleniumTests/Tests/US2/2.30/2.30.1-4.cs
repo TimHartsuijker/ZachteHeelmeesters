@@ -1,89 +1,65 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Support.UI;
-using System;
+using SeleniumTests.Base;
 
-namespace SeleniumTests
+namespace US2._30
 {
     [TestClass]
-    public class _2_30_1_4
+    public class _2_30_1_4 : BaseTest
     {
-        private IWebDriver driver;
-        private WebDriverWait wait;
-        private string baseUrl = "http://localhost";
-
-        [TestInitialize]
-        public void Setup()
-        {
-            var options = new ChromeOptions();
-            options.AddArgument("--start-maximized");
-            options.AddArgument("--ignore-certificate-errors");
-
-            driver = new ChromeDriver(options);
-            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-        }
-
-        [TestCleanup]
-        public void Cleanup()
-        {
-            driver.Quit();
-            driver.Dispose();
-        }
-
         [TestMethod]
         public void TC_2_30_1_4_WelcomeMessageWithoutName()
         {
-            Console.WriteLine("Test started: TC_2_30_1_4_WelcomeMessageWithoutName");
-            Console.WriteLine("Test case: TC2.30.1-4 - Welcome message when patient name cannot be retrieved");
+            const string EMAIL = "gebruiker@example.com";
+            const string PASSWORD = "Wachtwoord123";
 
-            // Option 1: Test with user without name (if available)
-            // Option 2: Simulate API error while retrieving name
+            // De start-log is al geschreven door BaseTest.Setup()
 
-            // Step 1: Navigate to login page
-            Console.WriteLine("Step 1: Navigating to login page...");
-            driver.Navigate().GoToUrl($"{baseUrl}/login");
-            Console.WriteLine("Navigation completed!");
+            // STAP 1: Navigatie
+            LogStep(1, "Navigating to login page via Page Object.");
+            loginPage.Navigate();
 
-            // Step 2: Login with user where name cannot be retrieved
-            Console.WriteLine("Step 2: Logging in with user (no login error, but name retrieval issue)...");
+            // Wachten tot inlogveld zichtbaar is (via POM methode)
+            wait.Until(_ => loginPage.IsPasswordInputDisplayed());
+            LogSuccess(1, "Login page is interactive.");
 
-            var emailInput = driver.FindElement(By.Id("email"));
-            emailInput.SendKeys("gebruiker@example.com");
+            // STAP 2: Login met gebruiker (fallback scenario)
+            LogStep(2, $"Performing login for: {EMAIL}");
+            loginPage.PerformLogin(EMAIL, PASSWORD);
+            LogInfo("Login submitted. Waiting for dashboard redirection.");
 
-            var passwordInput = driver.FindElement(By.Id("wachtwoord"));
-            passwordInput.SendKeys("Wachtwoord123");
+            // STAP 3: Dashboard Verificatie
+            LogStep(3, "Waiting for dashboard to load and verifying welcome message presence.");
 
-            var loginButton = driver.FindElement(By.Id("login-btn"));
-            loginButton.Click();
-            Console.WriteLine("Login submitted!");
+            RetryVerification(() =>
+            {
+                // Check of dashboard geladen is
+                Assert.IsTrue(dashboardPage.IsWelcomeMessageDisplayed(),
+                    "Dashboard welcome message element not found.");
+            });
+            LogSuccess(3, "Dashboard element detected.");
 
-            // Step 3: Wait for dashboard
-            Console.WriteLine("Step 3: Waiting for dashboard...");
-            wait.Until(d => d.FindElement(By.CssSelector("[data-test='welcome-message']")));
-            Console.WriteLine("Dashboard loaded!");
+            // STAP 4: Welkomstboodschap Validatie (Fallback check)
+            LogStep(4, "Verifying if the welcome message is appropriate when a name might be missing.");
 
-            // Step 4: Verify welcome message
-            Console.WriteLine("Step 4: Verifying welcome message...");
-            var welcomeMessage = driver.FindElement(By.CssSelector("[data-test='welcome-message']"));
+            RetryVerification(() =>
+            {
+                string welcomeText = dashboardPage.GetWelcomeMessageText();
+                LogInfo($"Detected welcome text: '{welcomeText}'");
 
-            string welcomeText = welcomeMessage.Text;
-            Console.WriteLine($"Welcome message text: {welcomeText}");
+                // Controleer of er tenminste een begroeting staat, ook als de naam ontbreekt
+                bool hasValidGreeting =
+                    welcomeText.Contains("Welkom") ||
+                    welcomeText.Contains("Hallo") ||
+                    welcomeText.Contains("Welcome") ||
+                    welcomeText.Contains("Hi");
 
-            Assert.IsTrue(welcomeMessage.Displayed,
-                "Welcome message is not displayed on the dashboard.");
+                Assert.IsTrue(hasValidGreeting || !string.IsNullOrWhiteSpace(welcomeText),
+                    $"The welcome message '{welcomeText}' is not considered appropriate for a user.");
 
-            bool hasValidWelcome =
-                welcomeText.Contains("Welcome") ||
-                welcomeText.Contains("Hello") ||
-                welcomeText.Contains("Hi") ||
-                welcomeText.Contains("Good day");
+                LogSuccess(4, "Appropriate welcome message verified.");
+            });
 
-            Assert.IsTrue(hasValidWelcome || !string.IsNullOrWhiteSpace(welcomeText),
-                $"Welcome message is not appropriate: '{welcomeText}'");
-
-            Console.WriteLine($"Welcome message displayed correctly: {welcomeText}");
-            Console.WriteLine("Test completed successfully.");
+            LogInfo("Test Case TC_2_30_1_4 finished successfully.");
         }
     }
 }

@@ -8,8 +8,10 @@ import AgendaView from '../views/AgendaView.vue';
 import AdminLoginView from "../views/AdminLoginView.vue";
 import AdminDashboardView from "../views/AdminDashboardView.vue";
 import UsersView from "../views/AdminUserManagementView.vue";
-import Patientprofiel from '../views/Patientprofiel.vue';
+import CreateReferralView from '../views/CreateReferralView.vue' 
 import DoctorPatientsView from "../views/DoctorPatientsView.vue";
+import DoorverwijzingenInzien from '../views/DoorverwijzingenInzien.vue';
+import Patientprofiel from '../views/Patientprofiel.vue';
 import AccountsOverviewView from "../views/AccountsOverviewView.vue";
 import AdminCreateUserView from "../views/AdminCreateUserView.vue"; 
 
@@ -29,7 +31,8 @@ const routes = [
   {
     path: '/dossier',
     name: 'dossier',
-    component: MedicalDossier
+    component: MedicalDossier,
+    meta: { requiresAuth: true, allowedRoles: ['Patient'] }
   },
   {
     path: '/dossier/:patientId',
@@ -68,6 +71,12 @@ const routes = [
     meta: { requiresAuth: true, allowedRoles: ['Specialist'] }
   },
   {
+    path: "/doorverwijzing-aanmaken",
+    name: "CreateReferral",
+    component: CreateReferralView,
+    meta: { requiresAuth: true, allowedRoles: ['Huisarts'] },
+  },
+  {
     path: "/admin/dashboard",
     name: "AdminDashboard",
     component: AdminDashboardView,
@@ -86,15 +95,21 @@ const routes = [
     meta: { requiresAuth: true, allowedRoles: ['Huisarts', 'Specialist'] },
   },
   {
+    path: "/doorverwijzingen-inzien",
+    name: "DoorverwijzingenInzien",
+    component: DoorverwijzingenInzien,
+    meta: { requiresAuth: true, allowedRoles: ['Patiënt'] },
+  },
+  {
     path: "/administratie/accounts",
     name: "AccountsOverview",
-    component: () => import("../views/AccountsOverviewView.vue"),
+    component: AccountsOverviewView,
     meta: { requiresAuth: true, allowedRoles: ['Administratiemedewerker'] },
   },
   {
     path: "/administratie/create-user",
     name: "AdminCreateUser",
-    component: () => import("../views/AdminCreateUserView.vue"),
+    component: AdminCreateUserView,
     meta: { requiresAuth: true, allowedRoles: ['Administratiemedewerker'] },
   },
 ]

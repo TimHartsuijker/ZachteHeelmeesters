@@ -46,6 +46,7 @@ using (var scope = app.Services.CreateScope())
         var context = services.GetRequiredService<AppDbContext>();
 
         // Voer migraties uit
+        context.Database.Migrate();
 
         // Seed basis data (Rollen, etc.)
         DbSeederStatic.Seed(context);

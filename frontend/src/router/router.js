@@ -32,7 +32,7 @@ const routes = [
     path: '/dossier',
     name: 'dossier',
     component: MedicalDossier,
-    meta: { requiresAuth: true, allowedRoles: ['Patient'] }
+    meta: { requiresAuth: true, allowedRoles: ['Patiënt'] }
   },
   {
     path: '/dossier/:patientId',

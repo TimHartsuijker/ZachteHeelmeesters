@@ -2,19 +2,19 @@
   <nav class="navbar" aria-label="Hoofdnavigatie">
     <!-- Andere gebruikers: Specialist & Admin -->
     <ul v-if="userRole !== 'Patiënt'" class="nav-center-buttons">
+      <li v-if="userRole === 'Specialist' || userRole === 'Huisarts'">
+        <RouterLink to="/patienten" aria-current="patient overview page">Patiënten</RouterLink> 
+      </li>
       <li v-if="userRole === 'Specialist'">
         <RouterLink to="/agenda" aria-current="calendar page">Agenda</RouterLink>
       </li>
-      <li v-if="userRole === 'Specialist' || userRole === 'Huisarts'" class="nav-center-buttons">
-          <RouterLink to="/patienten" aria-current="patient overview page">Patiënten</RouterLink>
+      <li v-if="userRole === 'Huisarts'">
+        <RouterLink to="/doorverwijzing-aanmaken" aria-current="create referral page">Doorverwijzing Aanmaken</RouterLink>
       </li>
-      <li v-else-if="userRole === 'Huisarts'" class="nav-center-buttons">
-          <RouterLink to="/doorverwijzing-aanmaken" aria-current="create referral page">Doorverwijzing Aanmaken</RouterLink>
-      </li>
-      <li v-else-if="userRole === 'Admin'" class="nav-center-buttons">
+      <li v-if="userRole === 'Admin'">
         <RouterLink to="/admin/users" aria-current="user management page">Gebruikersbeheer</RouterLink>
       </li>
-      <li v-else-if="userRole === 'Administratiemedewerker'" class="nav-center-buttons">
+      <li v-if="userRole === 'Administratiemedewerker'">
         <RouterLink to="/administratie/accounts" aria-current="accounts page">
           Accounts Overzicht
         </RouterLink>

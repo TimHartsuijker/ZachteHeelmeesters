@@ -147,7 +147,7 @@ const login = async () => {
           if (userData?.role === "Admin") {
             router.push("/admin/dashboard");
           } else if (userData?.role === "Administratiemedewerker") {
-            router.push("/admin/create-user");
+            router.push("/administratie/accounts");
           }
         }
       } catch (adminError) {

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Identity;
 
 namespace backend.Data
 {
@@ -11,6 +12,8 @@ namespace backend.Data
         public static void Seed(AppDbContext context)
         {
             Console.WriteLine("[DbSeederStatic] Start seeding basisdata...");
+
+            var passwordHasher = new PasswordHasher<User>();
 
             // 1. Rollen (Idempotent)
             string[] rolesToSeed = { "Patiënt", "Admin", "Huisarts", "Specialist", "Administratiemedewerker" };
@@ -24,6 +27,71 @@ namespace backend.Data
                     Console.WriteLine($"[DbSeederStatic] Rol toegevoegd: {roleName}");
                 }
             }
+
+            Role GetRole(string name) => context.Roles.FirstOrDefault(r => r.RoleName == name) 
+                ?? context.Roles.Add(new Role { RoleName = name }).Entity;
+
+            var patientRole = GetRole("Patiënt");
+            var specialistRole = GetRole("Specialist");
+            var gpRole = GetRole("Huisarts");
+            var adminRole = GetRole("Admin");
+            var adminMedewerkerRole = GetRole("Administratiemedewerker");
+            context.SaveChanges();
+
+            User EnsureUser(User user, string password)
+            {
+                var existing = context.Users.FirstOrDefault(u => u.Email == user.Email);
+                if (existing != null) return existing;
+
+                // Voorkom BSN (CitizenServiceNumber) conflicten bij herhaalde runs
+                if (context.Users.Any(u => u.CitizenServiceNumber == user.CitizenServiceNumber))
+                {
+                    user.CitizenServiceNumber = new Random().Next(100000000, 999999999).ToString();
+                }
+
+                user.PasswordHash = passwordHasher.HashPassword(user, password);
+                user.CreatedAt = DateTime.UtcNow;
+                var newUser = context.Users.Add(user).Entity;
+                context.SaveChanges();
+                Console.WriteLine($"[DbSeederTest] Gebruiker aangemaakt: {user.Email}");
+                return newUser;
+            }
+
+            // 1. Administratie Medewerker
+            EnsureUser(new User
+            {
+                FirstName = "Admin", LastName = "Medewerker", Email = "administratie@example.com",
+                StreetName = "Adminstraat", HouseNumber = "50", PostalCode = "1234AB",
+                PhoneNumber = "0611111111", DateOfBirth = DateTime.UtcNow.AddYears(-30),
+                Gender = "Vrouw", CitizenServiceNumber = "111111111", RoleId = adminMedewerkerRole.Id
+            }, "AdminMed123");
+
+            var mainDoctor = EnsureUser(new User
+            {
+                FirstName = "Huisarts", LastName = "Een", Email = "doctor1@example.com",
+                StreetName = "Doctorstraat", HouseNumber = "1", PostalCode = "1234AB",
+                PhoneNumber = "0612345671", DateOfBirth = DateTime.UtcNow,
+                Gender = "Man", CitizenServiceNumber = "987654322", RoleId = gpRole.Id
+            }, "Huisarts123");
+
+            // 3. Test Patiënt (gekoppeld aan Main Doctor)
+            EnsureUser(new User
+            {
+                FirstName = "Test", LastName = "Gebruiker", Email = "gebruiker@example.com",
+                StreetName = "Teststraat", HouseNumber = "1", PostalCode = "1234AB",
+                CitizenServiceNumber = "123456789", DateOfBirth = new DateTime(2000, 1, 1),
+                Gender = "Vrouw", PhoneNumber = "0612345678", RoleId = patientRole.Id,
+                DoctorId = mainDoctor.Id
+            }, "Wachtwoord123");
+
+            EnsureUser(new User
+            {
+                FirstName = "System", LastName = "Administrator", Email = "admin@example.com",
+                StreetName = "Adminstraat", HouseNumber = "99", PostalCode = "9999AA",
+                PhoneNumber = "0600000000", DateOfBirth = DateTime.UtcNow,
+                Gender = "Man", CitizenServiceNumber = "012345678", RoleId = adminRole.Id
+            }, "Admin123");
+
             context.SaveChanges();
 
             // 2. Specialismen (Caching in Dictionary voor snelheid)

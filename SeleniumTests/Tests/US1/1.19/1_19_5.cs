@@ -1,200 +1,167 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Support.UI;
-using SeleniumTests.P_O_M;
-using System;
+using SeleniumTests.Base;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace SeleniumTests
+namespace US1._19
 {
     [TestClass]
-    public class _1_19_5
+    public class _1_19_5 : BaseTest
     {
-        private IWebDriver driver;
-        private WebDriverWait wait;
-        private string baseUrl = "http://localhost";
-        private LoginPage loginPage;
-
-        [TestInitialize]
-        public void Setup()
-        {
-            var options = new ChromeOptions();
-            options.AddArgument("--start-maximized");
-            options.AddArgument("--ignore-certificate-errors");
-
-            driver = new ChromeDriver(options);
-            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-
-            loginPage = new LoginPage(driver);
-        }
-
-        [TestCleanup]
-        public void TearDown()
-        {
-            driver.Quit();
-            driver.Dispose();
-        }
-
         // ------------------------
-        // 1?? Goed e-mail + fout wachtwoord
+        // 1. Goed e-mail + fout wachtwoord
         // ------------------------
         [TestMethod]
         public void TC_1_19_5_CorrectEmail_WrongPassword()
         {
-            Console.WriteLine("Test: CorrectEmail_WrongPassword");
+            const string CORRECT_EMAIL = "gebruiker@example.com";
+            const string WRONG_PASSWORD = "FoutWw123";
 
-            driver.Navigate().GoToUrl($"{baseUrl}/");
-            Console.WriteLine("Loginpagina geladen.");
+            LogStep(1, "Navigating to login page...");
+            loginPage.Navigate();
+            wait.Until(d => loginPage.IsPasswordInputDisplayed());
+            LogSuccess(1, "Login page loaded successfully.");
 
-            loginPage.EnterEmail("gebruiker@example.com");
-            Console.WriteLine("Correct e-mailadres ingevoerd.");
+            LogStep(2, $"Attempting login with correct email and wrong password...");
+            loginPage.PerformLogin(CORRECT_EMAIL, WRONG_PASSWORD);
+            LogSuccess(2, "Login attempt submitted.");
 
-            loginPage.EnterPassword("FoutWw123");
-            Console.WriteLine("Fout wachtwoord ingevoerd.");
+            LogStep(3, "Verifying error message for incorrect credentials...");
+            wait.Until(d => loginPage.IsErrorDisplayed());
+            var errorText = loginPage.GetErrorMessageText();
+            LogInfo($"Error message found: {errorText}");
 
-            loginPage.ClickLogin();
-            Console.WriteLine("Loginpoging uitgevoerd.");
-
-            var error = wait.Until(d => d.FindElement(By.Id("login-error")));
-            Console.WriteLine("Foutmelding gevonden: " + error.Text);
-
-            Assert.AreEqual("Inloggegevens zijn incorrect", error.Text);
-            Console.WriteLine(" Test geslaagd.\n");
+            Assert.AreEqual("Inloggegevens zijn incorrect", errorText);
+            LogSuccess(3, "Correct error message displayed for wrong password.");
         }
 
         // ------------------------
-        // 2?? Fout e-mail + goed wachtwoord
+        // 2. Fout e-mail + goed wachtwoord
         // ------------------------
         [TestMethod]
         public void TC_1_19_5_WrongEmail_CorrectPassword()
         {
-            Console.WriteLine("Test: WrongEmail_CorrectPassword");
+            const string WRONG_EMAIL = "gebruikerexample.com";
+            const string CORRECT_PASSWORD = "Wachtwoord123";
 
-            driver.Navigate().GoToUrl($"{baseUrl}/");
-            Console.WriteLine("Loginpagina geladen.");
+            LogStep(1, "Navigating to login page...");
+            loginPage.Navigate();
+            wait.Until(d => loginPage.IsPasswordInputDisplayed());
+            LogSuccess(1, "Login page loaded successfully.");
 
-            loginPage.EnterEmail("gebruikerexample.com");
-            Console.WriteLine("Fout e-mailadres ingevoerd.");
+            LogStep(2, $"Attempting login with wrong email format and correct password...");
+            loginPage.PerformLogin(WRONG_EMAIL, CORRECT_PASSWORD);
+            LogSuccess(2, "Login attempt submitted.");
 
-            loginPage.EnterPassword("Wachtwoord123");
-            Console.WriteLine("Correct wachtwoord ingevoerd.");
+            LogStep(3, "Verifying error message for incorrect credentials...");
+            wait.Until(d => loginPage.IsErrorDisplayed());
+            var errorText = loginPage.GetErrorMessageText();
+            LogInfo($"Error message found: {errorText}");
 
-            loginPage.ClickLogin();
-            Console.WriteLine("Loginpoging uitgevoerd.");
-
-            var error = wait.Until(d => d.FindElement(By.Id("login-error")));
-            Console.WriteLine("Foutmelding gevonden: " + error.Text);
-
-            Assert.AreEqual("Inloggegevens zijn incorrect", error.Text);
-            Console.WriteLine(" Test geslaagd.\n");
+            Assert.AreEqual("Inloggegevens zijn incorrect", errorText);
+            LogSuccess(3, "Correct error message displayed for wrong email.");
         }
 
         // ------------------------
-        // 3?? Beide verkeerd
+        // 3. Beide verkeerd
         // ------------------------
         [TestMethod]
         public void TC_1_19_5_WrongEmail_WrongPassword()
         {
-            Console.WriteLine("Test: WrongEmail_WrongPassword");
+            const string WRONG_EMAIL = "gebruikerexample.com";
+            const string WRONG_PASSWORD = "Wachtwoord";
 
-            driver.Navigate().GoToUrl($"{baseUrl}/");
-            Console.WriteLine("Loginpagina geladen.");
+            LogStep(1, "Navigating to login page...");
+            loginPage.Navigate();
+            wait.Until(d => loginPage.IsPasswordInputDisplayed());
+            LogSuccess(1, "Login page loaded successfully.");
 
-            loginPage.EnterEmail("gebruikerexample.com");
-            Console.WriteLine("Fout e-mailadres ingevoerd.");
+            LogStep(2, "Attempting login with both email and password incorrect...");
+            loginPage.PerformLogin(WRONG_EMAIL, WRONG_PASSWORD);
+            LogSuccess(2, "Login attempt submitted.");
 
-            loginPage.EnterPassword("Wachtwoord");
-            Console.WriteLine("Fout wachtwoord ingevoerd.");
+            LogStep(3, "Verifying error message for incorrect credentials...");
+            wait.Until(d => loginPage.IsErrorDisplayed());
+            var errorText = loginPage.GetErrorMessageText();
+            LogInfo($"Error message found: {errorText}");
 
-            loginPage.ClickLogin();
-            Console.WriteLine("Loginpoging uitgevoerd.");
-
-            var error = wait.Until(d => d.FindElement(By.Id("login-error")));
-            Console.WriteLine("Foutmelding gevonden: " + error.Text);
-
-            Assert.AreEqual("Inloggegevens zijn incorrect", error.Text);
-            Console.WriteLine(" Test geslaagd.\n");
+            Assert.AreEqual("Inloggegevens zijn incorrect", errorText);
+            LogSuccess(3, "Correct error message displayed for both fields incorrect.");
         }
 
         // ------------------------
-        // 4?? E-mail leeg + wachtwoord ingevuld
+        // 4. E-mail leeg + wachtwoord ingevuld
         // ------------------------
         [TestMethod]
         public void TC_1_19_5_EmptyEmail_CorrectPassword()
         {
-            Console.WriteLine("Test: EmptyEmail_CorrectPassword");
+            const string CORRECT_PASSWORD = "Wachtwoord123";
 
-            driver.Navigate().GoToUrl($"{baseUrl}/");
-            Console.WriteLine("Loginpagina geladen.");
+            LogStep(1, "Navigating to login page...");
+            loginPage.Navigate();
+            wait.Until(d => loginPage.IsPasswordInputDisplayed());
+            LogSuccess(1, "Login page loaded successfully.");
 
-            loginPage.EnterEmail("");
-            Console.WriteLine("Leeg e-mailadres ingevoerd.");
+            LogStep(2, "Attempting login with empty email field...");
+            loginPage.PerformLogin("", CORRECT_PASSWORD);
+            LogSuccess(2, "Login attempt submitted.");
 
-            loginPage.EnterPassword("Wachtwoord123");
-            Console.WriteLine("Correct wachtwoord ingevoerd.");
+            LogStep(3, "Verifying validation message for empty fields...");
+            wait.Until(d => loginPage.IsEmptyDisplayed());
+            var errorText = loginPage.GetEmptyMessageText();
+            LogInfo($"Validation message found: {errorText}");
 
-            loginPage.ClickLogin();
-            Console.WriteLine("Loginpoging uitgevoerd.");
-
-            var error = wait.Until(d => d.FindElement(By.Id("empty-input-error")));
-            Console.WriteLine("Foutmelding gevonden: " + error.Text);
-
-            Assert.AreEqual("Gegevens moeten ingevuld zijn", error.Text);
-            Console.WriteLine(" Test geslaagd.\n");
+            Assert.AreEqual("Gegevens moeten ingevuld zijn", errorText);
+            LogSuccess(3, "Correct validation message displayed for empty email.");
         }
 
         // ------------------------
-        // 5?? E-mail ingevuld + wachtwoord leeg
+        // 5. E-mail ingevuld + wachtwoord leeg
         // ------------------------
         [TestMethod]
         public void TC_1_19_5_CorrectEmail_EmptyPassword()
         {
-            Console.WriteLine("Test: CorrectEmail_EmptyPassword");
+            const string CORRECT_EMAIL = "gebruiker@example.com";
 
-            driver.Navigate().GoToUrl($"{baseUrl}/");
-            Console.WriteLine("Loginpagina geladen.");
+            LogStep(1, "Navigating to login page...");
+            loginPage.Navigate();
+            wait.Until(d => loginPage.IsPasswordInputDisplayed());
+            LogSuccess(1, "Login page loaded successfully.");
 
-            loginPage.EnterEmail("gebruiker@example.com");
-            Console.WriteLine("Correct e-mailadres ingevoerd.");
+            LogStep(2, "Attempting login with empty password field...");
+            loginPage.PerformLogin(CORRECT_EMAIL, "");
+            LogSuccess(2, "Login attempt submitted.");
 
-            loginPage.EnterPassword("");
-            Console.WriteLine("Leeg wachtwoord ingevoerd.");
+            LogStep(3, "Verifying validation message for empty fields...");
+            wait.Until(d => loginPage.IsEmptyDisplayed());
+            var errorText = loginPage.GetEmptyMessageText();
+            LogInfo($"Validation message found: {errorText}");
 
-            loginPage.ClickLogin();
-            Console.WriteLine("Loginpoging uitgevoerd.");
-
-            var error = wait.Until(d => d.FindElement(By.Id("empty-input-error")));
-            Console.WriteLine("Foutmelding gevonden: " + error.Text);
-
-            Assert.AreEqual("Gegevens moeten ingevuld zijn", error.Text);
-            Console.WriteLine(" Test geslaagd.\n");
+            Assert.AreEqual("Gegevens moeten ingevuld zijn", errorText);
+            LogSuccess(3, "Correct validation message displayed for empty password.");
         }
 
         // ------------------------
-        // 6?? Beide leeg
+        // 6. Beide leeg
         // ------------------------
         [TestMethod]
         public void TC_1_19_5_BothFieldsEmpty()
         {
-            Console.WriteLine("Test: BothFieldsEmpty");
+            LogStep(1, "Navigating to login page...");
+            loginPage.Navigate();
+            wait.Until(d => loginPage.IsPasswordInputDisplayed());
+            LogSuccess(1, "Login page loaded successfully.");
 
-            driver.Navigate().GoToUrl($"{baseUrl}/");
-            Console.WriteLine("Loginpagina geladen.");
+            LogStep(2, "Attempting login with both fields empty...");
+            loginPage.PerformLogin("", "");
+            LogSuccess(2, "Login attempt submitted.");
 
-            loginPage.EnterEmail("");
-            Console.WriteLine("Leeg e-mailadres ingevoerd.");
+            LogStep(3, "Verifying validation message for empty fields...");
+            wait.Until(d => loginPage.IsEmptyDisplayed());
+            var errorText = loginPage.GetEmptyMessageText();
+            LogInfo($"Validation message found: {errorText}");
 
-            loginPage.EnterPassword("");
-            Console.WriteLine("Leeg wachtwoord ingevoerd.");
-
-            loginPage.ClickLogin();
-            Console.WriteLine("Loginpoging uitgevoerd.");
-
-            var error = wait.Until(d => d.FindElement(By.Id("empty-input-error")));
-            Console.WriteLine("Foutmelding gevonden: " + error.Text);
-
-            Assert.AreEqual("Gegevens moeten ingevuld zijn", error.Text);
-            Console.WriteLine(" Test geslaagd.\n");
+            Assert.AreEqual("Gegevens moeten ingevuld zijn", errorText);
+            LogSuccess(3, "Correct validation message displayed for both fields empty.");
         }
     }
 }

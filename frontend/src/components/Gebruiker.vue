@@ -1,7 +1,7 @@
 <template>
   <div class="user-row">
-    <span class="user-field"><strong>Naam:</strong> {{ name }}</span>
-    <span class="user-field"><strong>Email:</strong> {{ email }}</span>
+    <span class="user-field"><strong>Naam: </strong><span id="user-name">{{ name }}</span></span>
+    <span class="user-field"><strong>Email: </strong><span id="user-email">{{ email }}</span></span>
     
     <span class="user-field">
       <label :for="'role-select-' + userId"><strong>Rol:</strong></label>

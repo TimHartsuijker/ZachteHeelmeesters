@@ -1,119 +1,103 @@
 using OpenQA.Selenium;
-using OpenQA.Selenium.BiDi.BrowsingContext;
-using OpenQA.Selenium.Support.UI;
-using OpenQA.Selenium.Chrome;
-using SeleniumTests.P_O_M;
+using SeleniumTests.Base;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace SeleniumTests.Tests.US1
+namespace US1._20
 {
     [TestClass]
-    public class LogoutTests
+    public class _1_20 : BaseTest
     {
-        private IWebDriver _driver;
-        private LoginPage _loginPage;
-        private WebDriverWait wait;
-
         private const string VALID_EMAIL = "gebruiker@example.com";
         private const string VALID_PASSWORD = "Wachtwoord123";
 
         [TestInitialize]
-        public void Setup()
+        public override void Setup()
         {
-            _driver = new ChromeDriver();
-            _driver.Manage().Window.Maximize();
-            _loginPage = new LoginPage(_driver);
-            _loginPage.Navigate();
+            base.Setup();
 
-            wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(10));
+            LogStep(0, "Initial setup: Navigating to login page...");
+            loginPage.Navigate();
+            wait.Until(d => loginPage.IsPasswordInputDisplayed());
+            LogSuccess(0, "Setup complete: Login page ready.");
         }
 
         [TestMethod]
         public void TC_1_20_1_LogoutButtonIsAvailable()
         {
-            // Login
-            DashboardPage dashboardPage = _loginPage.PerformLogin(VALID_EMAIL, VALID_PASSWORD);
+            LogStep(1, $"Logging in with user: {VALID_EMAIL}");
+            loginPage.PerformLogin(VALID_EMAIL, VALID_PASSWORD);
+            LogSuccess(1, "Login credentials submitted.");
 
-            wait.Until(d => dashboardPage.IsDashboardDisplayed());
+            LogStep(2, "Waiting for dashboard to load...");
+            wait.Until(d => dashboardPage.IsLogoutButtonDisplayed());
+            LogSuccess(2, "Dashboard loaded.");
 
-            // ASSERT: Logout button available
+            LogStep(3, "Verifying logout button visibility...");
             Assert.IsTrue(dashboardPage.IsLogoutButtonDisplayed(), "ERROR: The logout button is not available on the Dashboardpage");
+            LogSuccess(3, "Logout button is present and visible.");
         }
 
         [TestMethod]
         public void TC_1_20_2_NoAccessViaRouteAfterLoggingOut()
         {
-            // Login
-            DashboardPage dashboardPage = _loginPage.PerformLogin(VALID_EMAIL, VALID_PASSWORD);
+            LogStep(1, "Logging in and waiting for dashboard...");
+            loginPage.PerformLogin(VALID_EMAIL, VALID_PASSWORD);
+            wait.Until(d => dashboardPage.IsLogoutButtonDisplayed());
+            LogSuccess(1, "Authentication successful.");
 
-            wait.Until(d => dashboardPage.IsDashboardDisplayed());
-
-            // Logout
-            Console.WriteLine("LOG: Clicking the logout button");
+            LogStep(2, "Clicking the logout button...");
             dashboardPage.ClickLogout();
+            LogSuccess(2, "Logout command executed.");
 
-            Console.WriteLine("LOG: Trying to navigate to the dashboard via routing");
-            var testDashboard = new DashboardPage(_driver);
-            testDashboard.NavigateToDashboard();
+            LogStep(3, "Attempting to navigate back to dashboard via URL routing...");
+            dashboardPage.Navigate();
+            LogInfo($"Current URL: {driver.Url}");
 
-            // ASSERT: No access to Dashboard via routing
-            Assert.IsFalse(testDashboard.IsDashboardDisplayed(), "ERROR: Dashboard was accessible via routing");
+            LogStep(4, "Verifying access is denied...");
+            Assert.IsFalse(dashboardPage.IsLogoutButtonDisplayed(), "ERROR: Dashboard was accessible via routing");
+            LogSuccess(4, "Access denied. User is not on the dashboard.");
         }
 
         [TestMethod]
         public void TC_1_20_3_NoAccessNavigatingBackAfterLoggingOut()
         {
-            // Login
-            DashboardPage dashboardPage = _loginPage.PerformLogin(VALID_EMAIL, VALID_PASSWORD);
+            LogStep(1, "Performing login...");
+            loginPage.PerformLogin(VALID_EMAIL, VALID_PASSWORD);
+            wait.Until(d => dashboardPage.IsLogoutButtonDisplayed());
+            LogSuccess(1, "Session established.");
 
-            wait.Until(d => dashboardPage.IsDashboardDisplayed());
-
-            // Logout
-            Console.WriteLine("LOG: Clicking the logout button");
+            LogStep(2, "Logging out of the application...");
             dashboardPage.ClickLogout();
+            LogSuccess(2, "Session terminated.");
 
-            // Navigate back
-            Console.WriteLine("LOG: Trying to navigate back");
-            _driver.Navigate().Back();
+            LogStep(3, "Attempting to navigate back using browser history...");
+            driver.Navigate().Back();
+            LogInfo("Browser 'Back' command sent.");
 
-            var currentDashboardState = new DashboardPage(_driver);
-
-            // ASSERT: Dashboard is not displayed after navigating back
-            Assert.IsFalse(currentDashboardState.IsDashboardDisplayed(),
-                "ERROR: Dashboard was accessible via navigating back");
+            LogStep(4, "Verifying dashboard is not displayed...");
+            Assert.IsFalse(dashboardPage.IsLogoutButtonDisplayed(), "ERROR: Dashboard was accessible via navigating back");
+            LogSuccess(4, "Access blocked. Browser history navigation does not restore the session.");
         }
 
         [TestMethod]
         public void TC_1_20_4_UserRedirectedToLoginPageAfterLoggingOut()
         {
-            // Login
-            DashboardPage dashboardPage = _loginPage.PerformLogin(VALID_EMAIL, VALID_PASSWORD);
+            LogStep(1, "Logging in to verify redirect behavior...");
+            loginPage.PerformLogin(VALID_EMAIL, VALID_PASSWORD);
+            wait.Until(d => dashboardPage.IsLogoutButtonDisplayed());
+            LogSuccess(1, "Authenticated.");
 
-            wait.Until(d => dashboardPage.IsDashboardDisplayed());
-
-            // Logout
-            Console.WriteLine("LOG: Clicking the logout button");
+            LogStep(2, "Clicking the logout button...");
             dashboardPage.ClickLogout();
+            LogSuccess(2, "Logout clicked.");
 
-            // ASSERT: User redirected to Loginpage
-            Assert.AreEqual(LoginPage.Url, _driver.Url, "ERROR: After logging out the user is not redirected to the Login page");
-        }
+            LogStep(3, "Waiting for automatic redirect to login page...");
+            wait.Until(d => loginPage.IsPasswordInputDisplayed());
+            LogInfo($"Redirected to: {driver.Url}");
 
-        [TestCleanup]
-        public void Teardown()
-        {
-            try
-            {
-                _driver?.Quit();
-                _driver?.Dispose();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error during teardown: {ex}");
-            }
-            finally
-            {
-                _driver = null!;
-            }
+            LogStep(4, "Verifying login page presence...");
+            Assert.IsTrue(loginPage.IsPasswordInputDisplayed(), "ERROR: After logging out the user is not redirected to the Login page");
+            LogSuccess(4, "User successfully redirected to the login page.");
         }
     }
 }

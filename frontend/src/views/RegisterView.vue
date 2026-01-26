@@ -20,20 +20,20 @@
 
         <!-- Straatnaam -->
         <div class="register-view-form-group">
-          <label for="street">Straatnaam:</label>
-          <input type="text" id="street" v-model="streetName" placeholder="Dicklaanstraat" />
+          <label for="streetname">Straatnaam:</label>
+          <input type="text" id="streetname" v-model="streetName" placeholder="Dicklaanstraat" />
         </div>
 
         <!-- Huisnummer -->
         <div class="register-view-form-group">
-          <label for="houseNumber">Huisnummer:</label>
-          <input type="text" id="houseNumber" v-model="houseNumber" placeholder="73A" />
+          <label for="housenumber">Huisnummer:</label>
+          <input type="text" id="housenumber" v-model="houseNumber" placeholder="73A" />
         </div>
 
         <!-- Postcode -->
         <div class="register-view-form-group">
-          <label for="postalCode">Postcode:</label>
-          <input type="text" minlength="6" maxlength="6" id="postalCode" v-model="postalCode" placeholder="1939AD"  />
+          <label for="postalcode">Postcode:</label>
+          <input type="text" minlength="6" maxlength="6" id="postalcode" v-model="postalCode" placeholder="1939AD"  />
         </div>
 
         <!-- BSN -->
@@ -70,11 +70,11 @@
 
         <!-- Telefoon -->
         <div class="register-view-form-group">
-          <label for="phone">Telefoonnummer:</label>
+          <label for="phonenumber">Telefoonnummer:</label>
           <input type="text" 
             minlength="10" 
             maxlength="10" 
-            id="phone" 
+            id="phonenumber" 
             v-model="phoneNumber" 
             placeholder="0630569461" 
             @input="phoneNumber = phoneNumber.replace(/\D/g, '')"
@@ -84,8 +84,8 @@
         <!-- Huisarts -->
         <div v-if="loading || !doctors">Huisartsen aan het ophalen...</div>
         <div v-else class="register-view-form-group">
-          <label for="doctor">Huisarts:</label>
-          <select id="doctor" v-model="doctor">
+          <label for="gp-id">Huisarts:</label>
+          <select id="gp-id" v-model="doctor">
             <option value="">Selecteer huisarts</option>
             <option v-for="doctor in doctors" :key="doctor.id" :value="doctor.id">
               Dr. {{ doctor.firstName }} {{ doctor.lastName }}
@@ -106,15 +106,15 @@
         </div>
 
         <!-- Foutmeldingen -->
-        <p v-if="emptyError" class="error-text">Alle velden moeten ingevuld zijn.</p>
-        <p v-if="registerError" class="error-text">{{ registerErrorMessage }}</p>
-        <p v-if="registerSuccess" class="success-text">{{ registerSuccess }}</p>
+        <p v-if="emptyError" id="error-message" class="error-text">Alle velden moeten ingevuld zijn.</p>
+        <p v-if="registerError" id="error-message" class="error-text">{{ registerErrorMessage }}</p>
+        <p v-if="registerSuccess" id="error-message" class="success-text">{{ registerSuccess }}</p>
 
-        <button type="submit" :disabled="isSubmitting">
+        <button id="register-btn" type="submit" :disabled="isSubmitting">
           {{ isSubmitting ? 'Bezig met registreren...' : 'Registreren' }}
         </button>
 
-        <div class="login-link">
+        <div id="login-link" class="login-link">
           <p>Heb je al een account? <button type="button" @click="goToLogin">Inloggen</button></p>
         </div>
 

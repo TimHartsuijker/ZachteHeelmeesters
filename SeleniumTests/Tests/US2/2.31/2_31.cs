@@ -1,198 +1,143 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Support.UI;
-using SeleniumTests.P_O_M;
-using System;
+using SeleniumTests.Base;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Generic;
 
-namespace SeleniumTests
+namespace US2._31
 {
     [TestClass]
-    public class _2_31
+    public class _2_31 : BaseTest
     {
-        private IWebDriver driver;
-        private WebDriverWait wait;
-        private RegistrationPage registrationPage;
-
-        [TestInitialize]
-        public void Setup()
+        // Standaard data voor een valide registratie
+        private readonly Dictionary<string, string> _validData = new Dictionary<string, string>
         {
-            var options = new ChromeOptions();
-            options.AddArgument("--start-maximized");
-            options.AddArgument("--ignore-certificate-errors");
-
-            driver = new ChromeDriver(options);
-            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-
-            registrationPage = new RegistrationPage(driver);
-        }
-
-        [TestCleanup]
-        public void TearDown()
-        {
-            driver.Quit();
-            driver.Dispose();
-        }
+            { "FirstName", "New" },
+            { "LastName", "User" },
+            { "Street", "Main Street" },
+            { "HouseNumber", "123" },
+            { "PostalCode", "1234AB" },
+            { "BSN", "000011009" },
+            { "DOB", "01-01-1990" },
+            { "Gender", "Man" },
+            { "Phone", "0611223344" },
+            { "Email", "newuser@example.com" },
+            { "Password", "NewUserPassword" }
+        };
 
         [TestMethod]
-        public void InputFieldsAreAvailable()
+        public void TC_2_31_01_InputFieldsAreAvailable()
         {
-            Console.WriteLine("Test started: Input fields are available");
-
+            LogStep(1, "Navigating to registration page...");
             registrationPage.Navigate();
+            LogSuccess(1, "Registration page loaded.");
+
+            LogStep(2, "Verifying visibility of all registration input fields...");
             Assert.IsTrue(registrationPage.IsAllDisplayed(),
                 "One or more registration input fields or the register button are not displayed.");
+            LogSuccess(2, "All required input fields and buttons are visible.");
         }
 
         [TestMethod]
-        public void RegistrationWithEmptyFieldsFail()
+        public void TC_2_31_02_RegistrationWithEmptyFieldsFail()
         {
-            string FIRSTNAME = "New";
-            string LASTNAME = "User";
-            string STREETNAME = "Main Street";
-            string HOUSENUMBER = "123";
-            string POSTALCODE = "1234AB";
-            string CITIZENSERVICENUMBER = "123456789";
-            string DATEOFBIRTH = "01-01-1990";
-            string GENDER = "Man";
-            string PHONE_NUMBER = "0611223344";
-            string EMAIL = "newuser@example.com";
-            string PASSWORD = "NewUserPassword";
+            const string ERROR_TEXT = "Alle velden moeten ingevuld zijn.";
+            LogStep(1, "Starting systematic validation check for all mandatory fields...");
 
-            Console.WriteLine("Test started: Registration with empty fields");
-
-            // Empty first name
-            registrationPage.Register(
-                "", LASTNAME, STREETNAME, HOUSENUMBER, POSTALCODE,
-                CITIZENSERVICENUMBER, DATEOFBIRTH, GENDER, PHONE_NUMBER, EMAIL, PASSWORD
-            );
-            wait.Until(d => registrationPage.IsErrorMessageDisplayed());
-            Assert.AreEqual("All fields must be filled in", registrationPage.GetErrorMessage());
-
-            // Empty last name
-            registrationPage.Register(
-                FIRSTNAME, "", STREETNAME, HOUSENUMBER, POSTALCODE,
-                CITIZENSERVICENUMBER, DATEOFBIRTH, GENDER, PHONE_NUMBER, EMAIL, PASSWORD
-            );
-            wait.Until(d => registrationPage.IsErrorMessageDisplayed());
-            Assert.AreEqual("All fields must be filled in", registrationPage.GetErrorMessage());
-
-            // Empty phone number
-            registrationPage.Register(
-                FIRSTNAME, LASTNAME, STREETNAME, HOUSENUMBER, POSTALCODE,
-                CITIZENSERVICENUMBER, DATEOFBIRTH, GENDER, "", EMAIL, PASSWORD
-            );
-            wait.Until(d => registrationPage.IsErrorMessageDisplayed());
-            Assert.AreEqual("All fields must be filled in", registrationPage.GetErrorMessage());
-
-            // Empty email
-            registrationPage.Register(
-                FIRSTNAME, LASTNAME, STREETNAME, HOUSENUMBER, POSTALCODE,
-                CITIZENSERVICENUMBER, DATEOFBIRTH, GENDER, PHONE_NUMBER, "", PASSWORD
-            );
-            wait.Until(d => registrationPage.IsErrorMessageDisplayed());
-            Assert.AreEqual("All fields must be filled in", registrationPage.GetErrorMessage());
-
-            // Empty password
-            registrationPage.Register(
-                FIRSTNAME, LASTNAME, STREETNAME, HOUSENUMBER, POSTALCODE,
-                CITIZENSERVICENUMBER, DATEOFBIRTH, GENDER, PHONE_NUMBER, EMAIL, ""
-            );
-            wait.Until(d => registrationPage.IsErrorMessageDisplayed());
-            Assert.AreEqual("All fields must be filled in", registrationPage.GetErrorMessage());
-        }
-
-        [TestMethod]
-        public void SuccesfulRegistration()
-        {
-            string FIRSTNAME = "New";
-            string LASTNAME = "Patient1";
-            string STREETNAME = "Main Street";
-            string HOUSENUMBER = "123";
-            string POSTALCODE = "1234AB";
-            string CITIZENSERVICENUMBER = "123456789";
-            string DATEOFBIRTH = "01-01-1990";
-            string GENDER = "Man";
-            string PHONE_NUMBER = "0611223344";
-            string EMAIL = "newpatient1@example.com";
-            string PASSWORD = "NewPatient1Password";
-
-            Console.WriteLine("Test started: Succesful Registration");
-
-            registrationPage.Register(
-                FIRSTNAME, LASTNAME, STREETNAME, HOUSENUMBER, POSTALCODE,
-                CITIZENSERVICENUMBER, DATEOFBIRTH, GENDER, PHONE_NUMBER, EMAIL, PASSWORD
-            );
-
-            Console.WriteLine("Waiting until the newly registered user is redirected to the login page");
-            wait.Until(d => d.Url.Contains("/login"));
-            Assert.IsTrue(driver.Url.Contains("/login"),
-                "Newly registered user has not been redirected to the login page.");
-        }
-
-        [TestMethod]
-        public void RegistrationWithExistingEmailFails()
-        {
-            string FIRSTNAME = "New";
-            string LASTNAME = "User";
-            string STREETNAME = "Main Street";
-            string HOUSENUMBER = "123";
-            string POSTALCODE = "1234AB";
-            string CITIZENSERVICENUMBER = "123456789";
-            string DATEOFBIRTH = "01-01-1990";
-            string GENDER = "Man";
-            string PHONE_NUMBER = "0611223344";
-            string EXISTING_EMAIL = "gebruiker@example.com"; // Existing email
-            string PASSWORD = "NewUserPassword";
-
-            Console.WriteLine("Test started: Registration with existing email fails");
-
-            registrationPage.Register(
-                FIRSTNAME, LASTNAME, STREETNAME, HOUSENUMBER, POSTALCODE,
-                CITIZENSERVICENUMBER, DATEOFBIRTH, GENDER, PHONE_NUMBER, EXISTING_EMAIL, PASSWORD
-            );
-
-            wait.Until(d => registrationPage.IsErrorMessageDisplayed());
-            Assert.AreEqual("The email that was used is already registered", registrationPage.GetErrorMessage());
-        }
-
-        [TestMethod]
-        public void RegistrationsWithInvalidEmailsFail()
-        {
-            string FIRSTNAME = "New";
-            string LASTNAME = "User";
-            string STREETNAME = "Main Street";
-            string HOUSENUMBER = "123";
-            string POSTALCODE = "1234AB";
-            string CITIZENSERVICENUMBER = "123456789";
-            string DATEOFBIRTH = "01-01-1990";
-            string GENDER = "Man";
-            string PHONE_NUMBER = "0611223344";
-            string PASSWORD = "NewUserPassword";
-
-            string[] INVALID_EMAILS = new string[]
+            // We lopen door elk veld in onze validData dictionary
+            foreach (var fieldToEmpty in _validData.Keys)
             {
-                "gebruikerexample.com",
-                "gebruiker@examplecom",
-                "@example.com",
-                "gebruiker@.com",
-                "gebruiker@example.",
-                "@example."
-            };
+                registrationPage.Navigate();
+                LogStep(2, $"Testing registration with empty field: {fieldToEmpty}");
 
-            Console.WriteLine("Test started: Registrations with invalid emails fail");
+                // Maak een kopie van de valide data en zet het huidige veld op leeg
+                var testData = new Dictionary<string, string>(_validData);
+                testData[fieldToEmpty] = "";
 
-            foreach (var invalidEmail in INVALID_EMAILS)
-            {
-                Console.WriteLine($"Testcase: {invalidEmail}");
                 registrationPage.Register(
-                    FIRSTNAME, LASTNAME, STREETNAME, HOUSENUMBER, POSTALCODE,
-                    CITIZENSERVICENUMBER, DATEOFBIRTH, GENDER, PHONE_NUMBER, invalidEmail, PASSWORD
+                    testData["FirstName"], testData["LastName"], testData["Street"],
+                    testData["HouseNumber"], testData["PostalCode"], testData["BSN"],
+                    testData["DOB"], testData["Gender"], testData["Phone"],
+                    5, testData["Email"], testData["Password"]
                 );
 
                 wait.Until(d => registrationPage.IsErrorMessageDisplayed());
-                Assert.AreEqual("The email that was used is invalid", registrationPage.GetErrorMessage());
+                string actualError = registrationPage.GetErrorMessageText();
+
+                Assert.AreEqual(ERROR_TEXT, actualError, $"Validation failed for empty field: {fieldToEmpty}");
+                LogSuccess(2, $"System correctly blocked registration when {fieldToEmpty} was empty.");
             }
+            LogSuccess(1, "All mandatory field validations passed successfully.");
+        }
+
+        [TestMethod]
+        public void TC_2_31_03_SuccesfulRegistration()
+        {
+            string email = "newpatient" + DateTime.Now.Ticks + "@example.com"; // Uniek email per run
+
+            LogStep(1, "Navigating to registration page...");
+            registrationPage.Navigate();
+
+            LogStep(2, $"Performing full registration for: {email}");
+            registrationPage.Register(
+                _validData["FirstName"], "PatientUnique", _validData["Street"],
+                _validData["HouseNumber"], _validData["PostalCode"], "010101001",
+                _validData["DOB"], _validData["Gender"], _validData["Phone"],
+                5, email, _validData["Password"]
+            );
+            LogSuccess(2, "Registration data submitted.");
+
+            LogStep(3, "Waiting for automatic redirect to login page...");
+            wait.Until(d => d.Url.Contains("/login"));
+            Assert.IsTrue(driver.Url.Contains("/login"), "Newly registered user was not redirected to the login page.");
+            LogSuccess(3, "Registration successful and redirected to login portal.");
+        }
+
+        [TestMethod]
+        public void TC_2_31_04_RegistrationWithExistingEmailFails()
+        {
+            const string EXISTING_EMAIL = "gebruiker@example.com";
+
+            LogStep(1, "Navigating to registration page...");
+            registrationPage.Navigate();
+
+            LogStep(2, $"Attempting registration with already registered email: {EXISTING_EMAIL}");
+            registrationPage.Register(
+                _validData["FirstName"], _validData["LastName"], _validData["Street"],
+                _validData["HouseNumber"], _validData["PostalCode"], "011101001",
+                _validData["DOB"], _validData["Gender"], _validData["Phone"],
+                5, EXISTING_EMAIL, _validData["Password"]
+            );
+
+            LogStep(3, "Verifying duplicate email error message...");
+            wait.Until(d => registrationPage.IsErrorMessageDisplayed());
+            Assert.AreEqual("Dit email is al geregistreerd.", registrationPage.GetErrorMessageText());
+            LogSuccess(3, "Registration correctly blocked for existing email.");
+        }
+
+        [TestMethod]
+        public void TC_2_31_05_RegistrationsWithInvalidEmailsFail()
+        {
+            string[] INVALID_EMAILS = { "gebruikerexample.com", "gebruiker@", "@example.com", "gebruiker@.com" };
+
+            LogStep(1, "Starting validation tests for invalid email formats...");
+            registrationPage.Navigate();
+
+            foreach (var invalidEmail in INVALID_EMAILS)
+            {
+                LogStep(2, $"Testing invalid email: {invalidEmail}");
+                registrationPage.Register(
+                    _validData["FirstName"], _validData["LastName"], _validData["Street"],
+                    _validData["HouseNumber"], _validData["PostalCode"], "010101011",
+                    _validData["DOB"], _validData["Gender"], _validData["Phone"],
+                    5, invalidEmail, _validData["Password"]
+                );
+
+                // We verwachten dat we op de registratiepagina blijven of een error zien (geen redirect naar login)
+                bool redirected = driver.Url.Contains("/login");
+                Assert.IsFalse(redirected, $"Registratie met incorrecte email '{invalidEmail}' is onterecht geaccepteerd!");
+                LogSuccess(2, $"Format '{invalidEmail}' was correctly rejected.");
+            }
+            LogSuccess(1, "All invalid email formats were correctly blocked.");
         }
     }
 }

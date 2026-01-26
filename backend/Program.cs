@@ -1,19 +1,18 @@
-using backend.Data;
+﻿using backend.Data;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// 1. Database Context registreren
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Add services to the container.
+// 2. Controllers en API tools
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Add session services
+// 4. Session & Cache services
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -27,47 +26,61 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("frontend", builder =>
     {
-        builder.WithOrigins("http://localhost")
-               .AllowAnyMethod()
-               .AllowAnyHeader()
-               .AllowCredentials();
+        builder.WithOrigins(
+                "http://localhost",
+                "http://localhost:5173",
+                "http://127.0.0.1:5173")
+               .AllowAnyMethod();
     });
 });
 
 // App bouwen
 var app = builder.Build();
 
-// MIGRATIONS + SEEDING (NA Build, VOOR Run)
-try
+// 5. MIGRATIONS + SEEDING (NA Build, VOOR Run)
+using (var scope = app.Services.CreateScope())
 {
-    using (var scope = app.Services.CreateScope())
+    var services = scope.ServiceProvider;
+    try
     {
-        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var context = services.GetRequiredService<AppDbContext>();
+
+        // Voer migraties uit
         context.Database.Migrate();
+
+        // Seed basis data (Rollen, etc.)
         DbSeederStatic.Seed(context);
+
+        // Seed test data alleen in Development mode
         if (app.Environment.IsDevelopment())
         {
-            DbSeederTest.Seed(context);
+            try { DbSeederTest.Seed(context); }
+            catch (Exception ex) { Console.WriteLine($"[Seeder] Test users failed: {ex.Message}"); }
+
+            try { DbSeederMedicalFiles.Seed(context); }
+            catch (Exception ex) { Console.WriteLine($"[Seeder] Medical files failed: {ex.Message}"); }
         }
     }
-}
-catch (Exception ex)
-{
-    Console.WriteLine($"FOUT BIJ MIGRATIE: {ex.Message}");
+    catch (Exception ex)
+    {
+        Console.WriteLine($"FOUT BIJ MIGRATIE/SEEDING: {ex.Message}");
+    }
 }
 
+// 6. Middleware Pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
+// BELANGRIJK: De volgorde van middleware is essentieel!
 app.UseCors("frontend");
-
 app.UseSession();
 
 app.UseAuthorization();
-app.UseAuthentication();
+
+app.UseAuthorization();
 
 app.MapControllers();
 

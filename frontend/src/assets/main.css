@@ -1,9 +1,36 @@
+@import "tailwindcss";
+
+@theme {
+  --color-green-lightest: #ECFAE5;
+  --color-green-light: #DDF6D2;
+  --color-green: #CAE8BD;
+  --color-green-dark: #B0DB9C;
+  --color-green-darkest: #88C070;
+
+  --color-gray-light: #EEEEEE;
+  --color-gray-default: #DDDDDD;
+  --color-gray-dark: #BBBBBB;
+}
+
+body {
+  background-color: #ECFAE5;
+  margin: 0;
+  padding: 0;
+}
+
+#app {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #ECFAE5;
+}
+
+/* LoginView Styling */
 /* LoginView.css of in <style scoped> */
 .login-view-page {
   display: flex;
-  justify-content: center; /* horizontaal centreren */
-  align-items: center;     /* verticaal centreren */
-  height: 100vh;           /* hele viewport hoogte */
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
@@ -25,7 +52,6 @@
 
 .login-view-form-group {
   display: flex;
-  
   flex-direction: column;
   margin-bottom: 1rem;
   text-align: left;
@@ -39,16 +65,22 @@
 
 .login-view-form-group input {
   padding: 0.5rem 0.75rem;
-  border: 1px solid #B0DB9C23;
+  border: 1px solid #B0DB9C;
   border-radius: 6px;
   font-size: 1rem;
-  background: #B0DB9C;
+  background: #FFFFFF;
+  color: #333;
   transition: border 0.3s;
 }
 
 .login-view-form-group input:focus {
   outline: none;
   border-color: #00a676;
+  background: #FFFFFF;
+}
+
+.login-view-form-group input::placeholder {
+  color: #999;
 }
 
 button[type="submit"] {
@@ -65,18 +97,25 @@ button[type="submit"] {
 }
 
 button[type="submit"]:hover {
-  background-color: #00855f;
+  background-color: #007a0a;
 }
 
-
 .error-text {
-  color: red;
+  color: #d32f2f;
   margin-top: 5px;
+  font-size: 0.9rem;
 }
 
 .success-text {
-  color: green;
+  color: #388e3c;
   margin-top: 5px;
+  font-size: 0.9rem;
+}
+
+@media (hover: hover) {
+  a:hover {
+    background-color: hsla(160, 100%, 37%, 0.2);
+  }
 }
 .admin-login-link {
     margin-top: 16px;       /* ruimte boven de knop */
@@ -181,6 +220,18 @@ admin-dashboard-page {
 
 .nav-center-buttons button:hover {
   background-color: #f0f0f0;
+}
+
+.router-link-active {
+  background-color: #B0DB9C;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.router-link-exact-active {
+  font-weight: bold;
+  border-bottom: 2px solid #2e7d32; 
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
 }
 
 /* Logout knop rechts */
@@ -364,6 +415,138 @@ admin-dashboard-page {
   color: #d32f2f;
 }
 
+.referral-view-page {
+  display: flex;
+  justify-content: center; /* horizontaal centreren */
+  align-items: center;     /* verticaal centreren */
+  height: 100vh;           /* hele viewport hoogte */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.referral-view-card {
+  background: #DDF6D2;
+  padding: 2.5rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.referral-view-form-group {
+  display: flex;
+  
+  flex-direction: column;
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.referral-view-form-group label {
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #555;
+}
+
+.referral-view-form-group input {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #B0DB9C23;
+  border-radius: 6px;
+  font-size: 1rem;
+  background: #B0DB9C;
+  transition: border 0.3s;
+}
+
+.referral-view-form-group input:focus {
+  outline: none;
+  border-color: #00a676;
+}
+
+.referral-view-form-group select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #B0DB9C23;
+  border-radius: 6px;
+  font-size: 1rem;
+  background: #B0DB9C;
+  transition: border 0.3s;
+}
+
+.referral-view-form-group select:focus {
+  outline: none;
+  border-color: #00a676;
+}
+
+button[type="submit"] {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #00960c;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 15px;
+  transition: background-color 0.3s;
+}
+
+.referrals-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  padding: 20px;
+}
+
+.referrals-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  max-width: 1000px;
+  width: 100%;
+}
+
+h1 {
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.loading, .error, .no-referrals {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+}
+
+.error {
+  color: #d32f2f;
+}
+
+.referrals-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.referrals-table th,
+.referrals-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.referrals-table th {
+  background-color: #f5f5f5;
+  font-weight: 600;
+  color: #333;
+}
+
+.referrals-table tr:hover {
+  background-color: #f9f9f9;
+}
+
+button[type="submit"]:hover {
+  background-color: #00855f;
+}
+
 /* color palette from <https://github.com/vuejs/theme> */
 :root {
   --vt-c-white: #ffffff;
@@ -437,4 +620,43 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+/* Admin Create User Styling */
+.create-user-form {
+  width: 100%;
+}
+
+.form-section {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid #dee2e6;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #495057;
+}
+
+.required-field::after {
+  content: " *";
+  color: #dc3545;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+  padding: 0.5rem 1.5rem;
+  font-size: 1rem;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
 }

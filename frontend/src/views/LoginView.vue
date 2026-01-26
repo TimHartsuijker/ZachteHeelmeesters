@@ -32,7 +32,7 @@
 
         <button type="submit" id="login-btn">Login</button>
         <div class="admin-login-link">
-            <RouterLink class="admin-login-link" to="/admin/login" aria-current="admin-login link">Inloggen als beheerder</RouterLink>
+            <RouterLink id="admin-login-link" class="admin-login-link" to="/admin/login" aria-current="admin-login link">Inloggen als beheerder</RouterLink>
         </div>
 
         <div class="register-link">
@@ -90,35 +90,91 @@ const login = async () => {
 
       // Sessie opslaan
       sessionStorage.setItem("isLoggedIn", "true");
-      sessionStorage.setItem("userId", userData.id);
-      sessionStorage.setItem("userEmail", userData.email);
-      sessionStorage.setItem("userName", `${userData.firstName} ${userData.lastName}`);
-      sessionStorage.setItem("userRole", userData.role);
+      if (userData?.id) {
+        sessionStorage.setItem("userId", String(userData.id));
+      }
+      if (userData?.role) {
+        sessionStorage.setItem("userRole", userData.role);
+      }
 
-      // Redirect op basis van rol
-      switch (userData.role) {
+      // ✅ CORRECTE REDIRECT OP BASIS VAN ROL
+      switch (userData?.role) {
         case "Specialist":
-          router.push("/agenda");
+          router.push("/patienten");
           break;
         case "Huisarts":
-          router.push("/agenda");
+          router.push("/patienten");
           break;
-        default:
+        case "Administratiemedewerker":
+          router.push("/administratie/accounts");
+          break;
+        case "Admin":
+          router.push("/admin/dashboard");
+          break;
+        default: // Patiënt
           router.push("/dashboard");
           break;
       }
     }
   } catch (error) {
-    console.error("Full error:", error);
-    
-    if (error.response?.data?.message) {
-      loginErrorMessage.value = error.response.data.message;
-    } else {
-      loginErrorMessage.value = error.message || "Er is iets misgegaan bij het inloggen.";
-    }
+    // Als de error is "Gebruik de admin login pagina", probeer dan admin login
+    if (error.response?.status === 401 && 
+        error.response?.data?.message === "Gebruik de admin login pagina") {
+      
+      // Probeer via admin login (voor het geval iemand per ongeluk hier probeert)
+      try {
+        const adminResponse = await axios.post("/api/login/admin", {
+          email: email.value,
+          wachtwoord: wachtwoord.value,
+        }, {
+          withCredentials: true
+        });
 
-    loginError.value = true;
+        if (adminResponse.status === 200) {
+          const userData = adminResponse.data.user;
+          console.log("Admin login gelukt!", userData);
+
+          // Sessie opslaan
+          sessionStorage.setItem("isLoggedIn", "true");
+          if (userData?.id) {
+            sessionStorage.setItem("userId", String(userData.id));
+          }
+          if (userData?.role) {
+            sessionStorage.setItem("userRole", userData.role);
+          }
+
+          // Redirect voor admin rollen
+          if (userData?.role === "Admin") {
+            router.push("/admin/dashboard");
+          } else if (userData?.role === "Administratiemedewerker") {
+            router.push("/administratie/accounts");
+          }
+        }
+      } catch (adminError) {
+        handleLoginError(adminError);
+      }
+    } else {
+      handleLoginError(error);
+    }
   }
 };
-</script>
 
+// Helper functie voor error handling
+const handleLoginError = (error) => {
+  console.error("Login error details:", {
+    message: error.message,
+    status: error.response?.status,
+    data: error.response?.data,
+  });
+
+  if (error.response?.data?.message) {
+    loginErrorMessage.value = error.response.data.message;
+  } else if (error.code === 'ERR_NETWORK') {
+    loginErrorMessage.value = "Verbindingsfout met server. Zorg dat de backend draait";
+  } else {
+    loginErrorMessage.value = "Er is iets misgegaan bij het inloggen.";
+  }
+
+  loginError.value = true;
+};
+</script>

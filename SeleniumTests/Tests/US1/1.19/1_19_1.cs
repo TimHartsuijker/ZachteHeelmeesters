@@ -1,78 +1,46 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Support.UI;
-using SeleniumTests.P_O_M;
-using System;
+using SeleniumTests.Base;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace SeleniumTests
+namespace US1._19
 {
     [TestClass]
-    public class _1_19_1
+    public class _1_19_1 : BaseTest
     {
-        private IWebDriver driver;
-        private WebDriverWait wait;
-        private string baseUrl = "http://localhost"; 
-
-        private LoginPage loginPage;
-
-        [TestInitialize]
-        public void Setup()
-        {
-            var options = new ChromeOptions();
-            options.AddArgument("--start-maximized");
-            options.AddArgument("--ignore-certificate-errors");
-
-            driver = new ChromeDriver(options);
-            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-
-            loginPage = new LoginPage(driver);
-        }
-
-        [TestCleanup]
-        public void Cleanup()
-        {
-            driver.Quit();
-            driver.Dispose();
-        }
-
         [TestMethod]
         public void TC_1_19_1_EmailInputIsPresentAndAcceptsInput()
         {
+            const string TEST_EMAIL = "test@example.com";
 
-            Console.WriteLine("Test gestart: TC_1_19_1_EmailInputIsPresentAndAcceptsInput");
+            // Stap 1: Navigatie
+            LogStep(1, "Navigating to login page...");
+            loginPage.Navigate();
+            LogSuccess(1, "Login page loaded successfully.");
 
-            Console.WriteLine("Navigeren naar loginpagina...");
-            driver.Navigate().GoToUrl($"{baseUrl}/");
-            Console.WriteLine("Navigatie voltooid!");
+            // Stap 2: Zichtbaarheid controleren
+            LogStep(2, "Verifying if email input field is visible...");
+            wait.Until(d => loginPage.IsEmailInputDisplayed());
+            Assert.IsTrue(loginPage.IsEmailInputDisplayed(), "Het e-mailadres veld is niet zichtbaar.");
+            LogSuccess(2, "Email input field is visible.");
 
-            
-            Console.WriteLine("Controleren of emailveld zichtbaar is...");
-            wait.Until(drv => loginPage.IsEmailFieldDisplayed());
-            Assert.IsTrue(loginPage.IsEmailFieldDisplayed(),
-                "Het e-mailadres veld is niet zichtbaar.");
-            Console.WriteLine("Emailveld is zichtbaar!");
+            // Stap 3: Focus/Klikken
+            LogStep(3, "Selecting email input field...");
+            loginPage.ClickEmailInput();
 
-          
-            Console.WriteLine("Emailveld selecteren...");
-            var emailField = driver.FindElement(By.Id("email"));
-            emailField.Click();
-            Console.WriteLine("Emailveld aangeklikt.");
+            Assert.IsTrue(loginPage.IsEmailInputFocused(), "Het e-mailadres veld kan geen focus krijgen.");
+            LogSuccess(3, "Email input field clicked and focused.");
 
-            Assert.IsTrue(emailField.Equals(driver.SwitchTo().ActiveElement()),
-                "Het e-mailadres veld kan geen focus krijgen.");
-            Console.WriteLine("Emailveld heeft focus.");
+            // Stap 4: Tekst invoer
+            LogStep(4, $"Entering email address: {TEST_EMAIL}");
+            loginPage.EnterEmail(TEST_EMAIL);
 
-            // Tekst invoeren
-            string testEmail = "test@example.com";
-            Console.WriteLine($"Email invoeren: {testEmail}");
-            loginPage.EnterEmail(testEmail);
+            Assert.AreEqual(TEST_EMAIL, loginPage.GetEmailInputValue(), "Het e-mailadres veld accepteert geen tekst.");
+            LogSuccess(4, "Email correctly entered and verified.");
 
-            Assert.AreEqual(testEmail, emailField.GetAttribute("value"),
-                "Het e-mailadres veld accepteert geen tekst.");
-            Console.WriteLine("Email correct ingevoerd!");
-
-            Console.WriteLine("Test succesvol afgerond.");
+            // Optionele extra info
+            LogStep(5, "Final verification of input state...");
+            LogInfo($"Verified value: {loginPage.GetEmailInputValue()}");
+            LogSuccess(5, "Input verification complete.");
         }
     }
 }
